@@ -4,7 +4,164 @@
    2) leaflet.heat plugin
    3) Chart.js 4.x
    CDNs: Leaflet/leaflet.heat/Chart.js official links. */
+// --- BOOTSTRAP: render the HTML so EF doesn't have to save a huge block ---
+(function bootstrapMarkup(){
+  const root = document.getElementById('saday');
+  if (!root || root.children.length) return;
+  root.classList.add('saday');
+  root.innerHTML = `
+  <!-- Header & counters -->
+  <div class="row">
+    <div class="title">THE NUKES — <span id="dayLabel">Day ?</span> <span class="muted">Start gate</span></div>
+    <div class="chip"><span>🔥 Streak:</span><span id="streakCount">0</span></div>
+    <div class="chip"><span>🧊 Freezes:</span><span id="freezeCount">0</span></div>
+  </div>
 
+  <!-- ADHD Tip -->
+  <div class="card">
+    <div class="row" style="justify-content:space-between">
+      <div>
+        <div class="muted small">Real ADHD tip of the session</div>
+        <div id="adhdTip" style="font-weight:800; font-size:16px; margin-top:6px;">Make the ugly version. Shipping > perfection.</div>
+      </div>
+      <button id="newTip" class="btn-secondary" aria-label="New tip">♻️ New</button>
+    </div>
+  </div>
+
+  <!-- Start latency + primary actions -->
+  <div class="card">
+    <div class="row" style="justify-content:space-between">
+      <div>
+        <div class="muted small">You’ve got 7:00 to lock in. Don’t stall.</div>
+        <div class="flip" id="latencyCountdown">07:00</div>
+        <div class="muted small">Task start latency: <span id="latencyMs" class="stat">—</span></div>
+      </div>
+      <div class="row">
+        <button id="startSession" class="btn-good">🚀 Start Work</button>
+        <button id="markDone" class="btn">🎉 Mark Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- If-Then + music links -->
+  <div class="grid">
+    <div class="card">
+      <div class="title" style="font-size:16px;">If-Then checks</div>
+      <div class="divider"></div>
+      <label class="toggle"><input type="checkbox" id="closedIg"> 📵 If IG is open → close it. (Tap when closed)</label><br/>
+      <label class="toggle"><input type="checkbox" id="closedFb"> 📵 If Facebook is open → close it. (Tap when closed)</label><br/>
+      <label class="toggle"><input type="checkbox" id="closedYt"> 🧐 “Did you close YouTube?” (Optional; use YouTube Music if needed)</label>
+      <div class="row" style="margin-top:8px;">
+        <a class="btn-secondary" href="https://music.youtube.com/" target="_blank" rel="noopener">🎵 YouTube Music</a>
+        <a class="btn-secondary" href="https://youtube.com/playlist?list=PLl-ShioB5kapDf5pXDxe2_FpNiTCQdVAO&si=ADssb7QlTymc-169" target="_blank" rel="noopener">🏠 Studio Vibes</a>
+      </div>
+      <div class="muted small" style="margin-top:10px;">Rule stays blunt: Stop polishing. Finish the song.</div>
+    </div>
+
+    <!-- Streak & freeze logic -->
+    <div class="card">
+      <div class="title" style="font-size:16px;">Streaks & Freezes</div>
+      <div class="divider"></div>
+      <div class="muted small">Finish today = +1 streak day. Every 7 finished days → earn 1 freeze.</div>
+      <div class="row" style="margin-top:8px;">
+        <button id="useFreeze" class="btn-warn">🧊 Use Freeze</button>
+        <div id="freezeMsg" class="muted small"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Grade your day (grows a CD) -->
+  <div class="card">
+    <div class="title" style="font-size:16px;">Grade your day</div>
+    <div class="divider"></div>
+    <div class="row" style="align-items:flex-end; justify-content:space-between">
+      <div>
+        <input id="gradeSlider" type="range" min="0" max="100" value="60" style="width:300px">
+        <div class="muted small">Slide to score 0–100. Keep it honest.</div>
+      </div>
+      <div class="cd-grow" id="cdGrow">💿</div>
+      <button id="saveGrade" class="btn-secondary">Save Grade</button>
+    </div>
+  </div>
+
+  <!-- Weather + Map + Heatmap -->
+  <div class="card">
+    <div class="title">City Weather & Map</div>
+    <div class="divider"></div>
+    <div class="row" style="gap:8px;">
+      <input id="cityInput" placeholder="Enter city (e.g., Charlotte, NC)" style="padding:10px;border-radius:10px;border:1px solid #2a2a33;background:#0f0f13;color:#fff;width:260px"/>
+      <button id="findCity" class="btn-secondary">📍 Search</button>
+      <button id="useGeo" class="btn-secondary">🛰️ Use My Location</button>
+      <div class="chip"><span>⏱️ Flip:</span><span class="flip" id="flipClock">00:00</span></div>
+    </div>
+    <div id="weatherBox" class="muted small" style="margin-top:8px">—</div>
+    <div id="map" style="margin-top:10px"></div>
+  </div>
+
+  <!-- Last Page: Data Science + Weather Recap -->
+  <div class="card">
+    <div class="title">Insights</div>
+    <div class="divider"></div>
+    <div class="grid">
+      <div>
+        <canvas id="chart1" height="220" aria-label="Success grade trend"></canvas>
+        <div class="muted small">Success grade (last 14 sessions)</div>
+      </div>
+      <div>
+        <canvas id="chart2" height="220" aria-label="Start latency trend"></canvas>
+        <div class="muted small">Start latency (ms) — lower is better</div>
+      </div>
+    </div>
+    <div class="row" style="margin-top:8px"><span class="muted small">Weather recap GIF:</span><img id="weatherGif" style="height:90px;border-radius:12px"/></div>
+  </div>
+
+  <!-- Overlays -->
+  <div class="overlay" id="runOverlay">
+    <div class="modal-card">
+      <h3>🏃 RUN!</h3>
+      <img id="runGif" class="reward-img" alt="Run">
+      <button class="btn-good" onclick="document.getElementById('runOverlay').style.display='none'">On it</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="successHomeOverlay">
+    <div class="modal-card">
+      <h3>Wrap. We’re out. ✅</h3>
+      <img id="successHomeGif" class="reward-img" alt="Success Home">
+      <button class="btn-good" onclick="document.getElementById('successHomeOverlay').style.display='none'">Peace</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="failHomeOverlay">
+    <div class="modal-card" style="display:flex; gap:12px; align-items:center;">
+      <div style="flex:1">
+        <h3 class="danger">We failed today.</h3>
+        <img id="failHomeGif" class="reward-img" alt="Fail Home">
+      </div>
+      <div class="wall" aria-hidden="true"></div>
+      <div style="flex:1">
+        <div class="muted">Villain watching from the sidelines. Tighten up tomorrow.</div>
+        <img id="willGif" class="reward-img" alt="Will (placeholder)">
+      </div>
+      <button class="btn-bad" style="margin-top:10px" onclick="document.getElementById('failHomeOverlay').style.display='none'">I’ll fix it</button>
+    </div>
+  </div>
+
+  <!-- Gear reward modal -->
+  <div class="reward-modal" id="rewardModal" role="dialog" aria-modal="true" aria-labelledby="rewardTitle">
+    <div class="modal-card">
+      <h3 id="rewardTitle">🎁 Gear Drop</h3>
+      <img id="rewardImg" class="reward-img" alt="Reward">
+      <div class="muted small" id="rewardCaption" style="margin:8px 0 12px;"></div>
+      <button id="rewardClose" class="btn-good">OK</button>
+    </div>
+  </div>
+
+  <canvas id="confetti" class="confetti"></canvas>
+  <div class="emoji-sprite">🎹</div>
+  <div class="emoji-sprite second">🔊</div>
+  `;
+})();
 (() => {
   'use strict';
   const $ = s => document.querySelector(s);
