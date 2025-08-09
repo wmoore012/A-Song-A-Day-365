@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>THE NUKES — Song-A-Day 365</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Rajdhani:wght@600;700&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+
+  <!-- Leaflet / Chart.js -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <!-- YouTube IFrame API (audio only) -->
+  <script src="https://www.youtube.com/iframe_api"></script>
+
+  <link rel="stylesheet" href="./nukes-v2.css">
+</head>
+<body>
+  <div class="wrap">
+
+    <header class="topbar">
+      <div class="brand">
+        <img src="assets/brand.svg" alt="" onerror="this.style.display='none'"/>
+        <span class="title">THE NUKES</span>
+        <span class="subtitle">Song-A-Day 365</span>
+      </div>
+      <div class="chips">
+        <div class="chip">🔥 Streak <b id="streak">0</b></div>
+        <div class="chip">🧊 Freezes <b id="freezes">0</b></div>
+        <div class="chip flip" id="flipClock">00:00</div>
+      </div>
+    </header>
+
+    <main class="grid">
+      <section class="card focus">
+        <div class="card-hd">
+          <h2>Lock-in</h2>
+          <div class="tip-tag" id="tipTag">“Make the ugly version. Ship it.”</div>
+        </div>
+
+        <div class="latency">
+          <div class="caption">You’ve got <b>7:00</b> to lock in.</div>
+          <div class="big flip" id="latencyCountdown">07:00</div>
+          <div class="muted">Start latency: <b id="latencyMs">—</b></div>
+        </div>
+
+        <div class="action-row">
+          <button id="startBtn" class="btn btn-primary">🚀 Start Work</button>
+          <button id="doneBtn" class="btn btn-good" disabled>🎉 Mark Done</button>
+          <button id="freezeBtn" class="btn btn-warn">🧊 Use Freeze</button>
+        </div>
+
+        <div id="messageBar" class="message">Tip: Don’t plan 20 steps. Do the first one only.</div>
+        <div class="divider"></div>
+
+        <div class="ifthen">
+          <div class="ifthen-hd">If-Then Checks</div>
+          <label class="tgl"><input type="checkbox" id="igClosed"> IG CLOSED</label>
+          <label class="tgl"><input type="checkbox" id="fbClosed"> FACEBOOK CLOSED</label>
+          <label class="tgl"><input type="checkbox" id="ytConsidered"> YT CONSIDERED</label>
+        </div>
+
+        <div class="quicklinks">
+          <a class="btn btn-secondary" target="_blank" href="https://music.youtube.com/">🎵 YouTube Music</a>
+          <a class="btn btn-secondary" target="_blank" href="https://youtube.com/playlist?list=PLl-ShioB5kapDf5pXDxe2_FpNiTCQdVAO">🏠 Studio Vibes</a>
+          <a class="btn btn-secondary" target="_blank" href="https://www.focusmate.com/">👥 Focusmate</a>
+        </div>
+
+        <div class="nowplaying">
+          <span class="np-label">Now Playing:</span>
+          <span id="npTitle" class="np-title">—</span>
+        </div>
+
+        <button id="armAudio" class="btn btn-volt arm">🔊 Enable Sound</button>
+        <div class="audio-row">
+          <button id="toggleNoise" class="btn btn-secondary">🌧️ White Noise</button>
+          <span class="muted small">Music vol 15% · Noise vol 15%</span>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-hd">
+          <h2>City + Weather</h2>
+          <button id="openCity" class="btn btn-secondary">🌆 City</button>
+        </div>
+        <div id="weatherBox" class="weather">Charlotte, NC — loading weather…</div>
+        <div id="map" class="map"></div>
+      </section>
+
+      <section class="card">
+        <div class="card-hd"><h2>Insights</h2></div>
+        <div class="charts">
+          <canvas id="chartGrades" height="160"></canvas>
+          <div class="muted">Success grade (last 14)</div>
+          <canvas id="chartLatency" height="160"></canvas>
+          <div class="muted">Start latency (ms) — lower is better</div>
+        </div>
+        <div class="grade">
+          <div class="grade-hd">
+            <span>Grade today</span>
+            <span class="cd" id="cd">💿</span>
+          </div>
+          <input type="range" min="0" max="100" value="60" id="gradeSlider" />
+          <button id="saveGrade" class="btn btn-secondary">Save Grade</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Villain chat -->
+  <aside id="chatDock" class="chat-dock">
+    <button id="chatToggle" class="chat-tab">😈 Villain</button>
+    <div class="chat-wrap">
+      <div class="chat-head">
+        <div>😈 Pocket-Watchin’ Producer</div>
+        <div class="muted small">LLM Mode: <span id="llmModeLabel">Off</span></div>
+      </div>
+      <div id="chatLog" class="chat-log"></div>
+      <div class="kbd" id="kbd">
+        <div class="row"><span data-k="Q">Q</span><span data-k="W">W</span><span data-k="E">E</span><span data-k="R">R</span><span data-k="T">T</span><span data-k="Y">Y</span><span data-k="U">U</span><span data-k="I">I</span><span data-k="O">O</span><span data-k="P">P</span></div>
+        <div class="row"><span data-k="A">A</span><span data-k="S">S</span><span data-k="D">D</span><span data-k="F">F</span><span data-k="G">G</span><span data-k="H">H</span><span data-k="J">J</span><span data-k="K">K</span><span data-k="L">L</span></div>
+        <div class="row"><span data-k="Z">Z</span><span data-k="X">X</span><span data-k="C">C</span><span data-k="V">V</span><span data-k="B">B</span><span data-k="N">N</span><span data-k="M">M</span></div>
+      </div>
+      <form id="chatForm" class="chat-form">
+        <input id="chatInput" placeholder="Villain: “I started 20 minutes ago, champ.”" />
+        <button class="btn btn-volt" type="submit">Send</button>
+      </form>
+      <details class="chat-settings">
+        <summary>LLM Settings (optional)</summary>
+        <label>OpenRouter API Key <input id="openrouterKey" placeholder="sk-or-..." /></label>
+        <label>Model <input id="openrouterModel" value="mistralai/mistral-small" /></label>
+        <button id="saveLLM" class="btn btn-secondary" type="button">Save</button>
+      </details>
+    </div>
+  </aside>
+
+  <!-- City panel -->
+  <div id="cityPanel" class="panel hidden">
+    <div class="panel-card">
+      <div class="panel-hd">
+        <h3>Set City</h3>
+        <button id="closeCity" class="btn btn-secondary">Close</button>
+      </div>
+      <div class="city-row">
+        <input id="cityInput" placeholder="Enter city (e.g., Charlotte, NC)" />
+        <button id="cityFind" class="btn btn-secondary">📍 Set City</button>
+        <button id="useGeo" class="btn btn-secondary">🛰️ Use My Location</button>
+      </div>
+      <div class="muted small">Default is Charlotte, NC. Map is non-interactive on purpose.</div>
+    </div>
+  </div>
+
+  <!-- Overlays -->
+  <div id="rewardModal" class="overlay hidden">
+    <div class="modal">
+      <h3 id="rewardTitle">🎁 Gear Drop</h3>
+      <img id="rewardGif" alt="" />
+      <div id="rewardCap" class="muted"></div>
+      <button class="btn btn-volt" onclick="document.getElementById('rewardModal').classList.add('hidden')">OK</button>
+    </div>
+  </div>
+  <div id="runOverlay" class="overlay hidden">
+    <div class="modal">
+      <h3>🏃 RUN!</h3>
+      <img id="runGif" alt="" />
+      <button class="btn btn-volt" onclick="document.getElementById('runOverlay').classList.add('hidden')">On it</button>
+    </div>
+  </div>
+  <div id="successHome" class="overlay hidden">
+    <div class="modal">
+      <h3>Wrap. We’re out. ✅</h3>
+      <img id="successGif" alt="" />
+      <button class="btn btn-good" onclick="document.getElementById('successHome').classList.add('hidden')">Peace</button>
+    </div>
+  </div>
+  <div id="failHome" class="overlay hidden">
+    <div class="modal twin">
+      <div>
+        <h3 class="danger">We failed today.</h3>
+        <img id="failGif" alt="" />
+      </div>
+      <div class="wall"></div>
+      <div>
+        <div class="muted">Villain watching from the sidelines. Tighten up tomorrow.</div>
+        <img id="willGif" alt="" />
+      </div>
+      <button class="btn btn-bad" onclick="document.getElementById('failHome').classList.add('hidden')">I’ll fix it</button>
+    </div>
+  </div>
+
+  <!-- Hidden players -->
+  <div class="visually-hidden">
+    <div id="musicPlayer"></div>
+    <div id="noisePlayer"></div>
+  </div>
+
+  <script src="./nukes-v2.js"></script>
+</body>
+</html>
