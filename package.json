@@ -2,5 +2,12 @@
   "type": "module",
   "dependencies": {
     "@notionhq/client": "^2.2.14"
+  },
+  "devDependencies": {
+  "vitest": "^1.6.0",
+  "jsdom": "^24.1.0"
+  },
+  "scripts": {
+    "test": "vitest --run"
   }
 }

@@ -46,9 +46,13 @@ export async function handler(event) {
   const freezes = num(payload.freezes);
   const latency = num(payload.latency_ms);
   const grade = num(payload.grade);
+  const startTimeIso = payload.start_time_iso || null;
+  const startEpochMs = num(payload.start_epoch_ms);
   const lyrics = str(payload.song_lyrics);
   const beat = str(payload.song_beat || lyrics);
   const sameSong = !!payload.same_song;
+  const surveyChoice = str(payload.survey_choice);
+  const surveyNote = str(payload.survey_note);
   const igClosed = !!payload.ig_closed;
   const fbClosed = !!payload.fb_closed;
   const ytConsidered = !!payload.yt_closed; // naming kept from browser
@@ -76,8 +80,10 @@ export async function handler(event) {
       'Day': numberOrNull(day),
       'Streak': numberOrNull(streak),
       'Freeze count': numberOrNull(freezes),
-      'Freeze used': { checkbox: false }, // set true if you log this client-side
+      'Freeze used': { checkbox: !!payload.freeze_used },
       'Start latency (ms)': numberOrNull(latency),
+      'Start time': startTimeIso ? { date: { start: startTimeIso } } : { date: null },
+      'Start epoch (ms)': numberOrNull(startEpochMs),
       'Grade': numberOrNull(grade),
       'Lyrics song': richText(lyrics),
       'Beat song': richText(beat),
@@ -91,6 +97,8 @@ export async function handler(event) {
       'Weather code': numberOrNull(weather.code),
       'Temp C': numberOrNull(weather.temp_c),
       'Wind m/s': numberOrNull(weather.wind),
+  'Survey choice': richText(surveyChoice),
+  'Survey note': richText(surveyNote),
     };
 
     await notion.pages.create({ parent: { database_id }, properties });

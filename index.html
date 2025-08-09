@@ -56,6 +56,10 @@
         </div>
 
         <div id="messageBar" class="message">Tip: Don’t plan 20 steps. Do the first one only.</div>
+        <div id="multiplier" class="mult">
+          <div class="label">Multiplier: <span id="multVal">100%</span></div>
+          <div class="bar"><div id="multBar"></div></div>
+        </div>
         <div class="divider"></div>
 
         <div class="ifthen">
@@ -74,6 +78,7 @@
         <div class="nowplaying">
           <span class="np-label">Now Playing:</span>
           <span id="npTitle" class="np-title">—</span>
+          <button id="hintsBtn" class="btn btn-secondary" style="margin-left:auto" onclick="openHints()">?📈 Hints</button>
         </div>
 
         <button id="armAudio" class="btn btn-volt arm">🔊 Enable Sound</button>
@@ -118,7 +123,8 @@
     <div class="chat-wrap">
       <div class="chat-head">
         <div>😈 Pocket-Watchin’ Producer</div>
-        <div class="muted small">LLM Mode: <span id="llmModeLabel">Off</span></div>
+  <div class="muted small">LLM Mode: <span id="llmModeLabel">Off</span></div>
+  <button id="openSettings" class="btn btn-secondary" style="padding:6px 10px;font-size:12px">⚙️</button>
       </div>
       <div id="chatLog" class="chat-log"></div>
       <div class="kbd" id="kbd">
@@ -155,6 +161,21 @@
     </div>
   </div>
 
+  <!-- Settings panel -->
+  <div id="settingsPanel" class="panel hidden">
+    <div class="panel-card">
+      <div class="panel-hd">
+        <h3>Settings</h3>
+        <button id="closeSettings" class="btn btn-secondary">Close</button>
+      </div>
+      <label class="tgl">Accountability emails (comma‑separated)</label>
+      <input id="acctEmails" placeholder="a@b.com, c@d.com" />
+      <div style="margin-top:8px">
+        <button id="saveSettings" class="btn btn-primary">Save</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Overlays -->
   <div id="rewardModal" class="overlay hidden">
     <div class="modal">
@@ -178,6 +199,24 @@
       <button class="btn btn-good" onclick="document.getElementById('successHome').classList.add('hidden')">Peace</button>
     </div>
   </div>
+  <!-- End-of-session Survey overlay -->
+  <div id="surveyModal" class="overlay hidden">
+    <div class="modal">
+      <h3>Quick survey</h3>
+      <div class="muted">What best describes today?</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:8px 0">
+        <label class="tgl"><input type="radio" name="surveyChoice" value="Scope too big"> Scope too big</label>
+        <label class="tgl"><input type="radio" name="surveyChoice" value="Distraction"> Distraction</label>
+        <label class="tgl"><input type="radio" name="surveyChoice" value="Low energy"> Low energy</label>
+        <label class="tgl"><input type="radio" name="surveyChoice" value="Other"> Other</label>
+      </div>
+      <textarea id="surveyNote" placeholder="Optional note" style="width:100%;min-height:80px;background:#0f0f18;border:1px solid var(--line);border-radius:12px;color:#fff;padding:10px"></textarea>
+      <div style="margin-top:10px;display:flex;gap:8px;justify-content:center">
+        <button id="submitSurvey" class="btn btn-primary">Submit</button>
+        <button id="skipSurvey" class="btn btn-secondary">Skip</button>
+      </div>
+    </div>
+  </div>
   <div id="failHome" class="overlay hidden">
     <div class="modal twin">
       <div>
@@ -193,12 +232,40 @@
     </div>
   </div>
 
+  <!-- Hints overlay -->
+  <div id="hintsModal" class="overlay hidden">
+    <div class="modal">
+      <h3>Hints</h3>
+      <p class="muted">Short coaching clips. Music fades while hints play.</p>
+      <div id="hintPlayerHost" style="aspect-ratio:16/9;background:#0f0f18;border:1px solid var(--line);border-radius:12px;padding:8px"></div>
+      <div style="margin-top:8px">
+        <a id="openInYoutube" class="btn btn-secondary" target="_blank">Open in YouTube</a>
+        <button class="btn btn-volt" onclick="closeHints()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Nudge overlay -->
+  <div id="nudgeModal" class="overlay hidden">
+    <div class="modal">
+      <h3>What’s the move?</h3>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center">
+        <button id="nudgeEightBar" class="btn btn-secondary">8 bars then bounce</button>
+        <button id="nudgeMoreTime" class="btn btn-secondary">I need more time</button>
+        <button id="nudgeCloseSocial" class="btn btn-secondary">Close social tabs</button>
+        <button id="nudgeFocusmate" class="btn btn-secondary">Book Focusmate</button>
+      </div>
+      <div style="margin-top:10px"><button class="btn btn-volt" onclick="closeNudge()">Dismiss</button></div>
+    </div>
+  </div>
+
   <!-- Hidden players -->
   <div class="visually-hidden">
     <div id="musicPlayer"></div>
     <div id="noisePlayer"></div>
+  <div id="hintPlayer"></div>
   </div>
 
-  <script src="./nukes-v2.js"></script>
+  <script type="module" src="./nukes-v2.js"></script>
 </body>
 </html>

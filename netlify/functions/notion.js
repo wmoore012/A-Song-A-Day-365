@@ -33,6 +33,12 @@ export async function handler(event) {
     return json(400, { error: 'Invalid JSON body' });
   }
 
+  // Validate shape (lightweight schema guard; no silent failure)
+  const v = validatePayload(payload);
+  if (!v.ok) {
+    return json(422, { error: 'Invalid payload', issues: v.issues });
+  }
+
   // We only write when a session is completed.
   if (payload.type && payload.type !== 'session_done') {
     return json(204, { ok: true, skipped: `ignored type ${payload.type}` });
@@ -44,10 +50,14 @@ export async function handler(event) {
   const streak = num(payload.streak_after);
   const freezes = num(payload.freezes);
   const latency = num(payload.latency_ms);
-  const grade = num(payload.grade);
+    const grade = num(payload.grade);
+    const startTimeIso = payload.start_time_iso || null;
+    const startEpochMs = num(payload.start_epoch_ms);
   const lyrics = str(payload.song_lyrics);
   const beat = str(payload.song_beat || lyrics);
   const sameSong = !!payload.same_song;
+  const surveyChoice = str(payload.survey_choice);
+  const surveyNote = str(payload.survey_note);
   const igClosed = !!payload.ig_closed;
   const fbClosed = !!payload.fb_closed;
   const ytConsidered = !!payload.yt_closed;
@@ -63,8 +73,8 @@ export async function handler(event) {
   };
 
   try {
-    const notion = new Client({ auth: process.env.NOTION_TOKEN });
-    const database_id = process.env.NOTION_DATABASE_ID;
+  const notion = new Client({ auth: process.env.NOTION_TOKEN });
+  const database_id = process.env.NOTION_DATABASE_ID;
 
     const title = `Day ${day ?? '—'} — ${dateStr}`;
 
@@ -77,6 +87,8 @@ export async function handler(event) {
       'Freeze count': numberOrNull(freezes),
       'Freeze used': { checkbox: !!payload.freeze_used },
       'Start latency (ms)': numberOrNull(latency),
+    'Start time': startTimeIso ? { date: { start: startTimeIso } } : { date: null },
+    'Start epoch (ms)': numberOrNull(startEpochMs),
       'Grade': numberOrNull(grade),
       'Lyrics song': richText(lyrics),
       'Beat song': richText(beat),
@@ -90,9 +102,12 @@ export async function handler(event) {
       'Weather code': numberOrNull(weather.code),
       'Temp C': numberOrNull(weather.temp_c),
       'Wind m/s': numberOrNull(weather.wind),
+  'Survey choice': richText(surveyChoice),
+  'Survey note': richText(surveyNote),
     };
 
-    await notion.pages.create({ parent: { database_id }, properties });
+  const pagesApi = (globalThis && globalThis.__TEST_NOTION_PAGES__) || notion.pages;
+  await pagesApi.create({ parent: { database_id }, properties });
     return json(200, { ok: true });
   } catch (err) {
     console.error('Notion error:', err?.body || err);
@@ -123,4 +138,25 @@ function str(v) {
 }
 function richText(s) {
   return { rich_text: s ? [{ text: { content: s } }] : [] };
+}
+
+/* ------------- validation (no deps) ------------- */
+export function validatePayload(p){
+  const issues = [];
+  if (!p || typeof p !== 'object') return { ok:false, issues:['payload must be an object'] };
+  if (p.type && p.type !== 'session_done') {
+    // allow other types to pass through to 204 skip, but structure should still be object
+  }
+  const req = ['date','day_index','streak_after'];
+  req.forEach(k=>{ if (!(k in p)) issues.push(`missing ${k}`); });
+  if (p.date && !/^\d{4}-\d{2}-\d{2}$/.test(p.date)) issues.push('date must be YYYY-MM-DD');
+  ['day_index','streak_after','freezes','latency_ms','grade','start_epoch_ms'].forEach(k=>{
+    if (p[k] != null && !Number.isFinite(Number(p[k]))) issues.push(`${k} must be number`);
+  });
+  if (p.weather){
+    const w = p.weather;
+    if (typeof w !== 'object') issues.push('weather must be object');
+    ['lat','lon','code','temp_c','wind'].forEach(k=>{ if (w[k]!=null && !Number.isFinite(Number(w[k]))) issues.push(`weather.${k} must be number`); });
+  }
+  return { ok: issues.length===0, issues };
 }
