@@ -1,0 +1,36 @@
+# Node/JS
+node_modules/
+.env
+.env.*
+*.local
+
+# VSCode
+.vscode/
+
+# Build artifacts
+/dist/
+/.next/
+/.cache/
+
+# Test output
+coverage/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Netlify
+netlify.toml.local
+
+# Secrets
+secrets*
+*.key
+*.pem
+*.crt
+*.p12
+*.jks
+*.pfx
+*.envrc
+
+# Logs
+*.log
