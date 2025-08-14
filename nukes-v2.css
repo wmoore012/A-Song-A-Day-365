@@ -23,6 +23,7 @@ html,body{margin:0;height:100%;background:linear-gradient(135deg,#0c0c12 0%, #11
 .card-hd{display:flex;align-items:center;justify-content:space-between}
 h2{font-family:Rajdhani,Inter;font-size:20px;letter-spacing:.5px;margin:0}
 .tip-tag{background:#17172a;border:1px solid var(--line);padding:6px 8px;border-radius:10px;color:var(--muted)}
+.tip-tag{max-width:52%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .focus{outline:2px solid #2a184f}
 
 /* Buttons */
@@ -52,7 +53,7 @@ h2{font-family:Rajdhani,Inter;font-size:20px;letter-spacing:.5px;margin:0}
 /* Now playing ticker */
 .nowplaying{margin-top:10px;background:#10111c;border:1px solid #1f2030;border-radius:12px;padding:8px 10px;display:flex;gap:8px;align-items:center}
 .np-label{color:#a6ace0;font-weight:800;font-size:12px}
-.np-title{font-weight:900}
+.np-title{font-weight:900;min-width:0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .nowplaying .btn{margin-left:auto}
 
 /* Latency block */
@@ -63,6 +64,14 @@ h2{font-family:Rajdhani,Inter;font-size:20px;letter-spacing:.5px;margin:0}
 .weather{margin-top:8px;color:#cbd3df}
 .map{height:260px;margin-top:10px;border-radius:12px;overflow:hidden;outline:1px solid var(--line)}
 .map{pointer-events:none}
+
+/* Lock-in Tips ticker */
+.ticker{position:relative;height:22px;overflow:hidden;border:1px solid var(--line);border-radius:10px;background:#0f0f18;margin-bottom:8px}
+.ticker::before{content:"LOCK‑IN TIPS";position:absolute;left:8px;top:50%;transform:translateY(-50%);color:#7f85b3;font-weight:900;font-size:11px}
+.ticker-track{position:absolute;left:120px;top:0;right:10px;bottom:0;display:flex;align-items:center;gap:40px;white-space:nowrap}
+.ticker-item{font-weight:800;color:#cbd3df}
+.ticker-anim{animation:tickerScroll 26s linear infinite}
+@keyframes tickerScroll{from{transform:translateX(0)}to{transform:translateX(-50%)} }
 
 /* Charts + grading */
 .charts{display:grid;gap:8px}
@@ -142,3 +151,35 @@ h2{font-family:Rajdhani,Inter;font-size:20px;letter-spacing:.5px;margin:0}
 /* Shake hint button */
 .shake{animation:shake .3s ease-in-out 0s 4}
 @keyframes shake{0%{transform:translateX(0)}25%{transform:translateX(-2px)}50%{transform:translateX(2px)}75%{transform:translateX(-2px)}100%{transform:translateX(0)}}
+
+/* Heat buttons */
+.heat{margin-top:10px}
+.heat-hd{font-weight:900;margin-bottom:6px}
+.heat-row{display:flex;gap:8px;flex-wrap:wrap}
+.heat-btn{cursor:pointer;background:#1b1c2b;border:1px solid var(--line);border-radius:12px;padding:8px 10px;font-size:18px;line-height:1;transition:transform .12s ease, box-shadow .12s ease}
+.heat-btn:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(0,0,0,.35)}
+.heat-btn.jiggle{animation:jiggle .5s ease}
+@keyframes jiggle{0%,100%{transform:translateY(0) rotate(0)}25%{transform:translateY(-1px) rotate(-3deg)}50%{transform:translateY(0) rotate(3deg)}75%{transform:translateY(-1px) rotate(-2deg)}}
+.heat-btn .badge{position:relative; top:-6px; margin-left:6px; background:#0b0d14; border:1px solid #2a2c3a; padding:1px 6px; border-radius:999px; font-size:11px; font-weight:900; color:#cbd3df}
+.heat-btn.cool{box-shadow:0 0 0 3px rgba(182,255,0,.15), 0 0 0 0 rgba(0,0,0,0);}
+
+/* Song title */
+.songtitle-row{display:flex;gap:8px;align-items:center;margin:8px 0}
+.song-title{flex:1;min-width:200px;background:#0f0f18;border:1px solid var(--line);border-radius:12px;color:#fff;padding:10px}
+
+/* Fire emoji rain */
+.fire-ember{position:fixed;bottom:-24px;font-size:20px;pointer-events:none;z-index:9997;opacity:.95;filter:drop-shadow(0 6px 10px rgba(0,0,0,.35));animation-name:riseUp;animation-timing-function:linear}
+@keyframes riseUp{from{transform:translateY(0) translateX(0) rotate(0);opacity:.95}to{transform:translateY(-110vh) translateX(var(--drift, 0px)) rotate(12deg);opacity:.25}}
+
+/* Confetti (optional reuse) */
+.confetti-piece{position:fixed;top:-10px;width:8px;height:12px;border-radius:2px;opacity:.9;z-index:9996;animation:confettiFall linear forwards}
+@keyframes confettiFall{to{transform:translateY(110vh) rotate(540deg);opacity:.85}}
+
+/* Side cannons (confetti shooting from sides) */
+.cannon-piece{position:fixed;pointer-events:none;z-index:9998;width:8px;height:12px;border-radius:2px;opacity:.95;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+@keyframes cannonLeft{from{left:-12px;transform:translate(0,0) rotate(0)}to{left:52vw;transform:translate(0,24vh) rotate(360deg)}}
+@keyframes cannonRight{from{right:-12px;transform:translate(0,0) rotate(0)}to{right:52vw;transform:translate(0,28vh) rotate(-360deg)}}
+
+/* Devil rain */
+.devil-head{position:fixed;top:-24px;pointer-events:none;z-index:9997;filter:drop-shadow(0 6px 10px rgba(0,0,0,.35));animation:devilFall linear forwards}
+@keyframes devilFall{to{transform:translateY(110vh) translateX(var(--drift, 0px)) rotate(8deg);opacity:.9}}

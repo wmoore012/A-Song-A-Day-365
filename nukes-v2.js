@@ -105,6 +105,18 @@ import { api } from './api.js';
       "Cut the cute. Ship the song.",
     ],
     RARE_DROP_RATE: 0.15,
+    VILLAIN_POCKET: [
+      "Sheeesh, them rims brand new? You ridin’ presidential, huh? 😂",
+      "Penthouse view, huh big bro? Must be different up there. 😏😂",
+      "Ain’t no recession in your closet, I see. 😂",
+      "You swapped chains again? Boy, you allergic to repeats. 😂",
+      "Whole vacation album lookin’ like a Visa commercial. 😂",
+      "Must be nice wakin’ up to deposits, not alarms. 😂",
+      "Keep that throne warm—I’m comin’ for the cushions. 😂",
+      "Heard your backend bigger than payroll—must be nice, CEO. 😂",
+      "Clocked your royalty sheet—got more commas than my DMs. 😂",
+      "Don’t spend it all in one reel, superstar. 😂"
+    ],
     GIFS: {
       RUN: [
         "https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3bTUwbzlxZ2pmYzNuYnZucDY1c3J0emU5c2I5MHFoa3NwNm01MmlvbCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/TJaNCdTf06YvwRPCge/giphy.gif",
@@ -127,16 +139,8 @@ import { api } from './api.js';
         "https://media.giphy.com/media/l0HU2s0vG3q8b2T9e/giphy.gif"
       ]
     },
-    // Music playlist (full YouTube links OK). We’ll cycle if one fails.
-    MUSIC_PLAYLIST: [
-      "https://www.youtube.com/watch?v=b0wbCtrGjXA",
-      "https://music.youtube.com/watch?v=rxlHSy3b-jI",
-      "https://music.youtube.com/watch?v=RtCsmozSF3Y",
-      "https://music.youtube.com/watch?v=t_M6TbnDOCE",
-      "https://music.youtube.com/watch?v=BT2DTjTmG9I"
-    ],
-    // Your premade playlist (preferred; fallback to above if blocked)
-    MUSIC_PLAYLIST_FALLBACK: "https://www.youtube.com/playlist?list=PLl-ShioB5kapLuMhLMqdyx_gKX_MBiXeb",
+  // Default Studio Vibes source (can be video or playlist). Silent until armed.
+  DEFAULT_VIBES: "https://youtu.be/r9P08bbllno?si=-IZlYIIsVY3X9BY4",
     NOISE_LIFEAT: "https://www.youtube.com/live/xdJ58r0k340"
   };
 
@@ -153,8 +157,17 @@ import { api } from './api.js';
   setText('#streak', LS.streak);
   setText('#freezes', LS.freezes);
   setText('#tipTag', pick(CFG.ENCOURAGEMENT_TIPS));
+  buildTicker();
+  const heelHdr = document.getElementById('sidekickHeader'); if (heelHdr) heelHdr.textContent = `😈 ${LS.heelName||'Heel'}`;
   // init multiplier UI
   updateMultiplier(LS.mult);
+
+  // Title input wiring
+  const titleEl = document.getElementById('songTitle');
+  if (titleEl){
+    titleEl.value = LS.songTitle || '';
+    titleEl.addEventListener('input', ()=>{ LS.songTitle = titleEl.value.trim(); });
+  }
 
   /* -------------------- Map (non-interactive) + heat -------------------- */
   let map = L.map('map', { dragging:false, touchZoom:false, scrollWheelZoom:false, doubleClickZoom:false, boxZoom:false, keyboard:false, zoomControl:false })
@@ -254,7 +267,7 @@ import { api } from './api.js';
   }, 250);
 
   // One-time pre-start sting in the message bar
-  const preTaunt = ()=> setText('#messageBar', rotPick('pre'));
+  const preTaunt = ()=> setText('#messageBar', 'LOCK IN — '+rotPick('pre'));
   preTaunt();
 
   { const el = $("#startBtn"); if (el) el.onclick = ()=>{
@@ -263,7 +276,7 @@ import { api } from './api.js';
     const latency = Date.now()-t0;
   setText('#latencyMs', `${latency.toLocaleString()} ms`);
     const db=$("#doneBtn"); if (db) db.disabled = false;
-    setText('#messageBar', pick(CFG.ENCOURAGEMENT_TIPS));
+  setText('#messageBar', 'LOCKED 🔒');
     LS.latencies = [...LS.latencies, latency].slice(-60);
     fadeOutMusic(); // music fade then stop
   startIso = new Date().toISOString();
@@ -301,6 +314,7 @@ import { api } from './api.js';
         freeze_used: !!freezeUsedToday,
         latency_ms: latencyMs,
         grade: gradeVal,
+        user_title: (LS.songTitle||'').trim() || null,
         survey_choice: (localStorage.getItem('nk_survey_choice')||'') || null,
         survey_note: (localStorage.getItem('nk_survey_note')||'') || null,
         ig_closed: igClosed,
@@ -308,7 +322,8 @@ import { api } from './api.js';
         yt_closed: ytConsidered,
         start_time_iso: startIso,
         start_epoch_ms: startIso ? Date.parse(startIso) : null,
-        weather: lastWeather || (LS.city ? { city: LS.city.name, lat: LS.city.lat, lon: LS.city.lon } : {})
+        weather: lastWeather || (LS.city ? { city: LS.city.name, lat: LS.city.lat, lon: LS.city.lon } : {}),
+        heat: LS.heatCounts
       };
   const { ok } = await api.postNotionWithRetry(body);
   if (!ok) {
@@ -319,6 +334,8 @@ import { api } from './api.js';
         // fire-and-forget accountability email
         sendAccountabilityEmail({ day: LS.dayIndex, date: today, streak: LS.streak, grade: gradeVal, latencyMs });
         freezeUsedToday = false;
+        // Reset heat counts for next session
+        LS.heatCounts = { drums:0, vocals:0, keys:0, lyrics:0, bass:0 };
       }
     } catch {}
   }; }
@@ -350,8 +367,8 @@ import { api } from './api.js';
 
   // Time-based nudges: one between 29–41 min, one between 60–100 min
   // Time nudges bring up the action modal with a sting first
-  scheduleNudge(29*60*1000, 41*60*1000, () => { stingVillainMaybeLLM(rotPick('shade')); openNudge(); });
-  scheduleNudge(60*60*1000, 100*60*1000, () => { stingVillainMaybeLLM(rotPick('shade')); openNudge(); });
+  scheduleNudge(29*60*1000, 41*60*1000, () => { stingVillainMaybeLLM(rotPick('shade'), 'shade'); openNudge(); });
+  scheduleNudge(60*60*1000, 100*60*1000, () => { stingVillainMaybeLLM(rotPick('shade'), 'shade'); openNudge(); showRun(); });
 
   { const el = $("#freezeBtn"); if (el) el.onclick = ()=>{
     if (LS.freezes<=0) return toast("No freezes yet. Earn one every 7 wins.");
@@ -381,11 +398,11 @@ import { api } from './api.js';
       const goingDown = (sel==="#ytConsidered" && !el.checked);
       if (goingDown){
         bumpMultiplier(-5);
-        stingVillain(rotPick('shade'));
+  stingVillain(rotPick('shade'), 'shade');
         hintPrompt();
       } else {
         bumpMultiplier(+3);
-        stingVillain(rotPick('hype'));
+  stingVillain(rotPick('hype'), 'hype');
       }
     });
   });
@@ -404,7 +421,7 @@ import { api } from './api.js';
     $("#chatDock")?.classList.toggle('open', chat.open);
   setText('#llmModeLabel', chat.mode()==='LLM' ? 'On' : 'Off');
     if (chat.open && chat.log && chat.log.childElementCount===0) {
-      pushMsg('bot', pick(CFG.VILLAIN_SEED));
+  pushMsg('bot', pick(CFG.VILLAIN_SEED));
     }
   }; }
   { const el = $("#saveLLM"); if (el) el.onclick = ()=>{
@@ -437,20 +454,41 @@ import { api } from './api.js';
     if (!chat.log) return; chat.log.appendChild(m); chat.log.scrollTop = chat.log.scrollHeight;
   }
   function ruleReply(txt){
-    // super simple attitude — keeps you moving
+      // tone-aware quick replies
     const lower = txt.toLowerCase();
-    if (lower.includes('tired')||lower.includes('low')) return "Lower the bar. Loop it, drums, bounce. Finish then nap.";
-    if (lower.includes('youtube')) return "YT considered? Use Music only. Don’t derail.";
-    if (lower.includes('mix')) return "Don’t mix the song. Finish, bounce, pack. Next.";
-    return pick(CFG.VILLAIN_SEED);
+      const tone = LS.tone ?? 1; // 0 gentle, 1 default, 2 spicy
+      const gentle = {
+        tired: "Low energy? Try 8 bars, simple drums. Finish is the win.",
+        youtube: "Stay on track. Music only, skip the scroll.",
+        mix: "Don’t overmix. Arrange, bounce, move on.",
+        other: "One small step. 8 bars, then bounce."
+      };
+      const mid = {
+        tired: "Lower the bar. 8 bars, simple drums, bounce it. Done beats perfect.",
+        youtube: "YT considered? Use Music only. Don’t derail.",
+        mix: "Don’t mix the song. Finish, bounce, pack. Next.",
+        other: pick(CFG.VILLAIN_SEED)
+      };
+      const spicy = {
+        tired: "Lower the bar and move. 8 bars, drums, bounce.",
+        youtube: "Close the tabs. Make the track, not excuses.",
+        mix: "Stop mixing pretty. Arrange and print it.",
+        other: pick(CFG.VILLAIN_SHADE)
+      };
+      const T = tone===0?gentle:(tone===2?spicy:mid);
+      if (lower.includes('tired')||lower.includes('low')) return T.tired;
+      if (lower.includes('youtube')) return T.youtube;
+      if (lower.includes('mix')) return T.mix;
+      return T.other;
   }
   async function villainLLM(user){
     const key = LS.llmKey; const model = LS.llmModel;
     const sys = [
-      "Role: Pocket-watching producer sidekick (villain).",
+    "Role: Pocket-watching producer heel (villain actor).",
       "Goal: Push to finish one song today. Keep it short, blunt, funny. No cornball, no motivational posters.",
       "Style: Competitive, passive‑aggressive AAVE for music. Avoid slurs and disrespect to groups. Keep it playful, not cruel.",
-      "Constraints: 1-2 sentences max. No emojis (unless user uses them). Always point to an action (loop, drums, bounce, arrange, post)."
+      "Constraints: 1-2 sentences max. No emojis (unless user uses them). Always point to an action (loop, drums, bounce, arrange, post).",
+      `Tone: ${LS.tone===0?'gentle, encouraging':LS.tone===2?'spicy, blunt':'balanced, direct but respectful'}.`
     ].join(' ');
     const shots = [
       {role:'user', content:'I feel tired and unmotivated'},
@@ -497,7 +535,7 @@ import { api } from './api.js';
       if (musicEl){
         musicPlayer = new YT.Player(EL.music,{
           height:'0', width:'0',
-          playerVars:{ autoplay:1, controls:0, rel:0, playsinline:1, mute:0 },
+          playerVars:{ autoplay:0, controls:0, rel:0, playsinline:1, mute:1 },
           events:{ onReady: onMusicReady, onStateChange: onMusicState }
         });
       }
@@ -530,8 +568,15 @@ import { api } from './api.js';
   }
   function onMusicReady(e){
     musicReady=true;
-    playPlaylist(e, CFG.MUSIC_PLAYLIST_FALLBACK, CFG.MUSIC_PLAYLIST);
-    setVol(musicPlayer, musicVol);
+    const src = (LS.vibesUrl && LS.vibesUrl.trim()) || CFG.DEFAULT_VIBES;
+    try{
+      if (src.includes('list=')){
+        e.target.loadPlaylist({ listType:'playlist', list: playlistIdFromUrl(src) });
+      } else {
+        e.target.loadVideoById(videoIdFromUrl(src));
+      }
+      setVol(musicPlayer, 0);
+    }catch{}
   }
   function playPlaylist(e, playlistUrl, singles){
     // Try playlist first; if blocked, fall back to first single
@@ -582,6 +627,13 @@ import { api } from './api.js';
       }
     }catch{}
   }; }
+
+  // Open Studio Vibes in a new tab using user preference or default
+  document.getElementById('openVibes')?.addEventListener('click', ()=>{
+    const src = (LS.vibesUrl && LS.vibesUrl.trim()) || CFG.DEFAULT_VIBES;
+    const href = src.includes('list=') ? `https://www.youtube.com/playlist?list=${playlistIdFromUrl(src)}` : `https://www.youtube.com/watch?v=${videoIdFromUrl(src)}`;
+    window.open(href, '_blank');
+  });
 
   // parsing helpers come from web-utils.js
 
@@ -637,16 +689,25 @@ import { api } from './api.js';
     const rare = Math.random() < CFG.RARE_DROP_RATE;
     const pool = rare ? CFG.REWARD_GIFS.rare : CFG.REWARD_GIFS.common;
     const gif = pick(pool);
-    $("#rewardTitle").textContent = rare ? "🌟 RARE Gear Drop" : "🎁 Gear Drop";
-    $("#rewardGif").src = gif;
-    $("#rewardCap").textContent = rare ? "Limited run. Flex quietly and keep working." : "Pocket this and move on.";
-    $("#rewardModal").classList.remove('hidden');
+  const tEl = document.getElementById('rewardTitle');
+  const gEl = document.getElementById('rewardGif');
+  const cEl = document.getElementById('rewardCap');
+  const mEl = document.getElementById('rewardModal');
+  if (tEl) tEl.textContent = rare ? "🌟 RARE Gear Drop" : "🎁 Gear Drop";
+  if (gEl) gEl.src = gif;
+  if (cEl) cEl.textContent = rare ? "Limited run. Flex quietly and keep working." : "Pocket this and move on.";
+  if (mEl) mEl.classList.remove('hidden');
   }
   window.closeReward = ()=> $("#rewardModal").classList.add('hidden');
 
   function showSuccess(){
-    $("#successGif").src = CFG.GIFS.SUCCESS_HOME;
-    $("#successHome").classList.remove('hidden');
+    const line = rotPick('pocket');
+    if (line) stingVillainMaybeLLM(line, 'seed');
+    setTimeout(()=>{
+      $("#successGif").src = CFG.GIFS.SUCCESS_HOME;
+      $("#successHome").classList.remove('hidden');
+      sideConfetti(2200);
+    }, 700);
   }
   window.closeSuccess = ()=> $("#successHome").classList.add('hidden');
 
@@ -662,22 +723,39 @@ import { api } from './api.js';
     $("#runOverlay").classList.remove('hidden');
   }
   window.closeRun = ()=> $("#runOverlay").classList.add('hidden');
+  function showPowerup(){
+    try{
+      const box=document.createElement('div');
+      box.style.cssText='position:fixed;right:18px;bottom:110px;z-index:9998;background:#0f0f18;border:1px solid #24253a;border-radius:12px;overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,.45)';
+      const img=document.createElement('img'); img.src=CFG.GIFS.POWERUP; img.alt='powerup'; img.style.cssText='width:180px;height:auto;display:block';
+      box.appendChild(img); document.body.appendChild(box);
+      setTimeout(()=>box.remove(), 1400);
+    }catch{}
+  }
 
   /* -------------------- Utils -------------------- */
   function pick(arr){ return arr[Math.floor(Math.random()*arr.length)] }
+  function buildTicker(){
+    const el = document.getElementById('lockinTicker'); if (!el) return;
+    const track = document.createElement('div'); track.className='ticker-track ticker-anim';
+    const tips = CFG.ENCOURAGEMENT_TIPS;
+    const loop = tips.concat(tips);
+    loop.forEach(t=>{ const s=document.createElement('span'); s.className='ticker-item'; s.textContent=t; track.appendChild(s); });
+    el.innerHTML=''; el.appendChild(track);
+  }
   function rotPick(kind){
-    const map = { pre:['VILLAIN_PRESTART','rotPre'], hype:['VILLAIN_HYPE','rotHype'], shade:['VILLAIN_SHADE','rotShade'], seed:['VILLAIN_SEED','rotSeed'] };
+    const map = { pre:['VILLAIN_PRESTART','rotPre'], hype:['VILLAIN_HYPE','rotHype'], shade:['VILLAIN_SHADE','rotShade'], seed:['VILLAIN_SEED','rotSeed'], pocket:['VILLAIN_POCKET','rotPocket'] };
     const [arrName, idxKey] = map[kind]||[];
     const pool = CFG[arrName]||[]; if (!pool.length) return '';
     const i = (LS[idxKey]||0) % pool.length;
     LS[idxKey] = (i+1) % pool.length;
     return pool[i];
   }
-  function stingVillainMaybeLLM(text){
+  function stingVillainMaybeLLM(text, kind='seed'){
     // occasionally replace with LLM if configured
     const doLLM = LS.llmKey && Math.random() < 0.22;
-    if (!doLLM){ stingVillain(text); return; }
-    villainLLM(text).then(reply=> stingVillain(reply)).catch(()=> stingVillain(text));
+    if (!doLLM){ stingVillain(text, kind); return; }
+    villainLLM(text).then(reply=> stingVillain(reply, kind)).catch(()=> stingVillain(text, kind));
   }
   function fmt(ms){ const s=Math.max(0,Math.ceil(ms/1000)); return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`; }
   function toast(msg){
@@ -704,25 +782,58 @@ import { api } from './api.js';
     el.style.animation = 'flashRed 0.3s ease-in-out 6 alternate';
     document.body.appendChild(el); setTimeout(()=>el.remove(),2400);
   }
-  function stingVillain(text){
+  function stingVillain(text, kind='seed'){
     const box=document.createElement('div'); box.className='villain-toast';
-    const hdr=document.createElement('div'); hdr.className='hdr'; hdr.innerHTML='😈 Villain';
+  const hdr=document.createElement('div'); hdr.className='hdr'; hdr.innerHTML=`😈 ${LS.heelName||'Heel'}`;
     const msg=document.createElement('div'); msg.className='msg'; msg.textContent=text;
     box.appendChild(hdr); box.appendChild(msg);
     document.body.appendChild(box);
     setTimeout(()=>box.remove(), 3000);
+    if (kind==='shade') {
+      // trigger public API so tests/other modules can call it too
+      if (typeof window.villainShadeRain === 'function') window.villainShadeRain(28, 2200);
+      else devilRain(2200);
+    }
   }
   function scheduleNudge(minDelay, maxDelay, fn){
     const wait = Math.floor(minDelay + Math.random()*(maxDelay-minDelay));
     setTimeout(()=>{ if (started) fn(); }, wait);
   }
+
+  // Pre-start recurring stings: ~every 30s show up to 10s, before Start is pressed
+  (function preStartPopups(){
+    let stop=false; // will flip when started
+    const loop=()=>{
+      if (started) { stop=true; return; }
+      // Optional: attach a themed GIF background if available
+      try{
+        const theme = LS.heelTheme || 'masc';
+        const pool = theme==='custom' ? (LS.heelGifs||[]) : (CFG.HEEL_GIFS?.[theme]||[]);
+        if (pool.length){
+          const bg = document.createElement('div');
+          bg.style.cssText = 'position:fixed;inset:auto 18px 80px auto;z-index:998;border-radius:12px;overflow:hidden;opacity:.9;box-shadow:0 8px 28px rgba(0,0,0,.45)';
+          const img = document.createElement('img'); img.src = pick(pool); img.style.cssText='width:220px;height:auto;display:block';
+          bg.appendChild(img); document.body.appendChild(bg);
+          setTimeout(()=>bg.remove(), 10_000);
+        }
+      }catch{}
+      stingVillain(rotPick('seed'));
+      setTimeout(()=>{ if (!stop) setTimeout(loop, 30_000); }, 10_000);
+    };
+    setTimeout(loop, 8_000);
+  })();
   function updateMultiplier(v){
     const el = document.getElementById('multVal'); const bar = document.getElementById('multBar');
     const cv = clampMultiplier(v, 0, 200);
     if (el) el.textContent = `${cv}%`;
     if (bar) bar.style.width = `${Math.max(0, Math.min(100, cv))}%`;
   }
-  function bumpMultiplier(delta){ LS.mult = clampMultiplier(LS.mult + delta, 0, 200); updateMultiplier(LS.mult); }
+  function bumpMultiplier(delta){
+    const prev = LS.mult;
+    LS.mult = clampMultiplier(LS.mult + delta, 0, 200);
+    updateMultiplier(LS.mult);
+    if (delta >= 5 && LS.mult > prev) showPowerup();
+  }
   // JSON + retry moved to api.js
 
   /* -------------------- Action Nudge modal -------------------- */
@@ -730,22 +841,157 @@ import { api } from './api.js';
   function closeNudge(){ document.getElementById('nudgeModal')?.classList.add('hidden'); }
   window.closeNudge = closeNudge;
   document.getElementById('nudgeMoreTime')?.addEventListener('click', ()=>{
-    closeNudge(); bumpMultiplier(-10); stingVillain(rotPick('shade')); hintPrompt();
+    closeNudge(); bumpMultiplier(-10); stingVillain(rotPick('shade'), 'shade'); hintPrompt();
   });
   document.getElementById('nudgeEightBar')?.addEventListener('click', ()=>{
-    closeNudge(); bumpMultiplier(+5); stingVillain(rotPick('hype'));
+    closeNudge(); bumpMultiplier(+5); stingVillain(rotPick('hype')); showRun();
   });
   document.getElementById('nudgeFocusmate')?.addEventListener('click', ()=>{
     closeNudge(); bumpMultiplier(+3); window.open('https://www.focusmate.com/', '_blank');
   });
   document.getElementById('nudgeCloseSocial')?.addEventListener('click', ()=>{
-    closeNudge(); bumpMultiplier(+4); stingVillain("Lock in. Tabs down, faders up.");
+    closeNudge(); bumpMultiplier(+4); stingVillain("Lock in. Tabs down, faders up.", 'seed');
   });
+
+  /* -------------------- Heat buttons -------------------- */
+  const HEAT_MAP = [
+    ['#heatDrums','drums','DRUMS'],
+    ['#heatVocals','vocals','VOCALS'],
+    ['#heatKeys','keys','KEYS'],
+    ['#heatLyrics','lyrics','LYRICS'],
+    ['#heatBass','bass','BASS']
+  ];
+  HEAT_MAP.forEach(([sel, key, label])=>{
+    const el = $(sel); if (!el) return;
+    el.addEventListener('click', ()=> heatBump(el, key, label));
+  });
+  function heatBump(btn, key, label){
+    try{
+      btn.classList.add('jiggle'); setTimeout(()=>btn.classList.remove('jiggle'), 500);
+      const hc = LS.heatCounts; hc[key] = (hc[key]||0) + 1; LS.heatCounts = hc;
+      toastGoodPager(`HEAT: ${label}`);
+      // Update badge
+      const badge = btn.querySelector('.badge'); if (badge){ badge.textContent = String(hc[key]); }
+      // Cooldown glow
+      btn.classList.add('cool'); setTimeout(()=>btn.classList.remove('cool'), 900);
+      fireRain(2600);
+      // Soft prompt to title once (first heat; no title yet)
+      if (!LS.songTitle && titleEl){
+        titleEl.focus();
+        toastGoodPager('Name it now (you can change later).');
+      }
+    }catch{}
+  }
+  function fireRain(ms=2400){
+    const start = performance.now();
+    const spawn = ()=>{
+      const now = performance.now();
+      const t = (now - start) / ms;
+      if (t > 1) return;
+      // ramp emit rate
+      const rate = t < 0.5 ? (t*2) : (2 - t*2); // 0->1->0
+      const count = Math.max(1, Math.floor(rate * 6));
+      for (let i=0;i<count;i++) createEmber();
+      requestAnimationFrame(spawn);
+    };
+    requestAnimationFrame(spawn);
+  }
+  function createEmber(){
+    const e = document.createElement('div');
+    e.className = 'fire-ember'; e.textContent = '🔥';
+    const left = Math.random()*100; // vw
+    const dur = 1.4 + Math.random()*1.6; // 1.4s - 3.0s
+    const drift = (Math.random()*80 - 40) + 'px';
+    const size = 16 + Math.floor(Math.random()*12);
+    e.style.left = left+'vw';
+    e.style.setProperty('--drift', drift);
+    e.style.animationDuration = dur+'s';
+    e.style.fontSize = size+'px';
+    document.body.appendChild(e);
+    setTimeout(()=> e.remove(), dur*1000 + 100);
+  }
+
+  function devilRain(ms=1600){
+    const start = performance.now();
+    const spawn = ()=>{
+      const now = performance.now();
+      const t = (now - start) / ms;
+      if (t > 1) return;
+      const rate = t < 0.5 ? (t*2) : (2 - t*2);
+      const count = Math.max(1, Math.floor(rate * 5));
+      for (let i=0;i<count;i++) createDevil();
+      requestAnimationFrame(spawn);
+    };
+    requestAnimationFrame(spawn);
+  }
+  // Public API for shade rain; intensity scales emission
+  window.villainShadeRain = function(intensity=28, durationMs=2200){
+    const start = performance.now();
+    const tick = ()=>{
+      const now = performance.now();
+      const t = (now - start) / durationMs;
+      if (t > 1) return;
+      const rate = Math.max(1, Math.floor(intensity * (t < 0.5 ? (t*2) : (2 - t*2)) / 6));
+      for (let i=0;i<rate;i++) createDevil();
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }
+  function createDevil(){
+    const e = document.createElement('div');
+    e.className = 'devil-head'; e.textContent = '😈';
+    const left = Math.random()*100; // vw
+    const dur = 1.1 + Math.random()*1.2;
+    const drift = (Math.random()*40 - 20) + 'px';
+    const size = 16 + Math.floor(Math.random()*14);
+    e.style.left = left+'vw';
+    e.style.setProperty('--drift', drift);
+    e.style.animationDuration = dur+'s';
+    e.style.fontSize = size+'px';
+    document.body.appendChild(e);
+    setTimeout(()=> e.remove(), dur*1000 + 120);
+  }
+
+  function sideConfetti(ms=1800){
+    const colors = ['#b6ff00','#7c3aed','#ff3b30','#ffb020','#35d07f','#4e2bb5'];
+    const start = performance.now();
+    function spawn(){
+      const now = performance.now();
+      const t = (now - start) / ms;
+      if (t>1) return;
+      const rate = t < 0.5 ? (t*2) : (2 - t*2);
+      const n = Math.max(1, Math.floor(rate*12));
+      for (let i=0;i<n;i++){
+        cannon('left'); cannon('right');
+      }
+      requestAnimationFrame(spawn);
+    }
+    function cannon(side){
+      const d = document.createElement('div');
+      d.className = 'cannon-piece';
+      const color = colors[Math.floor(Math.random()*colors.length)];
+      const w = 6 + Math.floor(Math.random()*6);
+      const h = 8 + Math.floor(Math.random()*10);
+      d.style.background = color;
+      d.style.width = w+'px'; d.style.height = h+'px';
+      if (side==='left'){
+        d.style.left = '-12px'; d.style.top = (20+Math.random()*60)+'vh';
+        d.style.animation = `cannonLeft ${1+Math.random()*1.2}s linear forwards`;
+      } else {
+        d.style.right = '-12px'; d.style.top = (20+Math.random()*60)+'vh';
+        d.style.animation = `cannonRight ${1+Math.random()*1.2}s linear forwards`;
+      }
+      document.body.appendChild(d);
+      setTimeout(()=> d.remove(), 2500);
+    }
+    requestAnimationFrame(spawn);
+  }
 
   /* -------------------- Settings (emails) -------------------- */
   document.getElementById('openSettings')?.addEventListener('click', ()=>{
     const el = document.getElementById('acctEmails');
     if (el) el.value = (LS.emails||[]).join(', ');
+  const vu = document.getElementById('vibesUrl'); if (vu) vu.value = LS.vibesUrl || '';
     document.getElementById('settingsPanel')?.classList.remove('hidden');
   });
   document.getElementById('closeSettings')?.addEventListener('click', ()=>{
@@ -755,7 +1001,41 @@ import { api } from './api.js';
     const raw = (document.getElementById('acctEmails')?.value||'').split(',').map(s=>s.trim()).filter(Boolean);
     LS.emails = raw; toastGoodPager('Settings saved');
     document.getElementById('settingsPanel')?.classList.add('hidden');
+    const src = document.getElementById('vibesUrl')?.value?.trim() || '';
+    LS.vibesUrl = src;
+    try{
+      if (musicPlayer && musicReady){
+        if (src){
+          if (src.includes('list=')) musicPlayer.loadPlaylist({ listType:'playlist', list: playlistIdFromUrl(src) });
+          else musicPlayer.loadVideoById(videoIdFromUrl(src));
+        }
+        setVol(musicPlayer, 0);
+        musicPlayer.pauseVideo();
+      }
+    }catch{}
   });
+
+  // First-run setup
+  (function firstRun(){
+    if (!LS.sidekickName || !LS.vibesUrl){
+      const p = document.getElementById('setupPanel');
+      if (p){
+        const n=document.getElementById('setupName'); if (n) n.value = LS.sidekickName || '';
+        const v=document.getElementById('setupVibesUrl'); if (v) v.value = LS.vibesUrl || '';
+        const t=document.getElementById('setupTone'); if (t) t.value = String(LS.tone ?? 1);
+        p.classList.remove('hidden');
+        document.getElementById('setupSave')?.addEventListener('click', ()=>{
+          LS.sidekickName = document.getElementById('setupName')?.value?.trim() || '';
+          LS.vibesUrl = document.getElementById('setupVibesUrl')?.value?.trim() || '';
+          LS.tone = Number(document.getElementById('setupTone')?.value || 1);
+          p.classList.add('hidden');
+          toastGoodPager('Setup saved');
+        });
+      }
+    }
+  })();
+
+  // Note: hidden unlock flow removed; users supply their own URL.
 
   async function sendAccountabilityEmail(report){
     const to = (LS.emails||[]);
@@ -784,6 +1064,7 @@ import { api } from './api.js';
       if (Array.isArray(v.prestart) && v.prestart.length) CFG.VILLAIN_PRESTART = v.prestart;
       if (Array.isArray(v.hype) && v.hype.length) CFG.VILLAIN_HYPE = v.hype;
       if (Array.isArray(v.shade) && v.shade.length) CFG.VILLAIN_SHADE = v.shade;
+  if (Array.isArray(v.pocket) && v.pocket.length) CFG.VILLAIN_POCKET = v.pocket;
     }catch{}
   }
 

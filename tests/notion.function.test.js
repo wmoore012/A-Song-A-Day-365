@@ -68,6 +68,38 @@ describe('netlify/functions/notion', () => {
     expect(body.ok).toBe(true);
   });
 
+  it('optionally attaches external file URLs and infers tempo/key from filename when env is set', async () => {
+    process.env.NOTION_TOKEN = 't';
+    process.env.NOTION_DATABASE_ID = 'db';
+    process.env.NOTION_FILES_PROP = 'Files';
+    process.env.NOTION_TEMPO_PROP = 'Tempo';
+    process.env.NOTION_KEY_PROP = 'Key';
+    const create = vi.fn().mockResolvedValue({ id: 'page_456' });
+    globalThis.__TEST_NOTION_PAGES__ = { create };
+
+    const payload = {
+      type: 'session_done',
+      date: '2025-08-09',
+      day_index: 11,
+      streak_after: 4,
+      file_name: 'My Hit_128bpm_Amin_v2.wav',
+      file_urls: ['https://example.com/audio/MyHit.wav'],
+    };
+    const res = await notionHandler(event(payload));
+    expect(res.statusCode).toBe(200);
+    const callArgs = create.mock.calls[0][0];
+    expect(callArgs.parent.database_id).toBe('db');
+    const props = callArgs.properties;
+    expect(props.Files).toBeDefined();
+    expect(Array.isArray(props.Files.files)).toBe(true);
+    expect(props.Files.files[0].external.url).toContain('https://example.com/audio/MyHit.wav');
+    expect(props.Tempo).toBeDefined();
+    expect(props.Tempo.number).toBe(128);
+    expect(props.Key).toBeDefined();
+    // Key stored as rich_text for compatibility
+    expect(props.Key.rich_text?.[0]?.text?.content).toMatch(/Amin|Amin/i);
+  });
+
   it('rejects invalid payload with 422', async () => {
     process.env.NOTION_TOKEN = 't'; process.env.NOTION_DATABASE_ID = 'db';
     const bad = { type:'session_done', date:'2025/08/09', day_index:'NaN' };

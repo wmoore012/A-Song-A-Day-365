@@ -25,10 +25,17 @@ export function createStorage(store = (typeof localStorage !== 'undefined' ? loc
   const setNum = (k, v) => { s.setItem(key(k), String(v)); };
   const getStr = (k, def='') => { const v = s.getItem(key(k)); return v ?? def; };
   const setStr = (k, v) => { s.setItem(key(k), String(v)); };
+  const getArr = (k, def=[]) => {
+    const v = s.getItem(key(k));
+    if (!v) return def;
+    try { const j = JSON.parse(v); return Array.isArray(j) ? j : def; } catch { return def; }
+  };
+  const setArr = (k, v) => { s.setItem(key(k), JSON.stringify(Array.isArray(v)?v:[])); };
 
   const clamp = (v, min=0, max=200) => Math.max(min, Math.min(max, v));
 
   return {
+  // User city prefs
     get city(){ return getJSON('city', null); },
     set city(v){ setJSON('city', v); },
     get streak(){ return getNum('streak', 0); },
@@ -63,6 +70,41 @@ export function createStorage(store = (typeof localStorage !== 'undefined' ? loc
     set emails(v){ setJSON('emails', v || []); },
     get mult(){ return clamp(getNum('mult', 100), 0, 200); },
     set mult(v){ setNum('mult', clamp(Number(v)||0, 0, 200)); },
+
+    // Heat counts per session
+    get heatCounts(){
+      const v = getJSON('heat_counts', null);
+      const base = { drums:0, vocals:0, keys:0, lyrics:0, bass:0 };
+      return v && typeof v === 'object' ? { ...base, ...v } : base;
+    },
+    set heatCounts(v){
+      const base = { drums:0, vocals:0, keys:0, lyrics:0, bass:0 };
+      setJSON('heat_counts', { ...base, ...(v||{}) });
+    },
+
+  // Song title (user-provided)
+  get songTitle(){ return getStr('title', ''); },
+  set songTitle(v){ setStr('title', v || ''); },
+
+  // User-configured Studio Vibes source (video or playlist URL)
+  get vibesUrl(){ return getStr('vibes_url', ''); },
+  set vibesUrl(v){ setStr('vibes_url', v || ''); },
+
+    // Heel (villain actor) personalization
+    get heelName(){
+      const v = getStr('heel_name', '');
+      if (v) return v;
+      const legacy = getStr('sidekick_name', '');
+      if (legacy) { setStr('heel_name', legacy); return legacy; }
+      return '';
+    },
+    set heelName(v){ setStr('heel_name', v || ''); },
+    get heelTheme(){ return getStr('heel_theme', 'masc'); }, // masc | fem | custom
+    set heelTheme(v){ setStr('heel_theme', v || 'masc'); },
+    get heelGifs(){ return getArr('heel_gifs', []); }, // for custom
+    set heelGifs(v){ setArr('heel_gifs', v || []); },
+    get tone(){ return getNum('tone', 1); },
+    set tone(v){ setNum('tone', Number(v)||0); },
   };
 }
 

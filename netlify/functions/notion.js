@@ -5,9 +5,14 @@
 import { Client } from '@notionhq/client';
 
 const REQUIRED_ENV = ['NOTION_TOKEN', 'NOTION_DATABASE_ID'];
+// Optional env config: read inside handler to support test-time mutation
 const ALLOW_ORIGIN = process.env.CORS_ALLOW_ORIGIN || '*';
 
 export async function handler(event) {
+  // Resolve optional env each request (tests mutate process.env)
+  const FILES_PROP = process.env.NOTION_FILES_PROP || null; // e.g., "Files" or "Demos"
+  const TEMPO_PROP = process.env.NOTION_TEMPO_PROP || null; // e.g., "Tempo"
+  const KEY_PROP = process.env.NOTION_KEY_PROP || null; // e.g., "Key" or "Key Signature"
   // --- CORS preflight ---
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 204, headers: corsHeaders() };
@@ -61,6 +66,18 @@ export async function handler(event) {
   const igClosed = !!payload.ig_closed;
   const fbClosed = !!payload.fb_closed;
   const ytConsidered = !!payload.yt_closed;
+  const heat = payload.heat || {};
+  const heatCounts = {
+    drums: num(heat.drums),
+    vocals: num(heat.vocals),
+    keys: num(heat.keys),
+    lyrics: num(heat.lyrics),
+    bass: num(heat.bass)
+  };
+
+  // Optional: parse key/tempo from filename if provided and env-configured
+  const fileName = str(payload.file_name);
+  const inferred = fileName ? inferFromFilename(fileName) : { key: null, tempo: null };
 
   const w = payload.weather || {};
   const weather = {
@@ -76,7 +93,7 @@ export async function handler(event) {
   const notion = new Client({ auth: process.env.NOTION_TOKEN });
   const database_id = process.env.NOTION_DATABASE_ID;
 
-    const title = `Day ${day ?? '—'} — ${dateStr}`;
+  const title = (payload.user_title && String(payload.user_title).trim()) || `Day ${day ?? '—'} — ${dateStr}`;
 
     // Property names MUST match your Notion DB.
     const properties = {
@@ -102,13 +119,35 @@ export async function handler(event) {
       'Weather code': numberOrNull(weather.code),
       'Temp C': numberOrNull(weather.temp_c),
       'Wind m/s': numberOrNull(weather.wind),
+  'Heat Drums': numberOrNull(heatCounts.drums),
+  'Heat Vocals': numberOrNull(heatCounts.vocals),
+  'Heat Keys': numberOrNull(heatCounts.keys),
+  'Heat Lyrics': numberOrNull(heatCounts.lyrics),
+  'Heat Bass': numberOrNull(heatCounts.bass),
   'Survey choice': richText(surveyChoice),
   'Survey note': richText(surveyNote),
     };
 
+  // Attach external file URLs into a Files property if configured and provided in payload
+  const files = normalizeFilesFromPayload(payload);
+  if (FILES_PROP && files.length) {
+    properties[FILES_PROP] = { files };
+  }
+
+  // Optionally include inferred tempo/key if configured
+  if (TEMPO_PROP && (num(payload.tempo) != null || inferred.tempo != null)) {
+    const chosenTempo = num(payload.tempo) ?? inferred.tempo;
+    properties[TEMPO_PROP] = numberOrNull(chosenTempo);
+  }
+  if (KEY_PROP && (str(payload.key) || inferred.key)) {
+    const chosenKey = str(payload.key) || inferred.key;
+    // Use rich_text for maximum compatibility across DBs
+    properties[KEY_PROP] = richText(chosenKey);
+  }
+
   const pagesApi = (globalThis && globalThis.__TEST_NOTION_PAGES__) || notion.pages;
-  await pagesApi.create({ parent: { database_id }, properties });
-    return json(200, { ok: true });
+  const created = await pagesApi.create({ parent: { database_id }, properties });
+    return json(200, { ok: true, page_id: created?.id });
   } catch (err) {
     console.error('Notion error:', err?.body || err);
     return json(502, { error: err?.body?.message || err?.message || 'Notion API error' });
@@ -138,6 +177,47 @@ function str(v) {
 }
 function richText(s) {
   return { rich_text: s ? [{ text: { content: s } }] : [] };
+}
+
+// Extract tempo/key from a filename like "Title_120bpm_Am_v2.wav"
+function inferFromFilename(name = ''){
+  const s = String(name || '');
+  // tempo: 2-3 digits followed by optional space and bpm
+  const t = s.match(/(\d{2,3})\s?bpm/i);
+  // key: letter with optional b/# and minor/major markers
+  // custom boundary: start or a non-word letter before the root (since _ counts as word)
+  const k = s.match(/([A-G][b#]?)(?:\s|-|_)?(maj(?:or)?|min(?:or)?|m)(?![A-Za-z])/i);
+  const tempo = t ? Number(t[1]) : null;
+  let key = null;
+  if (k) {
+    const root = k[1].toUpperCase();
+    const qualRaw = k[2].toLowerCase();
+    const qual = /maj/.test(qualRaw) ? 'maj' : 'min';
+    key = `${root}${qual}`; // e.g., Am -> Amin, Cmaj
+  }
+  return { tempo: Number.isFinite(tempo) ? tempo : null, key };
+}
+
+// Build Notion-compatible files array from payload
+function normalizeFilesFromPayload(payload = {}){
+  // Accept either payload.file_urls: string[] or payload.files: [{ name?, url }]
+  const arr = [];
+  const pushUrl = (url, name) => {
+    const u = String(url || '').trim();
+    if (!/^https?:\/\//i.test(u)) return; // Notion requires http(s)
+    const fileName = String(name || '').trim() || u.split('?')[0].split('#')[0].split('/').pop() || 'file';
+    arr.push({ name: fileName, type: 'external', external: { url: u } });
+  };
+  if (Array.isArray(payload.file_urls)) {
+    payload.file_urls.forEach(u => pushUrl(u));
+  }
+  if (Array.isArray(payload.files)) {
+    payload.files.forEach(f => {
+      if (!f) return;
+      pushUrl(f.url, f.name);
+    });
+  }
+  return arr;
 }
 
 /* ------------- validation (no deps) ------------- */

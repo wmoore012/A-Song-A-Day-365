@@ -43,6 +43,11 @@
           <div class="tip-tag" id="tipTag">“Make the ugly version. Ship it.”</div>
         </div>
 
+        <div class="songtitle-row">
+          <input id="songTitle" class="song-title" placeholder="Song title (optional)" aria-label="Song title" />
+          <small class="muted">You can set or change this anytime.</small>
+        </div>
+
         <div class="latency">
           <div class="caption">You’ve got <b>7:00</b> to lock in.</div>
           <div class="big flip" id="latencyCountdown">07:00</div>
@@ -62,6 +67,19 @@
         </div>
         <div class="divider"></div>
 
+        <div class="heat">
+          <div class="heat-hd">Heat check</div>
+          <div class="heat-row">
+            <button id="heatDrums" class="heat-btn" title="Drums hot">🥁🔥<span class="badge" aria-hidden="true">0</span></button>
+            <button id="heatVocals" class="heat-btn" title="Vocal melody hot">🎤🔥<span class="badge" aria-hidden="true">0</span></button>
+            <button id="heatKeys" class="heat-btn" title="Keys / Guitars hot">🎹🔥<span class="badge" aria-hidden="true">0</span></button>
+            <button id="heatLyrics" class="heat-btn" title="Lyrics hot">✍️<span class="badge" aria-hidden="true">0</span></button>
+            <button id="heatBass" class="heat-btn" title="Bass hot">🔊🔥<span class="badge" aria-hidden="true">0</span></button>
+          </div>
+        </div>
+
+        <div id="fireLayer" class="fire-layer"></div>
+
         <div class="ifthen">
           <div class="ifthen-hd">If-Then Checks</div>
           <label class="tgl"><input type="checkbox" id="igClosed"> IG CLOSED</label>
@@ -71,7 +89,7 @@
 
         <div class="quicklinks">
           <a class="btn btn-secondary" target="_blank" href="https://music.youtube.com/">🎵 YouTube Music</a>
-          <a class="btn btn-secondary" target="_blank" href="https://youtube.com/playlist?list=PLl-ShioB5kapDf5pXDxe2_FpNiTCQdVAO">🏠 Studio Vibes</a>
+          <button id="openVibes" class="btn btn-secondary">🏠 Studio Vibes</button>
           <a class="btn btn-secondary" target="_blank" href="https://www.focusmate.com/">👥 Focusmate</a>
         </div>
 
@@ -89,6 +107,7 @@
       </section>
 
       <section class="card">
+        <div id="lockinTicker" class="ticker muted small" aria-label="Lock-in Tips"></div>
         <div class="card-hd">
           <h2>City + Weather</h2>
           <button id="openCity" class="btn btn-secondary">🌆 City</button>
@@ -119,15 +138,15 @@
 
   <!-- Villain chat -->
   <aside id="chatDock" class="chat-dock">
-    <button id="chatToggle" class="chat-tab">😈 Villain</button>
+  <button id="chatToggle" class="chat-tab">😈 Heel</button>
     <div class="chat-wrap">
       <div class="chat-head">
-        <div>😈 Pocket-Watchin’ Producer</div>
+  <div id="sidekickHeader">😈 Heel</div>
   <div class="muted small">LLM Mode: <span id="llmModeLabel">Off</span></div>
   <button id="openSettings" class="btn btn-secondary" style="padding:6px 10px;font-size:12px">⚙️</button>
       </div>
       <div id="chatLog" class="chat-log"></div>
-      <div class="kbd" id="kbd">
+  <div class="kbd" id="kbd">
         <div class="row"><span data-k="Q">Q</span><span data-k="W">W</span><span data-k="E">E</span><span data-k="R">R</span><span data-k="T">T</span><span data-k="Y">Y</span><span data-k="U">U</span><span data-k="I">I</span><span data-k="O">O</span><span data-k="P">P</span></div>
         <div class="row"><span data-k="A">A</span><span data-k="S">S</span><span data-k="D">D</span><span data-k="F">F</span><span data-k="G">G</span><span data-k="H">H</span><span data-k="J">J</span><span data-k="K">K</span><span data-k="L">L</span></div>
         <div class="row"><span data-k="Z">Z</span><span data-k="X">X</span><span data-k="C">C</span><span data-k="V">V</span><span data-k="B">B</span><span data-k="N">N</span><span data-k="M">M</span></div>
@@ -170,8 +189,40 @@
       </div>
       <label class="tgl">Accountability emails (comma‑separated)</label>
       <input id="acctEmails" placeholder="a@b.com, c@d.com" />
+      <div class="divider"></div>
+  <label class="tgl">Studio Vibes source (YouTube Video or Playlist URL)</label>
+  <input id="vibesUrl" placeholder="https://youtu.be/... or https://youtube.com/playlist?..." />
       <div style="margin-top:8px">
         <button id="saveSettings" class="btn btn-primary">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- First-run Setup panel -->
+  <div id="setupPanel" class="panel hidden">
+    <div class="panel-card">
+      <div class="panel-hd">
+        <h3>Quick Setup</h3>
+      </div>
+      <label class="tgl">Name your heel (😈)</label>
+      <input id="setupName" placeholder="e.g., Coach, Nemesis, Drill Sgt." />
+      <div class="divider"></div>
+      <label class="tgl">Heel theme</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <label class="tgl"><input type="radio" name="heelTheme" value="masc" checked> Masc (male)</label>
+        <label class="tgl"><input type="radio" name="heelTheme" value="fem"> Fem (female)</label>
+        <label class="tgl"><input type="radio" name="heelTheme" value="custom"> Other (provide GIF URLs)</label>
+      </div>
+      <textarea id="setupHeelGifs" placeholder="One GIF URL per line (only used for Other)" style="width:100%;min-height:80px;background:#0f0f18;border:1px solid var(--line);border-radius:12px;color:#fff;padding:10px"></textarea>
+      <div class="divider"></div>
+      <label class="tgl">Studio Vibes source (YouTube Video or Playlist URL)</label>
+      <input id="setupVibesUrl" placeholder="https://youtu.be/... or https://youtube.com/playlist?..." />
+      <div class="divider"></div>
+      <label class="tgl">Spicy level (tone)</label>
+      <input id="setupTone" type="range" min="0" max="2" value="1" />
+      <div class="muted small">Moving this slider may enable LLM replies for dynamic tone. This uses your API key if configured.</div>
+      <div style="margin-top:10px">
+        <button id="setupSave" class="btn btn-primary">Save</button>
       </div>
     </div>
   </div>
