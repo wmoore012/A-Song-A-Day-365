@@ -8,7 +8,7 @@
    - White noise: LifeAt live toggle @ 15%
 */
 
-import { playlistIdFromUrl, videoIdFromUrl, clampMultiplier, rotatePick } from './web-utils.js';
+import { playlistIdFromUrl, videoIdFromUrl, clampMultiplier, rotatePick, bumpMultiplierCalc } from './web-utils.js';
 import { LS } from './storage.js';
 import { api } from './api.js';
 
@@ -139,8 +139,8 @@ import { api } from './api.js';
         "https://media.giphy.com/media/l0HU2s0vG3q8b2T9e/giphy.gif"
       ]
     },
-  // Default Studio Vibes source (can be video or playlist). Silent until armed.
-  DEFAULT_VIBES: "https://youtu.be/r9P08bbllno?si=-IZlYIIsVY3X9BY4",
+  DEFAULT_PLAYLIST: "https://music.youtube.com/playlist?list=PLl-ShioB5kapLuMhLMqdyx_gKX_MBiXeb&si=SOYdGB364nptRLFA",
+  DEFAULT_STUDIO_VIBES: "",
     NOISE_LIFEAT: "https://www.youtube.com/live/xdJ58r0k340"
   };
 
@@ -221,18 +221,18 @@ import { api } from './api.js';
 
   /* -------------------- Weather -------------------- */
   async function loadWeather(lat, lon, label){
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=${CFG.WEATHER_FIELDS}&timezone=auto`;
-  const r = await api.getJSON(url).catch(()=>null);
-  if (!r?.current) { setText('#weatherBox', `${label} — weather unavailable.`); return; }
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=${CFG.WEATHER_FIELDS}&temperature_unit=fahrenheit&windspeed_unit=mph&timezone=auto`;
+    const r = await api.getJSON(url).catch(()=>null);
+    if (!r?.current) { setText('#weatherBox', `${label} — weather unavailable.`); return; }
     const w = r.current;
-  setHTML('#weatherBox', `<b>${label}</b> — Temp: <b>${w.temperature_2m}&deg;C</b> · Wind: ${w.wind_speed_10m} m/s · ${codeDesc(w.weather_code)}`);
+    setHTML('#weatherBox', `<b>${label}</b> — Temp: <b>${w.temperature_2m}&deg;F</b> · Wind: ${w.wind_speed_10m} mph · ${codeDesc(w.weather_code)}`);
     lastWeather = {
       city: label,
       lat,
       lon,
       code: w.weather_code,
-      temp_c: w.temperature_2m,
-      wind: w.wind_speed_10m
+      temp_f: w.temperature_2m,
+      wind_mph: w.wind_speed_10m
     };
   }
   function codeDesc(c){
@@ -258,12 +258,20 @@ import { api } from './api.js';
   }
   drawCharts();
 
-  /* -------------------- Session flow -------------------- */
-  let t0 = Date.now(), started=false, startIso=null, freezeUsedToday=false;
+/* -------------------- Session flow -------------------- */
+let t0 = Date.now(), started=false, startIso=null, freezeUsedToday=false;
+let pendingBody = null;
   setInterval(()=>{
     const rem = 7*60*1000 - (Date.now()-t0);
     setText('#latencyCountdown', fmt(rem));
-    if (rem <= 0) { const el=$("#latencyCountdown"); if (el) el.style.color = '#ff6b6b'; }
+    const el = $("#latencyCountdown");
+    if (el){
+      el.classList.remove('blink');
+      if (rem <= 60*1000){ el.style.color = 'var(--bad)'; el.classList.add('blink'); }
+      else if (rem <= 2*60*1000){ el.style.color = 'var(--bad)'; }
+      else if (rem <= 4*60*1000){ el.style.color = 'var(--warn)'; }
+      else { el.style.color = 'var(--good)'; }
+    }
   }, 250);
 
   // One-time pre-start sting in the message bar
@@ -284,75 +292,82 @@ import { api } from './api.js';
   stingVillainMaybeLLM(rotPick('pre'));
   }; }
 
-  { const el = $("#doneBtn"); if (el) el.onclick = async ()=>{
+  { const el = $("#doneBtn"); if (el) el.onclick = ()=>{
     if (!started) return toast("Hit Start first.");
     started = false;
-  LS.streak += 1; setText('#streak', LS.streak);
-  if (LS.streak % 7 === 0){ LS.freezes += 1; setText('#freezes', LS.freezes); toast("🧊 Earned a freeze!"); }
-  gearDrop();
-  // show survey before success overlay
-  const survey = document.getElementById('surveyModal');
-  if (survey) survey.classList.remove('hidden');
+    LS.streak += 1; setText('#streak', LS.streak);
+    if (LS.streak % 7 === 0){ LS.freezes += 1; setText('#freezes', LS.freezes); toast("🧊 Earned a freeze!"); }
+    gearDrop();
+    const survey = document.getElementById('surveyModal');
+    if (survey) survey.classList.remove('hidden');
     const db=$("#doneBtn"); if (db) db.disabled = true;
 
-    // Notion snapshot with 1/day guard + retry
+    const igClosed = $("#igClosed")?.checked || false;
+    const fbClosed = $("#fbClosed")?.checked || false;
+    const ytConsidered = $("#ytConsidered")?.checked || false;
+    const gradeVal = +$("#gradeSlider")?.value || null;
+    const latencyMs = LS.latencies.slice(-1)[0] || null;
+    const today = new Date().toISOString().slice(0,10);
+    pendingBody = {
+      type: 'session_done',
+      date: today,
+      streak_after: LS.streak,
+      freezes: LS.freezes,
+      freeze_used: !!freezeUsedToday,
+      latency_ms: latencyMs,
+      grade: gradeVal,
+      user_title: (LS.songTitle||'').trim() || null,
+      ig_closed: igClosed,
+      fb_closed: fbClosed,
+      yt_closed: ytConsidered,
+      start_time_iso: startIso,
+      start_epoch_ms: startIso ? Date.parse(startIso) : null,
+      weather: lastWeather || (LS.city ? { city: LS.city.name, lat: LS.city.lat, lon: LS.city.lon } : {}),
+      heat: LS.heatCounts
+    };
+  }; }
+
+  async function finalizeSession(allNighter, surveyChoice, surveyNote){
+    if (!pendingBody) return;
+    const baseDate = pendingBody.date;
+    const d = new Date(baseDate + 'T00:00:00');
+    if (allNighter) d.setDate(d.getDate()-1);
+    const dateStr = d.toISOString().slice(0,10);
+    const willIncrement = LS.lastDay !== dateStr;
+    const dayIdxToSend = willIncrement ? (LS.dayIndex||0)+1 : LS.dayIndex;
+    const body = { ...pendingBody, date: dateStr, day_index: dayIdxToSend, survey_choice: surveyChoice || null, survey_note: surveyNote || null, all_nighter: allNighter };
     try {
-      const igClosed = $("#igClosed")?.checked || false;
-      const fbClosed = $("#fbClosed")?.checked || false;
-      const ytConsidered = $("#ytConsidered")?.checked || false;
-      const gradeVal = +$("#gradeSlider")?.value || null;
-      const latencyMs = LS.latencies.slice(-1)[0] || null;
-      const today = new Date().toISOString().slice(0,10);
-      const willIncrement = LS.lastDay !== today;
-      const dayIdxToSend = willIncrement ? (LS.dayIndex||0)+1 : LS.dayIndex;
-      const body = {
-        type: 'session_done',
-        date: today,
-        day_index: dayIdxToSend,
-        streak_after: LS.streak,
-        freezes: LS.freezes,
-        freeze_used: !!freezeUsedToday,
-        latency_ms: latencyMs,
-        grade: gradeVal,
-        user_title: (LS.songTitle||'').trim() || null,
-        survey_choice: (localStorage.getItem('nk_survey_choice')||'') || null,
-        survey_note: (localStorage.getItem('nk_survey_note')||'') || null,
-        ig_closed: igClosed,
-        fb_closed: fbClosed,
-        yt_closed: ytConsidered,
-        start_time_iso: startIso,
-        start_epoch_ms: startIso ? Date.parse(startIso) : null,
-        weather: lastWeather || (LS.city ? { city: LS.city.name, lat: LS.city.lat, lon: LS.city.lon } : {}),
-        heat: LS.heatCounts
-      };
-  const { ok } = await api.postNotionWithRetry(body);
-  if (!ok) {
+      const { ok } = await api.postNotionWithRetry(body);
+      if (!ok) {
         toastBad('Notion sync failed.');
       } else {
         toastGoodPager('Synced');
-        if (willIncrement){ LS.dayIndex = dayIdxToSend; LS.lastDay = today; }
-        // fire-and-forget accountability email
-        sendAccountabilityEmail({ day: LS.dayIndex, date: today, streak: LS.streak, grade: gradeVal, latencyMs });
+        if (willIncrement){ LS.dayIndex = dayIdxToSend; LS.lastDay = dateStr; }
+        sendAccountabilityEmail({ day: LS.dayIndex, date: dateStr, streak: LS.streak, grade: body.grade, latencyMs: body.latency_ms });
         freezeUsedToday = false;
-        // Reset heat counts for next session
         LS.heatCounts = { drums:0, vocals:0, keys:0, lyrics:0, bass:0 };
       }
     } catch {}
-  }; }
+    pendingBody = null;
+  }
 
   // Survey handlers
   document.getElementById('submitSurvey')?.addEventListener('click', ()=>{
     const v = document.querySelector('input[name="surveyChoice"]:checked');
     const note = document.getElementById('surveyNote');
+    const allNight = document.getElementById('surveyAllNighter')?.checked || false;
     localStorage.setItem('nk_survey_choice', v?.value || '');
     localStorage.setItem('nk_survey_note', note?.value || '');
     document.getElementById('surveyModal')?.classList.add('hidden');
+    finalizeSession(allNight, v?.value || null, note?.value || null);
     setTimeout(()=> showSuccess(), 400);
   });
   document.getElementById('skipSurvey')?.addEventListener('click', ()=>{
     localStorage.removeItem('nk_survey_choice');
     localStorage.removeItem('nk_survey_note');
+    const allNight = document.getElementById('surveyAllNighter')?.checked || false;
     document.getElementById('surveyModal')?.classList.add('hidden');
+    finalizeSession(allNight, null, null);
     setTimeout(()=> showSuccess(), 200);
   });
 
@@ -520,6 +535,7 @@ import { api } from './api.js';
   let musicPlayer, noisePlayer, hintPlayer;
   let musicReady=false, noiseReady=false, hintReady=false;
   let musicVol=15, noiseVol=15;
+  let noisePending=false;
   let ytInited = false;
 
   // Gate for autoplay w/ sound: user must click once (Chrome policy)
@@ -535,7 +551,7 @@ import { api } from './api.js';
       if (musicEl){
         musicPlayer = new YT.Player(EL.music,{
           height:'0', width:'0',
-          playerVars:{ autoplay:0, controls:0, rel:0, playsinline:1, mute:1 },
+          playerVars:{ autoplay:1, controls:0, rel:0, playsinline:1 },
           events:{ onReady: onMusicReady, onStateChange: onMusicState }
         });
       }
@@ -568,14 +584,16 @@ import { api } from './api.js';
   }
   function onMusicReady(e){
     musicReady=true;
-    const src = (LS.vibesUrl && LS.vibesUrl.trim()) || CFG.DEFAULT_VIBES;
+    const src = (LS.vibesUrl && LS.vibesUrl.trim()) || CFG.DEFAULT_PLAYLIST;
     try{
       if (src.includes('list=')){
         e.target.loadPlaylist({ listType:'playlist', list: playlistIdFromUrl(src) });
       } else {
         e.target.loadVideoById(videoIdFromUrl(src));
       }
-      setVol(musicPlayer, 0);
+      e.target.unMute();
+      setVol(musicPlayer, musicVol);
+      e.target.playVideo();
     }catch{}
   }
   function playPlaylist(e, playlistUrl, singles){
@@ -599,8 +617,13 @@ import { api } from './api.js';
   }
   function onNoiseReady(e){
     noiseReady=true;
-    // don't autostart; controlled by button
     setVol(noisePlayer, noiseVol);
+    if (noisePending){
+      const id = videoIdFromUrl(CFG.NOISE_LIFEAT);
+      noisePlayer.loadVideoById(id);
+      noisePlayer.playVideo();
+      noisePending=false;
+    }
   }
   function setVol(player, pct){
     try{ player.setVolume(Math.max(0, Math.min(100, pct))); }catch{}
@@ -615,7 +638,8 @@ import { api } from './api.js';
     }, 120);
   }
   { const el = $("#toggleNoise"); if (el) el.onclick = ()=>{
-    if (!noisePlayer){ initYouTubeOnce(); return; }
+    initYouTubeOnce();
+    if (!noisePlayer){ noisePending=true; return; }
     try{
       const s = noisePlayer.getPlayerState();
       if (s===(window.YT?.PlayerState?.PLAYING)){ noisePlayer.pauseVideo(); }
@@ -630,7 +654,8 @@ import { api } from './api.js';
 
   // Open Studio Vibes in a new tab using user preference or default
   document.getElementById('openVibes')?.addEventListener('click', ()=>{
-    const src = (LS.vibesUrl && LS.vibesUrl.trim()) || CFG.DEFAULT_VIBES;
+    const src = (LS.vibesUrl && LS.vibesUrl.trim()) || CFG.DEFAULT_STUDIO_VIBES;
+    if (!src){ toast('No Studio Vibes URL set.'); return; }
     const href = src.includes('list=') ? `https://www.youtube.com/playlist?list=${playlistIdFromUrl(src)}` : `https://www.youtube.com/watch?v=${videoIdFromUrl(src)}`;
     window.open(href, '_blank');
   });
@@ -737,11 +762,17 @@ import { api } from './api.js';
   function pick(arr){ return arr[Math.floor(Math.random()*arr.length)] }
   function buildTicker(){
     const el = document.getElementById('lockinTicker'); if (!el) return;
-    const track = document.createElement('div'); track.className='ticker-track ticker-anim';
-    const tips = CFG.ENCOURAGEMENT_TIPS;
-    const loop = tips.concat(tips);
-    loop.forEach(t=>{ const s=document.createElement('span'); s.className='ticker-item'; s.textContent=t; track.appendChild(s); });
-    el.innerHTML=''; el.appendChild(track);
+    const tipEl = document.createElement('span'); tipEl.className='ticker-item';
+    el.innerHTML=''; el.appendChild(tipEl);
+    const tips = CFG.ENCOURAGEMENT_TIPS; let idx=0;
+    const show = ()=>{
+      tipEl.textContent = tips[idx];
+      tipEl.classList.add('visible');
+      setTimeout(()=>tipEl.classList.remove('visible'), 19500);
+      idx = (idx+1) % tips.length;
+    };
+    show();
+    setInterval(show, 20000);
   }
   function rotPick(kind){
     const map = { pre:['VILLAIN_PRESTART','rotPre'], hype:['VILLAIN_HYPE','rotHype'], shade:['VILLAIN_SHADE','rotShade'], seed:['VILLAIN_SEED','rotSeed'], pocket:['VILLAIN_POCKET','rotPocket'] };
@@ -810,9 +841,11 @@ import { api } from './api.js';
         const theme = LS.heelTheme || 'masc';
         const pool = theme==='custom' ? (LS.heelGifs||[]) : (CFG.HEEL_GIFS?.[theme]||[]);
         if (pool.length){
+          const { value: gif, nextIdx } = rotatePick(pool, LS.rotHeel);
+          LS.rotHeel = nextIdx;
           const bg = document.createElement('div');
           bg.style.cssText = 'position:fixed;inset:auto 18px 80px auto;z-index:998;border-radius:12px;overflow:hidden;opacity:.9;box-shadow:0 8px 28px rgba(0,0,0,.45)';
-          const img = document.createElement('img'); img.src = pick(pool); img.style.cssText='width:220px;height:auto;display:block';
+          const img = document.createElement('img'); img.src = gif; img.style.cssText='width:220px;height:auto;display:block';
           bg.appendChild(img); document.body.appendChild(bg);
           setTimeout(()=>bg.remove(), 10_000);
         }
@@ -824,13 +857,13 @@ import { api } from './api.js';
   })();
   function updateMultiplier(v){
     const el = document.getElementById('multVal'); const bar = document.getElementById('multBar');
-    const cv = clampMultiplier(v, 0, 200);
+    const cv = clampMultiplier(Math.round(v), 0, 200);
     if (el) el.textContent = `${cv}%`;
     if (bar) bar.style.width = `${Math.max(0, Math.min(100, cv))}%`;
   }
   function bumpMultiplier(delta){
     const prev = LS.mult;
-    LS.mult = clampMultiplier(LS.mult + delta, 0, 200);
+    LS.mult = bumpMultiplierCalc(LS.mult, delta, 0, 200);
     updateMultiplier(LS.mult);
     if (delta >= 5 && LS.mult > prev) showPowerup();
   }
@@ -1017,18 +1050,19 @@ import { api } from './api.js';
 
   // First-run setup
   (function firstRun(){
-    if (!LS.sidekickName || !LS.vibesUrl){
+    if (!LS.heelName || !LS.vibesUrl){
       const p = document.getElementById('setupPanel');
       if (p){
-        const n=document.getElementById('setupName'); if (n) n.value = LS.sidekickName || '';
+        const n=document.getElementById('setupName'); if (n) n.value = LS.heelName || '';
         const v=document.getElementById('setupVibesUrl'); if (v) v.value = LS.vibesUrl || '';
         const t=document.getElementById('setupTone'); if (t) t.value = String(LS.tone ?? 1);
         p.classList.remove('hidden');
         document.getElementById('setupSave')?.addEventListener('click', ()=>{
-          LS.sidekickName = document.getElementById('setupName')?.value?.trim() || '';
+          LS.heelName = document.getElementById('setupName')?.value?.trim() || '';
           LS.vibesUrl = document.getElementById('setupVibesUrl')?.value?.trim() || '';
           LS.tone = Number(document.getElementById('setupTone')?.value || 1);
           p.classList.add('hidden');
+          const hdr=document.getElementById('sidekickHeader'); if(hdr) hdr.textContent=`😈 ${LS.heelName||'Heel'}`;
           toastGoodPager('Setup saved');
         });
       }

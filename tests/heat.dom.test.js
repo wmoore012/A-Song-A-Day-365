@@ -35,7 +35,7 @@ beforeEach(() => {
     <button id="heatVocals" class="heat-btn">🎤🔥</button>
     <button id="heatKeys" class="heat-btn">🎹🔥</button>
     <button id="heatLyrics" class="heat-btn">✍️🔥</button>
-    <button id="heatBass" class="heat-btn">🔊🔥</button>
+    <button id="heatBass" class="heat-btn">8️⃣0️⃣8️⃣🔥</button>
 
     <div id="musicPlayer"></div>
     <div id="noisePlayer"></div>
@@ -95,11 +95,11 @@ describe('Heat buttons', () => {
     // Click Done to trigger Notion payload; ensure fetch was called with heat
   let bodySent = null;
     document.getElementById('doneBtn').click();
+    document.getElementById('skipSurvey').click();
     // Allow async post to run
     await new Promise(r => setTimeout(r, 0));
 
-    // Find last call to notion endpoint
-  const calls = global.fetch.mock.calls.filter(([u]) => String(u).includes('/.netlify/functions/notion'));
+    const calls = global.fetch.mock.calls.filter(([u]) => String(u).includes('/.netlify/functions/notion'));
     expect(calls.length).toBeGreaterThan(0);
     try { bodySent = JSON.parse(calls.at(-1)[1].body); } catch { bodySent = null; }
     expect(bodySent).toBeTruthy();

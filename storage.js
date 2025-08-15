@@ -66,6 +66,8 @@ export function createStorage(store = (typeof localStorage !== 'undefined' ? loc
     set rotHype(v){ setNum('rot_hype', v); },
     get rotShade(){ return getNum('rot_shade', 0); },
     set rotShade(v){ setNum('rot_shade', v); },
+    get rotHeel(){ return getNum('rot_heel', 0); },
+    set rotHeel(v){ setNum('rot_heel', v); },
     get emails(){ return getJSON('emails', []); },
     set emails(v){ setJSON('emails', v || []); },
     get mult(){ return clamp(getNum('mult', 100), 0, 200); },

@@ -26,9 +26,11 @@ describe('web-utils', () => {
 
   it('bumpMultiplierCalc clamps and sums safely', () => {
     expect(bumpMultiplierCalc(100, +5)).toBe(105);
-    expect(bumpMultiplierCalc(98, +10)).toBe(108);
+    expect(bumpMultiplierCalc(98, +10)).toBe(110);
     expect(bumpMultiplierCalc(0, -4)).toBe(0);
     expect(bumpMultiplierCalc(195, +20)).toBe(200);
     expect(bumpMultiplierCalc('x', 'y')).toBe(0);
+    expect(bumpMultiplierCalc(100, +3)).toBe(105);
+    expect(bumpMultiplierCalc(100, -3)).toBe(95);
   });
 });
