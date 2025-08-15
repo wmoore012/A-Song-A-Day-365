@@ -41,32 +41,37 @@ describe('netlify/functions/notion', () => {
     expect(res.statusCode).toBe(400);
   });
 
-  it('creates a page and returns 200 on valid payload', async () => {
-    process.env.NOTION_TOKEN = 't'; process.env.NOTION_DATABASE_ID = 'db';
-    globalThis.__TEST_NOTION_PAGES__ = { create: vi.fn().mockResolvedValue({ id:'page_123'}) };
-    const payload = {
-      type: 'session_done',
-      date: '2025-08-09',
-      day_index: 10,
-      streak_after: 3,
-      freezes: 1,
-      freeze_used: false,
-      latency_ms: 1234,
-      grade: 80,
-      survey_choice: 'Low energy',
-      survey_note: 'Stayed focused, shorter session',
-      ig_closed: true,
-      fb_closed: true,
-      yt_closed: false,
-      start_time_iso: '2025-08-09T12:00:00Z',
-      start_epoch_ms: 1754731200000,
-      weather: { city:'Charlotte, NC', lat:35.2, lon:-80.84, code:1, temp_c:28, wind:2.1 }
-    };
-    const res = await notionHandler(event(payload));
-    expect(res.statusCode).toBe(200);
-    const body = JSON.parse(res.body||'{}');
-    expect(body.ok).toBe(true);
-  });
+    it('creates a page and returns 200 on valid payload', async () => {
+      process.env.NOTION_TOKEN = 't'; process.env.NOTION_DATABASE_ID = 'db';
+      const create = vi.fn().mockResolvedValue({ id:'page_123'});
+      globalThis.__TEST_NOTION_PAGES__ = { create };
+      const payload = {
+        type: 'session_done',
+        date: '2025-08-09',
+        day_index: 10,
+        streak_after: 3,
+        freezes: 1,
+        freeze_used: false,
+        latency_ms: 1234,
+        grade: 80,
+        all_nighter: true,
+        survey_choice: 'Low energy',
+        survey_note: 'Stayed focused, shorter session',
+        ig_closed: true,
+        fb_closed: true,
+        yt_closed: false,
+        start_time_iso: '2025-08-09T12:00:00Z',
+        start_epoch_ms: 1754731200000,
+        weather: { city:'Charlotte, NC', lat:35.2, lon:-80.84, code:1, temp_c:28, wind:2.1 }
+      };
+      const res = await notionHandler(event(payload));
+      expect(res.statusCode).toBe(200);
+      const body = JSON.parse(res.body||'{}');
+      expect(body.ok).toBe(true);
+      const props = create.mock.calls[0][0].properties;
+      expect(props['All nighter']).toBeDefined();
+      expect(props['All nighter'].checkbox).toBe(true);
+    });
 
   it('optionally attaches external file URLs and infers tempo/key from filename when env is set', async () => {
     process.env.NOTION_TOKEN = 't';

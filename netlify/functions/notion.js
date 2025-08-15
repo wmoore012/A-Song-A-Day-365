@@ -52,12 +52,13 @@ export async function handler(event) {
   // Normalize inputs
   const day = num(payload.day_index);
   const dateStr = payload.date || new Date().toISOString().slice(0, 10);
-  const streak = num(payload.streak_after);
-  const freezes = num(payload.freezes);
-  const latency = num(payload.latency_ms);
-    const grade = num(payload.grade);
-    const startTimeIso = payload.start_time_iso || null;
-    const startEpochMs = num(payload.start_epoch_ms);
+    const streak = num(payload.streak_after);
+    const freezes = num(payload.freezes);
+    const latency = num(payload.latency_ms);
+      const grade = num(payload.grade);
+      const startTimeIso = payload.start_time_iso || null;
+      const startEpochMs = num(payload.start_epoch_ms);
+    const allNighter = !!payload.all_nighter;
   const lyrics = str(payload.song_lyrics);
   const beat = str(payload.song_beat || lyrics);
   const sameSong = !!payload.same_song;
@@ -80,14 +81,14 @@ export async function handler(event) {
   const inferred = fileName ? inferFromFilename(fileName) : { key: null, tempo: null };
 
   const w = payload.weather || {};
-  const weather = {
-    city: str(w.city),
-    lat: num(w.lat),
-    lon: num(w.lon),
-    code: num(w.code),
-    temp_c: num(w.temp_c),
-    wind: num(w.wind),
-  };
+    const weather = {
+      city: str(w.city),
+      lat: num(w.lat),
+      lon: num(w.lon),
+      code: num(w.code),
+      temp_c: num(w.temp_c),
+      wind: num(w.wind),
+    };
 
   try {
   const notion = new Client({ auth: process.env.NOTION_TOKEN });
@@ -111,10 +112,11 @@ export async function handler(event) {
       'Beat song': richText(beat),
       'Same song': { checkbox: sameSong },
       'IG closed': { checkbox: igClosed },
-      'FB closed': { checkbox: fbClosed },
-      'YT closed': { checkbox: ytConsidered },
-      'City': richText(weather.city),
-      'Lat': numberOrNull(weather.lat),
+        'FB closed': { checkbox: fbClosed },
+        'YT closed': { checkbox: ytConsidered },
+        'All nighter': { checkbox: allNighter },
+        'City': richText(weather.city),
+        'Lat': numberOrNull(weather.lat),
       'Lon': numberOrNull(weather.lon),
       'Weather code': numberOrNull(weather.code),
       'Temp C': numberOrNull(weather.temp_c),
@@ -233,6 +235,7 @@ export function validatePayload(p){
   ['day_index','streak_after','freezes','latency_ms','grade','start_epoch_ms'].forEach(k=>{
     if (p[k] != null && !Number.isFinite(Number(p[k]))) issues.push(`${k} must be number`);
   });
+  if (p.all_nighter != null && typeof p.all_nighter !== 'boolean') issues.push('all_nighter must be boolean');
   if (p.weather){
     const w = p.weather;
     if (typeof w !== 'object') issues.push('weather must be object');

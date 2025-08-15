@@ -27,11 +27,13 @@ h2{font-family:Rajdhani,Inter;font-size:20px;letter-spacing:.5px;margin:0}
 .focus{outline:2px solid #2a184f}
 
 /* Buttons */
-.btn{cursor:pointer;border:none;border-radius:14px;padding:10px 14px;font-weight:900;letter-spacing:.2px;transition:transform .08s ease, box-shadow .08s ease, filter .08s ease}
+.btn{cursor:pointer;display:inline-flex;align-items:center;justify-content:center;border:none;border-radius:14px;padding:10px 14px;font-weight:900;letter-spacing:.2px;transition:transform .08s ease, box-shadow .08s ease, filter .08s ease;text-decoration:none}
+a.btn{text-decoration:none}
 .btn:hover{transform:translateY(-1px) scale(1.03);box-shadow:0 8px 18px rgba(0,0,0,.35);filter:brightness(1.05)}
 .btn:active{transform:translateY(0)}
 .btn-primary{background:linear-gradient(135deg,var(--purple),#4e2bb5);color:#fff}
 .btn-secondary{background:#1b1c29;border:1px solid var(--line);color:#fff}
+.btn-secondary:hover{background:linear-gradient(135deg,var(--volt),#75ff00);color:#001}
 .btn-good{background:linear-gradient(135deg,#1cae72,#119e68);color:#001}
 .btn-warn{background:linear-gradient(135deg,#ffb020,#e5890c);color:#001}
 .btn-bad{background:linear-gradient(135deg,#ff3b30,#c62828);color:#fff}
@@ -39,10 +41,12 @@ h2{font-family:Rajdhani,Inter;font-size:20px;letter-spacing:.5px;margin:0}
 .arm{margin-top:10px;width:100%}
 
 /* Text bits */
-.message{margin-top:10px;background:#141522;border:1px dashed #2d3050;padding:10px;border-radius:12px}
+.message{margin-top:10px;background:#141522;border:1px dashed var(--volt);padding:10px;border-radius:12px}
 .divider{height:1px;background:var(--line);margin:12px 0}
 .ifthen-hd{font-weight:900;margin-bottom:6px}
-.tgl{display:block;margin:4px 0}
+.tgl{display:flex;align-items:center;margin:4px 0}
+.tgl input{margin-right:8px}
+.ifthen{margin-bottom:8px}
 .quicklinks{display:flex;gap:8px;flex-wrap:wrap}
 /* Multiplier */
 .mult{margin-top:10px}
@@ -60,18 +64,19 @@ h2{font-family:Rajdhani,Inter;font-size:20px;letter-spacing:.5px;margin:0}
 .latency .caption{color:var(--muted)}
 .big{font-size:44px;margin:2px 0 6px}
 
+.blink{animation:blink 1s step-start infinite}
+@keyframes blink{50%{opacity:0}}
+
 /* City/Weather/Map */
 .weather{margin-top:8px;color:#cbd3df}
 .map{height:260px;margin-top:10px;border-radius:12px;overflow:hidden;outline:1px solid var(--line)}
 .map{pointer-events:none}
 
 /* Lock-in Tips ticker */
-.ticker{position:relative;height:22px;overflow:hidden;border:1px solid var(--line);border-radius:10px;background:#0f0f18;margin-bottom:8px}
+.ticker{position:relative;height:22px;overflow:hidden;border:1px solid var(--line);border-radius:10px;background:#0f0f18;margin-bottom:8px;display:flex;align-items:center;padding-left:120px}
 .ticker::before{content:"LOCK‑IN TIPS";position:absolute;left:8px;top:50%;transform:translateY(-50%);color:#7f85b3;font-weight:900;font-size:11px}
-.ticker-track{position:absolute;left:120px;top:0;right:10px;bottom:0;display:flex;align-items:center;gap:40px;white-space:nowrap}
-.ticker-item{font-weight:800;color:#cbd3df}
-.ticker-anim{animation:tickerScroll 26s linear infinite}
-@keyframes tickerScroll{from{transform:translateX(0)}to{transform:translateX(-50%)} }
+.ticker-item{font-weight:800;color:#cbd3df;opacity:0;transition:opacity .5s}
+.ticker-item.visible{opacity:1}
 
 /* Charts + grading */
 .charts{display:grid;gap:8px}

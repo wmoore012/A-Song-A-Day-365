@@ -27,7 +27,9 @@ export function rotatePick(pool, idx = 0){
 }
 
 export function bumpMultiplierCalc(prev = 100, delta = 0, min = 0, max = 200){
-  return clampMultiplier((Number.isFinite(+prev) ? +prev : 0) + (Number.isFinite(+delta) ? +delta : 0), min, max);
+  const sum = (Number.isFinite(+prev) ? +prev : 0) + (Number.isFinite(+delta) ? +delta : 0);
+  const rounded = Math.round(sum / 5) * 5; // ensure multiplier stays in 5-point steps
+  return clampMultiplier(rounded, min, max);
 }
 
 // Build an Open-in-YouTube link from a video URL or ID

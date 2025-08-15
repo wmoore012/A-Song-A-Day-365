@@ -74,7 +74,7 @@
             <button id="heatVocals" class="heat-btn" title="Vocal melody hot">🎤🔥<span class="badge" aria-hidden="true">0</span></button>
             <button id="heatKeys" class="heat-btn" title="Keys / Guitars hot">🎹🔥<span class="badge" aria-hidden="true">0</span></button>
             <button id="heatLyrics" class="heat-btn" title="Lyrics hot">✍️<span class="badge" aria-hidden="true">0</span></button>
-            <button id="heatBass" class="heat-btn" title="Bass hot">🔊🔥<span class="badge" aria-hidden="true">0</span></button>
+            <button id="heatBass" class="heat-btn" title="Bass hot">8️⃣0️⃣8️⃣🔥<span class="badge" aria-hidden="true">0</span></button>
           </div>
         </div>
 
@@ -190,8 +190,8 @@
       <label class="tgl">Accountability emails (comma‑separated)</label>
       <input id="acctEmails" placeholder="a@b.com, c@d.com" />
       <div class="divider"></div>
-  <label class="tgl">Studio Vibes source (YouTube Video or Playlist URL)</label>
-  <input id="vibesUrl" placeholder="https://youtu.be/... or https://youtube.com/playlist?..." />
+  <label class="tgl">YouTube Music playlist URL</label>
+  <input id="vibesUrl" placeholder="https://music.youtube.com/playlist?list=..." />
       <div style="margin-top:8px">
         <button id="saveSettings" class="btn btn-primary">Save</button>
       </div>
@@ -215,8 +215,8 @@
       </div>
       <textarea id="setupHeelGifs" placeholder="One GIF URL per line (only used for Other)" style="width:100%;min-height:80px;background:#0f0f18;border:1px solid var(--line);border-radius:12px;color:#fff;padding:10px"></textarea>
       <div class="divider"></div>
-      <label class="tgl">Studio Vibes source (YouTube Video or Playlist URL)</label>
-      <input id="setupVibesUrl" placeholder="https://youtu.be/... or https://youtube.com/playlist?..." />
+      <label class="tgl">YouTube Music playlist URL</label>
+      <input id="setupVibesUrl" placeholder="https://music.youtube.com/playlist?list=..." />
       <div class="divider"></div>
       <label class="tgl">Spicy level (tone)</label>
       <input id="setupTone" type="range" min="0" max="2" value="1" />
@@ -261,6 +261,7 @@
         <label class="tgl"><input type="radio" name="surveyChoice" value="Low energy"> Low energy</label>
         <label class="tgl"><input type="radio" name="surveyChoice" value="Other"> Other</label>
       </div>
+      <label class="tgl"><input type="checkbox" id="surveyAllNighter"> All-nighter (counts for previous day)</label>
       <textarea id="surveyNote" placeholder="Optional note" style="width:100%;min-height:80px;background:#0f0f18;border:1px solid var(--line);border-radius:12px;color:#fff;padding:10px"></textarea>
       <div style="margin-top:10px;display:flex;gap:8px;justify-content:center">
         <button id="submitSurvey" class="btn btn-primary">Submit</button>
