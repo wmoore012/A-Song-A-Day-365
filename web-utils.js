@@ -28,7 +28,8 @@ export function rotatePick(pool, idx = 0){
 
 export function bumpMultiplierCalc(prev = 100, delta = 0, min = 0, max = 200){
   const sum = (Number.isFinite(+prev) ? +prev : 0) + (Number.isFinite(+delta) ? +delta : 0);
-  const rounded = Math.round(sum / 5) * 5; // ensure multiplier stays in 5-point steps
+  const STEP = 10; // snap multiplier to clean 10-point steps for calmer motion
+  const rounded = Math.round(sum / STEP) * STEP;
   return clampMultiplier(rounded, min, max);
 }
 
