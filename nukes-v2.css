@@ -77,6 +77,8 @@ a.btn{text-decoration:none}
 .ticker::before{content:"LOCK‑IN TIPS";position:absolute;left:8px;top:50%;transform:translateY(-50%);color:#7f85b3;font-weight:900;font-size:11px}
 .ticker-item{font-weight:800;color:#cbd3df;opacity:0;transition:opacity .5s}
 .ticker-item.visible{opacity:1}
+.blink{animation:blink 1s step-start infinite}
+@keyframes blink{50%{opacity:0}}
 
 /* Charts + grading */
 .charts{display:grid;gap:8px}

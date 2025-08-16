@@ -93,7 +93,7 @@ describe('Heat buttons', () => {
     expect(ember).toBeTruthy();
 
     // Click Done to trigger Notion payload; ensure fetch was called with heat
-  let bodySent = null;
+    let bodySent = null;
     document.getElementById('doneBtn').click();
     document.getElementById('skipSurvey').click();
     // Allow async post to run

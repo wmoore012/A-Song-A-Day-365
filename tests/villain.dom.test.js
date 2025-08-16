@@ -1,8 +1,6 @@
 /* @vitest-environment jsdom */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-// This verifies that shade stings trigger devil-head rain, while non-shade do not.
-
 describe('Villain shade rain', () => {
   beforeEach(() => {
     document.body.innerHTML = `
@@ -53,8 +51,6 @@ describe('Villain shade rain', () => {
     };
     globalThis.Chart = class { constructor(){} destroy(){} };
     vi.spyOn(global, 'fetch').mockResolvedValue({ ok:true, json: async()=>({ videos: [] }) });
-
-    // Use real timers; we will wait briefly for animation spawn.
   });
 
   afterEach(() => {

@@ -1,8 +1,6 @@
 /* @vitest-environment jsdom */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-// Use JSDOM environment in Vitest config implicitly; simulate minimal DOM
-
 beforeEach(() => {
   document.body.innerHTML = `
     <div id="hintsModal" class="overlay hidden"></div>
