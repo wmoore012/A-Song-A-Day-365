@@ -1,0 +1,17 @@
+feat(spd365): open-core polish, Pro (BSL) setup, CI/CD, and user media prefs
+
+- Open core structure with clear Pro boundary under /pro (BSL 1.1)
+- Add licenses/PRO-LICENSE.BSL and RELEASING.md (Change Date 2028-08-16); STYLEGUIDE.md for fail-loud TDD and a11y
+- GitHub Actions workflow runs tests+build on push/PR; deploys main to Netlify
+- Netlify SPA config with asset caching; Vite build emits dist/
+- Villain system: move proprietary lines to /pro/villain-lines.js (BSL) and load dynamically; open core ships with empty arrays
+- Villain UX: add mute chip (localStorage persisted), shade rain API, and lobby speaker backdrop with smooth fade
+- Music: user-controlled Now Playing playlist (LS.musicUrl) at startup; no default Studio Vibes auto-play (user must set)
+- Hints: support user-defined hints list (LS.hintsUrls); falls back to config/hints.json then examples
+- Settings + first-run: add fields for Studio Vibes, Music playlist, and Hints list; include tone and heel name
+- Storage: add getters/setters for musicUrl, hintsUrls, and heel prefs; clamp and safe JSON handling
+- Tests: add jsdom-backed unit tests for duration/all-nighter logic and villain mute chip; vitest.config.js
+- README updated with Getting Started, Tests, Open vs Pro, CI/CD
+- .gitignore ignores node_modules, dist, .env, .vscode, .idea; removed tracked junk from VCS
+
+Ready for push: set NETLIFY_SITE_ID/NETLIFY_AUTH_TOKEN in GitHub and connect Netlify for PR previews.

@@ -90,6 +90,14 @@ export function createStorage(store = (typeof localStorage !== 'undefined' ? loc
   get vibesUrl(){ return getStr('vibes_url', ''); },
   set vibesUrl(v){ setStr('vibes_url', v || ''); },
 
+  // Optional: override default music playlist (used for Now Playing at startup)
+  get musicUrl(){ return getStr('music_url', ''); },
+  set musicUrl(v){ setStr('music_url', v || ''); },
+
+  // Optional: custom hints list (array of YouTube video URLs)
+  get hintsUrls(){ return getArr('hints_urls', []); },
+  set hintsUrls(v){ setArr('hints_urls', Array.isArray(v)?v:[]); },
+
     // Heel (villain actor) personalization
     get heelName(){
       const v = getStr('heel_name', '');

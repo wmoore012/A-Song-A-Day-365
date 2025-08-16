@@ -33,8 +33,11 @@
         <div class="chip">🔥 Streak <b id="streak">0</b></div>
         <div class="chip">🧊 Freezes <b id="freezes">0</b></div>
         <div class="chip flip" id="flipClock">00:00</div>
+        <button id="villainMuteChip" class="chip" aria-pressed="false" title="Mute villain">🔇 Villain</button>
       </div>
     </header>
+
+    <div id="lobbyBackdrop" aria-hidden="true"></div>
 
     <main class="grid">
       <section class="card focus">
@@ -190,8 +193,16 @@
       <label class="tgl">Accountability emails (comma‑separated)</label>
       <input id="acctEmails" placeholder="a@b.com, c@d.com" />
       <div class="divider"></div>
-  <label class="tgl">Studio Vibes source (YouTube Video or Playlist URL)</label>
-  <input id="vibesUrl" placeholder="https://youtu.be/... or https://youtube.com/playlist?..." />
+      <label class="tgl">Studio Vibes source (YouTube Video or Playlist URL)</label>
+      <input id="vibesUrl" placeholder="https://youtu.be/... or https://youtube.com/playlist?..." />
+      <small class="muted">No default. Add your own video/playlist.</small>
+      <div class="divider"></div>
+      <label class="tgl">Music playlist (Now Playing at startup)</label>
+      <input id="musicUrl" placeholder="https://youtube.com/playlist?list=... (optional)" />
+      <small class="muted">Defaults to the built-in playlist unless you set one here.</small>
+      <div class="divider"></div>
+      <label class="tgl">Hints videos (one YouTube URL per line)</label>
+      <textarea id="hintsList" placeholder="https://www.youtube.com/watch?v=...\nhttps://www.youtube.com/watch?v=..." style="width:100%;min-height:100px;background:#0f0f18;border:1px solid var(--line);border-radius:12px;color:#fff;padding:10px"></textarea>
       <div style="margin-top:8px">
         <button id="saveSettings" class="btn btn-primary">Save</button>
       </div>
@@ -217,6 +228,10 @@
       <div class="divider"></div>
       <label class="tgl">Studio Vibes source (YouTube Video or Playlist URL)</label>
       <input id="setupVibesUrl" placeholder="https://youtu.be/... or https://youtube.com/playlist?..." />
+      <small class="muted">No default: add your own video/playlist.</small>
+      <div class="divider"></div>
+      <label class="tgl">Music playlist (startup Now Playing; optional)</label>
+      <input id="setupMusicUrl" placeholder="https://youtube.com/playlist?list=... (optional)" />
       <div class="divider"></div>
       <label class="tgl">Spicy level (tone)</label>
       <input id="setupTone" type="range" min="0" max="2" value="1" />

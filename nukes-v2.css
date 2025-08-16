@@ -190,3 +190,26 @@ a.btn{text-decoration:none}
 /* Devil rain */
 .devil-head{position:fixed;top:-24px;pointer-events:none;z-index:9997;filter:drop-shadow(0 6px 10px rgba(0,0,0,.35));animation:devilFall linear forwards}
 @keyframes devilFall{to{transform:translateY(110vh) translateX(var(--drift, 0px)) rotate(8deg);opacity:.9}}
+
+/* Lobby hero with the same speaker image on both sides + dark gradient */
+#lobbyBackdrop {
+  height: 200px;
+  border-radius: 16px;
+  background-image:
+    url("/img/speaker-dark.jpg"),
+    url("/img/speaker-dark.jpg"),
+    linear-gradient(180deg, #0b0c10, #07090c);
+  background-repeat: no-repeat, no-repeat, no-repeat;
+  background-size: 33% auto, 33% auto, cover;
+  background-position: left center, right center, center;
+  box-shadow: inset 0 -80px 120px rgba(0,0,0,.65);
+  transition: opacity 4s ease;
+}
+.lobby-faded { opacity: 0; }
+
+/* Calendar dots + all-nighter badge */
+.day-cell .dot.active { background:#b6ff00; box-shadow:0 0 6px #b6ff00; }
+.day-cell .dot.active.moon { position:relative; }
+.day-cell .dot.active.moon::after {
+  content: "🌙"; position:absolute; top:-8px; right:-8px; font-size:10px;
+}

@@ -35,88 +35,13 @@ import { api } from './api.js';
       "Five good minutes beats zero perfect ones.",
       "Set one outcome. Everything else is extra.",
     ],
-    // Competitive, passive‑aggressive AAVE tone; no sports metaphors
-    VILLAIN_SEED: [
-      "I started already. You still debating?",
-      "Got a sample flipped. You still window‑shopping?",
-      "Hook’s bounced. Catch up.",
-      "I’m posting placements later. Don’t get left.",
-      "Keep polishing—I’ll keep publishing.",
-      "I move. You muse. See the difference?",
-      "Quiet grind > loud plans. What you on?",
-      "Timers runnin’. Your excuses too?",
-      "Catalog grows when you stop overthinking.",
-      "You still curating vibes instead of making one?",
-      "I got stems zipped already. You still auditioning kicks.",
-      "Talk less, bounce more.",
-      "Idea down, drums on. You comin’ or what?",
-      "You busy scrolling. I’m busy shipping.",
-      "Less pretend, more print.",
-    ],
-    VILLAIN_PRESTART: [
-      "Start the timer. Loops don’t cook themselves.",
-      "Quit stalling. Put one idea down—then build.",
-      "Talking won’t bounce a track. Press start.",
-      "Open DAW, pick a loop, drums, go.",
-      "First move: eight bars, no detours.",
-      "Clock’s live. Put numbers on the board—quietly.",
-      "Keep it simple, ship it. Then flex.",
-      "Load the kit, not another tab.",
-      "No grand plan. One section, print it.",
-      "Set a limiter: 30 mins, export no matter what.",
-      "You know the recipe. Stop remixing the checklist.",
-      "Minimal chain. Max output.",
-      "Reference last win. Repeat the steps.",
-      "One hook. One bounce. Next.",
-      "You ain’t stuck. You bored. Move.",
-    ],
-    VILLAIN_HYPE: [
-      "Clean bounce. That’s grown work.",
-      "Kept it simple and shipped. Respect.",
-      "Bag secured. Next one.",
-      "Catalog up one. Keep moving.",
-      "You executed, not fantasized. That’s it.",
-      "Quiet cook, loud results.",
-      "You don’t chase perfect, you chase done.",
-      "Real discipline. I see it.",
-      "You made it easy on yourself. That’s mastery.",
-      "Routine hittin’.",
-      "Clocked in, clocked out, product shipped.",
-      "You treated it like a job. That’s why it’s working.",
-      "You left nothing cute—just the export.",
-      "Numbers moving up. Keep it boring, keep it winning.",
-      "That’s momentum.",
-    ],
-    VILLAIN_SHADE: [
-      "You polishing excuses. Arrange and bounce.",
-      "Too many tabs, not enough exports.",
-      "You scrolling like it pays. It doesn’t.",
-      "Close IG. Open that chorus.",
-      "Stop auditioning. Pick one and commit.",
-      "You busy, not productive. Fix that.",
-      "All preview, no print—classic.",
-      "You tweaking solo’d hats again? C’mon.",
-      "If it ain’t exporting, it’s just stalling.",
-      "Playlist curator vibes. Producer? Prove it.",
-      "Loop been looping. When you gon’ bounce?",
-      "You love ‘almost’. Try ‘done’.",
-      "That’s not research, that’s hiding.",
-      "Less taste‑testing, more plate‑serving.",
-      "Cut the cute. Ship the song.",
-    ],
+    // Villain lines are provided by /pro/villain-lines.js (BSL). Empty by default in open core.
+    VILLAIN_SEED: [],
+    VILLAIN_PRESTART: [],
+    VILLAIN_HYPE: [],
+    VILLAIN_SHADE: [],
     RARE_DROP_RATE: 0.15,
-    VILLAIN_POCKET: [
-      "Sheeesh, them rims brand new? You ridin’ presidential, huh? 😂",
-      "Penthouse view, huh big bro? Must be different up there. 😏😂",
-      "Ain’t no recession in your closet, I see. 😂",
-      "You swapped chains again? Boy, you allergic to repeats. 😂",
-      "Whole vacation album lookin’ like a Visa commercial. 😂",
-      "Must be nice wakin’ up to deposits, not alarms. 😂",
-      "Keep that throne warm—I’m comin’ for the cushions. 😂",
-      "Heard your backend bigger than payroll—must be nice, CEO. 😂",
-      "Clocked your royalty sheet—got more commas than my DMs. 😂",
-      "Don’t spend it all in one reel, superstar. 😂"
-    ],
+    VILLAIN_POCKET: [],
     GIFS: {
       RUN: [
         "https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3bTUwbzlxZ2pmYzNuYnZucDY1c3J0emU5c2I5MHFoa3NwNm01MmlvbCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/TJaNCdTf06YvwRPCge/giphy.gif",
@@ -143,6 +68,23 @@ import { api } from './api.js';
   DEFAULT_STUDIO_VIBES: "",
     NOISE_LIFEAT: "https://www.youtube.com/live/xdJ58r0k340"
   };
+
+  // Load Pro villain lines (BSL) if available
+  (async () => {
+    try {
+      const mod = await import('./pro/villain-lines.js');
+      const v = mod?.getProVillainLines?.();
+      if (!v) throw new Error('Invalid pro villain export');
+      if (Array.isArray(v.seed)) CFG.VILLAIN_SEED = v.seed;
+      if (Array.isArray(v.prestart)) CFG.VILLAIN_PRESTART = v.prestart;
+      if (Array.isArray(v.hype)) CFG.VILLAIN_HYPE = v.hype;
+      if (Array.isArray(v.shade)) CFG.VILLAIN_SHADE = v.shade;
+      if (Array.isArray(v.pocket)) CFG.VILLAIN_POCKET = v.pocket;
+    } catch (e) {
+      console.error('Pro villain scripts missing or invalid.', e);
+      try { if (location && location.hostname === 'localhost') throw new Error('Missing /pro/villain-lines.js (BSL): add your villain packs.'); } catch {}
+    }
+  })();
 
   /* -------------------- State -------------------- */
   const EL = { music:'musicPlayer', noise:'noisePlayer', nowPlaying:'npTitle', map:'map', hint:'hintPlayerHost' };
@@ -436,7 +378,8 @@ let pendingBody = null;
     $("#chatDock")?.classList.toggle('open', chat.open);
   setText('#llmModeLabel', chat.mode()==='LLM' ? 'On' : 'Off');
     if (chat.open && chat.log && chat.log.childElementCount===0) {
-  pushMsg('bot', pick(CFG.VILLAIN_SEED));
+      const l = rotPick('seed');
+      if (l) pushMsg('bot', l);
     }
   }; }
   { const el = $("#saveLLM"); if (el) el.onclick = ()=>{
@@ -458,7 +401,7 @@ let pendingBody = null;
     pushMsg('me', text); if (chat.input) chat.input.value='';
     if (chat.mode()==='LLM'){
       try { const reply = await villainLLM(text); pushMsg('bot', reply); }
-      catch { pushMsg('bot', pick(CFG.VILLAIN_SEED)); }
+      catch { const l = rotPick('seed'); if (l) pushMsg('bot', l); }
     } else {
     pushMsg('bot', ruleReply(text));
     }
@@ -482,13 +425,13 @@ let pendingBody = null;
         tired: "Lower the bar. 8 bars, simple drums, bounce it. Done beats perfect.",
         youtube: "YT considered? Use Music only. Don’t derail.",
         mix: "Don’t mix the song. Finish, bounce, pack. Next.",
-        other: pick(CFG.VILLAIN_SEED)
+        other: (rotPick('seed') || 'Lower the bar. 8 bars, simple drums, bounce it.')
       };
       const spicy = {
         tired: "Lower the bar and move. 8 bars, drums, bounce.",
         youtube: "Close the tabs. Make the track, not excuses.",
         mix: "Stop mixing pretty. Arrange and print it.",
-        other: pick(CFG.VILLAIN_SHADE)
+        other: (rotPick('shade') || 'Close the tabs. Make the track, not excuses.')
       };
       const T = tone===0?gentle:(tone===2?spicy:mid);
       if (lower.includes('tired')||lower.includes('low')) return T.tired;
@@ -528,7 +471,7 @@ let pendingBody = null;
       })
     });
     const json = await r.json();
-    return json?.choices?.[0]?.message?.content?.trim() || pick(CFG.VILLAIN_SEED);
+    return json?.choices?.[0]?.message?.content?.trim() || (rotPick('seed') || 'Hook slid by… go write the one that sticks.');
   }
 
   /* -------------------- Music / Noise (YouTube IFrame) -------------------- */
@@ -584,7 +527,7 @@ let pendingBody = null;
   }
   function onMusicReady(e){
     musicReady=true;
-    const src = (LS.vibesUrl && LS.vibesUrl.trim()) || CFG.DEFAULT_PLAYLIST;
+    const src = (LS.musicUrl && LS.musicUrl.trim()) || CFG.DEFAULT_PLAYLIST;
     try{
       if (src.includes('list=')){
         e.target.loadPlaylist({ listType:'playlist', list: playlistIdFromUrl(src) });
@@ -688,11 +631,17 @@ let pendingBody = null;
     return videoIdFromUrl(HINTS[i]);
   }
   async function loadHintsConfig(){
+    // 1) User-saved list takes priority
+    try{
+      const user = (LS.hintsUrls||[]).filter(Boolean);
+      if (user.length) { HINTS = user; return; }
+    }catch{}
+    // 2) Repo config next
     try{
       const r = await fetch('config/hints.json', { headers:{'Accept':'application/json'} });
       if (r.ok){ const j = await r.json(); if (Array.isArray(j?.videos)) HINTS = j.videos; }
     }catch{}
-    // fallback examples if none
+    // 3) Fallback examples if still empty
     if (!HINTS.length){
       HINTS = [
         'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
@@ -1024,7 +973,9 @@ let pendingBody = null;
   document.getElementById('openSettings')?.addEventListener('click', ()=>{
     const el = document.getElementById('acctEmails');
     if (el) el.value = (LS.emails||[]).join(', ');
-  const vu = document.getElementById('vibesUrl'); if (vu) vu.value = LS.vibesUrl || '';
+    const vu = document.getElementById('vibesUrl'); if (vu) vu.value = LS.vibesUrl || '';
+    const mu = document.getElementById('musicUrl'); if (mu) mu.value = LS.musicUrl || '';
+    const hl = document.getElementById('hintsList'); if (hl) hl.value = (LS.hintsUrls||[]).join('\n');
     document.getElementById('settingsPanel')?.classList.remove('hidden');
   });
   document.getElementById('closeSettings')?.addEventListener('click', ()=>{
@@ -1032,15 +983,24 @@ let pendingBody = null;
   });
   document.getElementById('saveSettings')?.addEventListener('click', ()=>{
     const raw = (document.getElementById('acctEmails')?.value||'').split(',').map(s=>s.trim()).filter(Boolean);
-    LS.emails = raw; toastGoodPager('Settings saved');
+    LS.emails = raw;
+    // Save vibes (studio) URL
+    LS.vibesUrl = document.getElementById('vibesUrl')?.value?.trim() || '';
+    // Save music playlist override
+    const music = document.getElementById('musicUrl')?.value?.trim() || '';
+    LS.musicUrl = music;
+    // Save hints list
+    const hintsRaw = (document.getElementById('hintsList')?.value||'').split('\n').map(s=>s.trim()).filter(Boolean);
+    LS.hintsUrls = hintsRaw;
+
+    toastGoodPager('Settings saved');
     document.getElementById('settingsPanel')?.classList.add('hidden');
-    const src = document.getElementById('vibesUrl')?.value?.trim() || '';
-    LS.vibesUrl = src;
+    // If music player exists, apply new music source (but keep paused until explicitly played)
     try{
       if (musicPlayer && musicReady){
-        if (src){
-          if (src.includes('list=')) musicPlayer.loadPlaylist({ listType:'playlist', list: playlistIdFromUrl(src) });
-          else musicPlayer.loadVideoById(videoIdFromUrl(src));
+        if (music){
+          if (music.includes('list=')) musicPlayer.loadPlaylist({ listType:'playlist', list: playlistIdFromUrl(music) });
+          else musicPlayer.loadVideoById(videoIdFromUrl(music));
         }
         setVol(musicPlayer, 0);
         musicPlayer.pauseVideo();
@@ -1055,11 +1015,13 @@ let pendingBody = null;
       if (p){
         const n=document.getElementById('setupName'); if (n) n.value = LS.heelName || '';
         const v=document.getElementById('setupVibesUrl'); if (v) v.value = LS.vibesUrl || '';
+        const m=document.getElementById('setupMusicUrl'); if (m) m.value = LS.musicUrl || '';
         const t=document.getElementById('setupTone'); if (t) t.value = String(LS.tone ?? 1);
         p.classList.remove('hidden');
         document.getElementById('setupSave')?.addEventListener('click', ()=>{
           LS.heelName = document.getElementById('setupName')?.value?.trim() || '';
           LS.vibesUrl = document.getElementById('setupVibesUrl')?.value?.trim() || '';
+          LS.musicUrl = document.getElementById('setupMusicUrl')?.value?.trim() || '';
           LS.tone = Number(document.getElementById('setupTone')?.value || 1);
           p.classList.add('hidden');
           const hdr=document.getElementById('sidekickHeader'); if(hdr) hdr.textContent=`😈 ${LS.heelName||'Heel'}`;
@@ -1103,3 +1065,53 @@ let pendingBody = null;
   }
 
 })();
+// ---------- open-core helpers: villain mute, calendar moon, lobby fade
+const VILLAIN_MUTED_KEY = "villain_muted";
+function villainMuted(){ try { return localStorage.getItem(VILLAIN_MUTED_KEY) === "1"; } catch { return false; } }
+
+export function initVillainMuteChip(){
+  const btn = document.getElementById("villainMuteChip");
+  if (!btn) return; // UI may not exist in some views
+  const sync = () => btn.setAttribute("aria-pressed", villainMuted() ? "true" : "false");
+  sync();
+  btn.addEventListener("click", () => {
+    try {
+      localStorage.setItem(VILLAIN_MUTED_KEY, villainMuted() ? "0" : "1");
+    } catch {}
+    sync();
+  });
+}
+
+export function villainMaybeSpeak(line){
+  if (villainMuted()) return;
+  // Integrate with existing sting/coach function if present
+  if (typeof window !== 'undefined' && typeof window.stingVillain === 'function') {
+    window.stingVillain(line || "Hook slid by… go write the one that sticks.");
+  }
+}
+
+export function finishSessionRecord(base){
+  const record = { ...base, allNighter: !!(base && base.allNighter) };
+  const d = new Date(record.timestamp || Date.now());
+  const key = d.toISOString().slice(0,10);
+  const cell = document.getElementById(`day-${key}`);
+  if (cell){
+    const dot = cell.querySelector('.dot');
+    if (dot){
+      dot.classList?.add('active');
+      if (record.allNighter) { dot.classList?.add('moon'); dot.title = "All-nighter 🌙"; }
+    }
+  }
+  return record;
+}
+
+export function fadeLobbyBackdrop(){
+  const el = document.getElementById("lobbyBackdrop");
+  if (el) el.classList.add("lobby-faded");
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Initialize mute chip and lobby fade if buttons exist
+  initVillainMuteChip();
+  document.getElementById('startBtn')?.addEventListener('click', fadeLobbyBackdrop);
+});
