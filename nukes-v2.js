@@ -10,6 +10,7 @@
 
 import { playlistIdFromUrl, videoIdFromUrl, clampMultiplier, rotatePick, bumpMultiplierCalc } from './web-utils.js';
 import { createMusicDucker } from './audio-utils.js';
+import { buildVillainEmoji, isHumanSelection } from './emoji-builder.js';
 import { LS } from './storage.js';
 import { api } from './api.js';
 
@@ -1026,8 +1027,22 @@ let pendingBody = null;
     const hintsRaw = (document.getElementById('hintsList')?.value||'').split('\n').map(s=>s.trim()).filter(Boolean);
     LS.hintsUrls = hintsRaw;
     // Save villain emoji
-    const vEm = document.getElementById('villainEmoji')?.value || '😈';
-    LS.heelEmoji = vEm;
+    try{
+      const chooser = {
+        subject: (document.getElementById('villainSubject')?.value || 'nonhuman'),
+        presenting: (document.getElementById('villainPresenting')?.value || 'neutral'),
+        age: (document.getElementById('villainAge')?.value || 'adult'),
+        hair: (document.getElementById('villainHair')?.value || 'default'),
+        beard: !!(document.getElementById('villainBeard')?.checked),
+        tone: (document.getElementById('villainTone')?.value || 'medium'),
+        nonHuman: (document.getElementById('villainNonHuman')?.value || '😈')
+      };
+      const vEm = buildVillainEmoji(chooser);
+      LS.heelEmoji = vEm;
+      // React to choice
+      const msg = isHumanSelection(chooser) ? "4 real you picked me?!? That's craaaazzzzy fam... Aight" : 'Good choice.';
+      stingVillain(msg, 'seed');
+    }catch{}
     const hdr=document.getElementById('sidekickHeader'); if(hdr) hdr.textContent=`${LS.heelEmoji||'😈'} ${LS.heelName||'Heel'}`;
     // Save noise URL
     const noise = document.getElementById('noiseUrl')?.value?.trim() || '';

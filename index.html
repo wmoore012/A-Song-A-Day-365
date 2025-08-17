@@ -238,10 +238,29 @@
       <input id="musicUrl" placeholder="https://youtube.com/playlist?list=... (optional)" />
       <small class="muted">Defaults to the built-in playlist unless you set one here.</small>
       <div class="divider"></div>
-      <label class="tgl">Villain emoji</label>
-      <select id="villainEmoji">
-        <option>😈</option><option>👹</option><option>🦂</option><option>💀</option>
-      </select>
+      <label class="tgl">Villain Emoji Builder</label>
+      <div id="villainWarning" class="muted" style="background:#071008;border:1px solid #236d42;border-radius:10px;padding:8px;color:#b6ff00;font-family:monospace;box-shadow:0 0 10px rgba(182,255,0,.35)">Warning… this is all make believe, but not everybody will think that! so 9x out of 10 it’s better to use one of the non‑humans emojis lol — Use at your own risk</div>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:8px">
+        <label>Subject
+          <select id="villainSubject"><option value="nonhuman">Non‑human</option><option value="human">Human</option></select>
+        </label>
+        <label>Presenting
+          <select id="villainPresenting"><option value="neutral">Neutral</option><option value="male">Male</option><option value="female">Female</option></select>
+        </label>
+        <label>Age
+          <select id="villainAge"><option value="adult">Adult</option><option value="old">Old</option></select>
+        </label>
+        <label>Hair
+          <select id="villainHair"><option value="default">Default</option><option value="short">Short</option><option value="long">Long</option></select>
+        </label>
+        <label class="tgl"><input type="checkbox" id="villainBeard"> Beard (male only)</label>
+        <label>Skin tone
+          <select id="villainTone"><option value="light">Light</option><option value="mediumLight">Medium‑light</option><option value="medium" selected>Medium</option><option value="mediumDark">Medium‑dark</option><option value="dark">Dark</option></select>
+        </label>
+        <label>Non‑human emoji
+          <select id="villainNonHuman"><option>😈</option><option>👹</option><option>💀</option><option>🤖</option><option>👾</option><option>🦂</option><option>🐍</option></select>
+        </label>
+      </div>
       <div class="divider"></div>
       <label class="tgl">White noise source (YouTube URL)</label>
       <input id="noiseUrl" placeholder="https://www.youtube.com/watch?v=..." />
