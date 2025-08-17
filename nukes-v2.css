@@ -48,6 +48,7 @@ a.btn{text-decoration:none}
 .tgl input{margin-right:8px}
 .ifthen{margin-bottom:8px}
 .quicklinks{display:flex;gap:8px;flex-wrap:wrap}
+.quicklinks .btn{min-width:160px;justify-content:center}
 /* Multiplier */
 .mult{margin-top:10px}
 .mult .label{font-weight:900;color:#cbd3df;margin-bottom:6px}
@@ -73,7 +74,7 @@ a.btn{text-decoration:none}
 .map{pointer-events:none}
 
 /* Lock-in Tips ticker */
-.ticker{position:relative;height:22px;overflow:hidden;border:1px solid var(--line);border-radius:10px;background:#0f0f18;margin-bottom:8px;display:flex;align-items:center;padding-left:120px}
+.ticker{position:relative;height:22px;min-height:42px;overflow:hidden;border:1px solid var(--line);border-radius:10px;background:#0f0f18;margin-bottom:8px;display:flex;align-items:center;padding-left:120px}
 .ticker::before{content:"LOCK‑IN TIPS";position:absolute;left:8px;top:50%;transform:translateY(-50%);color:#7f85b3;font-weight:900;font-size:11px}
 .ticker-item{font-weight:800;color:#cbd3df;opacity:0;transition:opacity .5s}
 .ticker-item.visible{opacity:1}
@@ -110,6 +111,7 @@ a.btn{text-decoration:none}
 .msg.me{font-weight:800}
 .chat-form{display:flex;gap:6px;margin-top:8px}
 .chat-form input{flex:1;background:#0f0f18;border:1px solid var(--line);border-radius:12px;color:#fff;padding:10px}
+.chat-head button[title="Close"], #chatCloseBtn{margin-left:8px}
 
 /* Sidekick keys animation */
 .kbd{display:grid;gap:4px;margin-top:6px}

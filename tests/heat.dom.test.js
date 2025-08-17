@@ -106,4 +106,23 @@ describe('Heat buttons', () => {
     expect(bodySent.heat).toBeTruthy();
     expect(bodySent.heat.drums).toBe(1);
   });
+
+  it('multiplier updates and clamps display at 100%', async () => {
+    document.body.innerHTML = `
+      <div id="multiplier"><span id="multVal"></span><div class="bar"><div id="multBar"></div></div></div>
+    `;
+    // Simulate module logic locally
+    const el = document.getElementById('multVal'); const bar = document.getElementById('multBar');
+    const { clampMultiplier } = await import('../web-utils.js');
+    function updateMultiplier(v){
+      const cv = clampMultiplier(Math.round(v), 0, 200);
+      const display = Math.max(0, Math.min(100, cv));
+      if (el) el.textContent = `${display}%`;
+      if (bar) bar.style.width = `${display}%`;
+    }
+    updateMultiplier(103);
+    expect(el.textContent).toBe('100%');
+    updateMultiplier(88);
+    expect(el.textContent).toBe('88%');
+  });
 });
