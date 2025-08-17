@@ -13,6 +13,43 @@ function el(tag, attrs={}, parent){
 
 function asset(path){ return encodeURI(path); }
 
+export function shouldCrossfade(currentTime, duration, threshold = 0.3){
+	if (!Number.isFinite(currentTime) || !Number.isFinite(duration) || duration <= 0) return false;
+	// threshold is seconds remaining to start crossfade (enforce a small floor)
+	const floor = Math.max(0.2, threshold);
+	return (duration - currentTime) <= floor + 1e-6; // include boundary
+}
+
+function addCrossfadedLoop(parent, src, baseOpacity = 0.12){
+	const style = {
+		position:'absolute', inset:'0', width:'100%', height:'100%', objectFit:'cover',
+		mixBlendMode:'screen', filter:'contrast(1.05) brightness(1.02)', transition:'opacity 240ms ease'
+	};
+	const v1 = el('video', { playsInline:true, muted:true, loop:false, autoplay:true }, parent);
+	const v2 = el('video', { playsInline:true, muted:true, loop:false, autoplay:false }, parent);
+	Object.assign(v1.style, style, { opacity:String(baseOpacity) });
+	Object.assign(v2.style, style, { opacity:'0' });
+	el('source', { src: asset(src), type:'video/mp4' }, v1);
+	el('source', { src: asset(src), type:'video/mp4' }, v2);
+	let active = v1, idle = v2;
+	function tick(){
+		try{
+			const d = active.duration || 0; const t = active.currentTime || 0;
+			if (shouldCrossfade(t, d)){
+				idle.currentTime = 0;
+				idle.play().catch(()=>{});
+				// crossfade
+				idle.style.opacity = String(baseOpacity);
+				active.style.opacity = '0';
+				const old = active; active = idle; idle = old;
+			}
+		}catch{}
+	}
+	active.addEventListener('timeupdate', tick);
+	active.addEventListener('ended', ()=>{ try{ active.currentTime = 0; active.play(); }catch{} });
+	return { v1, v2 };
+}
+
 export async function bootFxOverlays(){
 	if (typeof document === 'undefined') return { mounted:false };
 	// Respect reduced motion
@@ -43,32 +80,12 @@ export async function bootFxOverlays(){
 		'pro/video/TC - VIEWFINDER 235 - BLACK.png'
 	];
 
-	// Helper to add a looping overlay video (screen blend)
-	function addOverlayVideo(src, opacity=0.12){
-		const v = el('video', {
-			playsInline:true, muted:true, loop:true, autoplay:true,
-			className:'overlayVideo'
-		}, deck);
-		Object.assign(v.style, {
-			position:'absolute', inset:'0', width:'100%', height:'100%', objectFit:'cover',
-			mixBlendMode:'screen', opacity:String(opacity), filter:'contrast(1.05) brightness(1.02)'
-		});
-		const s = el('source', { src: asset(src), type:'video/mp4' }, v);
-		return v;
-	}
-	function addFrame(src, opacity=0.18){
-		const img = el('img', { src: asset(src), alt:'', 'aria-hidden':'true' }, deck);
-		Object.assign(img.style, {
-			position:'absolute', inset:'0', width:'100%', height:'100%', objectFit:'cover',
-			opacity:String(opacity), pointerEvents:'none'
-		});
-		return img;
-	}
-
-	// Mount 1 burn + 1 dust + 1 frame if available
-	addOverlayVideo(burns[0], 0.10);
-	addOverlayVideo(dust[0], 0.08);
-	addFrame(frames[2], 0.16);
+	// Mount crossfaded loops for seamless look
+	addCrossfadedLoop(deck, burns[0], 0.10);
+	addCrossfadedLoop(deck, dust[0], 0.08);
+	// Frame overlay
+	const img = el('img', { src: asset(frames[2]), alt:'', 'aria-hidden':'true' }, deck);
+	Object.assign(img.style, { position:'absolute', inset:'0', width:'100%', height:'100%', objectFit:'cover', opacity:'0.16', pointerEvents:'none' });
 
 	// Grain on wallpaper color via matte png
 	const grain = el('div', { id:'grainOverlay' }, deck);
