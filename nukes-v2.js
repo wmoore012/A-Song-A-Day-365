@@ -13,6 +13,8 @@ import { createMusicDucker } from './audio-utils.js';
 import { buildVillainEmoji, isHumanSelection } from './emoji-builder.js';
 import { LS } from './storage.js';
 import { api } from './api.js';
+import { bootParallaxMat } from './parallax-mat.js';
+import { initHamburger } from './ui-nav.js';
 
 (() => {
   'use strict';
@@ -1202,6 +1204,35 @@ export   function fadeLobbyBackdrop(){
 document.addEventListener('DOMContentLoaded', async () => {
   // Initialize mute chip and lobby fade if buttons exist
   initVillainMuteChip();
+  initHamburger();
   document.getElementById('startBtn')?.addEventListener('click', fadeLobbyBackdrop);
   try { const { bootProPlugins } = await import('./pro-loader.js'); await bootProPlugins({ LS }); } catch {}
+
+  // GSAP parallax boot (CDN first, then local fallback)
+  try {
+    if (!window.gsap || !window.ScrollTrigger) {
+      // attempt to load GSAP from local bundle as fallback
+      const s1 = document.createElement('script'); s1.src = '/gsap-public/umd/gsap.js'; s1.defer = true;
+      const s2 = document.createElement('script'); s2.src = '/gsap-public/umd/ScrollTrigger.js'; s2.defer = true;
+      await new Promise((resolve)=>{ s1.onload = resolve; s1.onerror = resolve; document.head.appendChild(s1); });
+      await new Promise((resolve)=>{ s2.onload = resolve; s2.onerror = resolve; document.head.appendChild(s2); });
+      // optional smoother
+      try {
+        const s3 = document.createElement('script'); s3.src = '/gsap-public/umd/ScrollSmoother.js'; s3.defer = true;
+        await new Promise((resolve)=>{ s3.onload = resolve; s3.onerror = resolve; document.head.appendChild(s3); });
+      } catch {}
+    }
+    try { bootParallaxMat(window.gsap); } catch (e) { console.warn('ParallaxMat boot skipped:', e?.message||e); }
+
+    // Animate panels into view
+    try {
+      const gsap = window.gsap; const ScrollTrigger = window.ScrollTrigger; if (gsap && ScrollTrigger) {
+        gsap.utils.toArray('.panel-animated').forEach((el)=>{
+          gsap.fromTo(el, { opacity:0, y:24 }, { opacity:1, y:0, duration:.4, ease:'power2.out', scrollTrigger:{ trigger: el, start:'top 85%' } });
+        });
+      } else {
+        document.querySelectorAll('.panel-animated').forEach(el=>{ el.style.opacity = '1'; el.style.transform = 'none'; });
+      }
+    } catch {}
+  } catch {}
 });

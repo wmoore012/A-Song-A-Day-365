@@ -20,8 +20,37 @@
 
   <link rel="stylesheet" href="./nukes-v2.css">
 </head>
-<body>
-  <div class="wrap">
+  <body>
+    <!-- Parallax ruler + lasers + rolodex layers -->
+    <div id="scrollRuler"><div class="ticks"></div><div class="marker"></div></div>
+    <div id="laserDeck">
+      <div class="laser"></div>
+      <div class="laser"></div>
+      <div class="laser"></div>
+      <div class="laser"></div>
+    </div>
+    <section id="mat" class="parallax-mat" aria-label="Rolodex">
+      <div class="mat-layer" data-speed="0.18" data-theme="dark" style="--slab:#0b0f14">
+        <div class="mat-content card-frost card-frost--refract">
+          <h3 class="sporty">Lock-in Flow</h3>
+          <p class="muted">Tiny steps. 8 bars. Bounce.</p>
+        </div>
+      </div>
+      <div class="mat-layer" data-speed="0.26" data-theme="light" style="--slab:#e6f2ff">
+        <div class="mat-content card-frost card-frost--refract">
+          <h3 class="sporty">City + Weather</h3>
+          <p class="muted">Charlotte defaults. Set yours.</p>
+        </div>
+      </div>
+      <div class="mat-layer" data-speed="0.34" data-theme="dark" style="--slab:#101522">
+        <div class="mat-content card-frost card-frost--refract">
+          <h3 class="sporty">Analytics</h3>
+          <p class="muted">Streak momentum. Grades. Latency.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="wrap">
 
     <!-- HUD (Now Playing + FX toggle) -->
     <header class="hud-header" role="banner" aria-label="HUD">
