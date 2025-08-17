@@ -1,0 +1,18 @@
+/* @vitest-environment jsdom */
+import { describe, it, expect } from 'vitest';
+import { typeInto, clearTyped } from '../typewriter.js';
+
+describe('typewriter', () => {
+	it('types into element with speed', async () => {
+		document.body.innerHTML = `<div id="t"></div>`;
+		const el = document.getElementById('t');
+		await typeInto(el, 'TEST', { speedMs: 1 });
+		expect(el.textContent).toBe('TEST');
+		clearTyped(el);
+		expect(el.textContent).toBe('');
+	});
+	it('throws on missing element', async () => {
+		expect(()=> clearTyped(null)).toThrow();
+		await expect(typeInto(null, 'x')).rejects.toThrow();
+	});
+});

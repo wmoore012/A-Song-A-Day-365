@@ -221,6 +221,11 @@ let pendingBody = null;
   // One-time pre-start sting in the message bar
   const preTaunt = ()=> setText('#messageBar', 'LOCK IN — '+rotPick('pre'));
   preTaunt();
+  // Type warning when settings open
+  document.getElementById('openSettings')?.addEventListener('click', ()=>{
+    const w = document.getElementById('villainWarning');
+    if (w) import('./typewriter.js').then(m=> m.typeInto(w, w.textContent || w.innerText || '', { speedMs: 8, neon:true }));
+  });
 
   { const el = $("#startBtn"); if (el) el.onclick = ()=>{
     if (started) return;
@@ -234,6 +239,8 @@ let pendingBody = null;
   startIso = new Date().toISOString();
   // Small start sting
   stingVillainMaybeLLM(rotPick('pre'));
+  // Pro: show villain announce
+  try { if (window.__PRO__) import('./pro/analytics-hud.js').then(m=> m.rotateVillainAnnounce('start', { frameSrc: 'pro/video/TC - VIEWFINDER 235 - BLACK.png', durationMs: 1800 })); } catch {}
   }; }
 
   { const el = $("#doneBtn"); if (el) el.onclick = ()=>{
@@ -701,22 +708,24 @@ let pendingBody = null;
   }
   window.closeReward = ()=> $("#rewardModal").classList.add('hidden');
 
-     function showSuccess(){
-    // Sprinkle a kind word at wrap unless user opted out of next session
-    try{ const line = Math.random()<0.5 ? rotPick('hype') : rotPick('pocket'); if (line) stingVillain(line, 'seed'); }catch{}
-    setTimeout(()=>{
-      $("#successGif").src = CFG.GIFS.SUCCESS_HOME;
-      $("#successHome").classList.remove('hidden');
-      sideConfetti(2200);
-    }, 700);
-  }
+        function showSuccess(){
+     // Sprinkle a kind word at wrap unless user opted out of next session
+     try{ const line = Math.random()<0.5 ? rotPick('hype') : rotPick('pocket'); if (line) stingVillain(line, 'seed'); }catch{}
+     try { if (window.__PRO__) import('./pro/analytics-hud.js').then(m=> m.rotateVillainAnnounce('done', { frameSrc: 'pro/video/TC - 35mm_MATTE.png', durationMs: 2200 })); } catch {}
+     setTimeout(()=>{
+       $("#successGif").src = CFG.GIFS.SUCCESS_HOME;
+       $("#successHome").classList.remove('hidden');
+       sideConfetti(2200);
+     }, 700);
+   }
   window.closeSuccess = ()=> $("#successHome").classList.add('hidden');
 
-  function showFail(){
-    $("#failGif").src = CFG.GIFS.FAIL_HOME;
-    $("#willGif").src = CFG.GIFS.WILL_PLACEHOLDER;
-    $("#failHome").classList.remove('hidden');
-  }
+     function showFail(){
+     $("#failGif").src = CFG.GIFS.FAIL_HOME;
+     $("#willGif").src = CFG.GIFS.WILL_PLACEHOLDER;
+     $("#failHome").classList.remove('hidden');
+     try { if (window.__PRO__) import('./pro/analytics-hud.js').then(m=> m.rotateVillainAnnounce('low-time', { frameSrc: 'pro/video/TC - VIEWFINDER 235 - BLACK.png', durationMs: 2000 })); } catch {}
+   }
   window.closeFail = ()=> $("#failHome").classList.add('hidden');
 
   function showRun(){

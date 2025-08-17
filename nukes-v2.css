@@ -240,3 +240,4 @@ a.btn{text-decoration:none}
 #laserDeck .laser{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#b6ff00,transparent);filter:drop-shadow(0 0 6px #b6ff00);opacity:.0}
 .card-frost--refract{position:relative;overflow:hidden}
 .card-frost--refract::before{content:"";position:absolute;inset:-20%;background:inherit;backdrop-filter:blur(24px) saturate(140%) contrast(105%);opacity:.35;mix-blend-mode:screen;transform:translate3d(0,0,0) scale(1.02);pointer-events:none;mask-image:radial-gradient(120% 120% at 40% 40%, rgba(255,255,255,.4), rgba(255,255,255,0) 70%)}
+.neon-type{color:#b6ff00;text-shadow:0 0 6px rgba(182,255,0,.55),0 0 14px rgba(182,255,0,.35)}
