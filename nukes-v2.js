@@ -691,9 +691,9 @@ let pendingBody = null;
   }
   window.closeReward = ()=> $("#rewardModal").classList.add('hidden');
 
-  function showSuccess(){
-    const line = rotPick('pocket');
-    if (line) stingVillainMaybeLLM(line, 'seed');
+     function showSuccess(){
+    // Sprinkle a kind word at wrap unless user opted out of next session
+    try{ const line = Math.random()<0.5 ? rotPick('hype') : rotPick('pocket'); if (line) stingVillain(line, 'seed'); }catch{}
     setTimeout(()=>{
       $("#successGif").src = CFG.GIFS.SUCCESS_HOME;
       $("#successHome").classList.remove('hidden');
@@ -870,6 +870,8 @@ let pendingBody = null;
       btn.classList.add('jiggle'); setTimeout(()=>btn.classList.remove('jiggle'), 500);
       const hc = LS.heatCounts; hc[key] = (hc[key]||0) + 1; LS.heatCounts = hc;
       toastGoodPager(`HEAT: ${label}`);
+      // Sprinkle a hype line occasionally
+      try{ if (Math.random() < 0.35) { const hype = rotPick('hype'); if (hype) stingVillain(hype, 'seed'); } }catch{}
       // Update badge
       const badge = btn.querySelector('.badge'); if (badge){ badge.textContent = String(hc[key]); }
       // Cooldown glow
