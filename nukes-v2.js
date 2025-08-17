@@ -16,6 +16,7 @@ import { api } from './api.js';
 
 (() => {
   'use strict';
+  const TYPED_BOT_MESSAGES = true;
   const $ = s => document.querySelector(s);
   const setText = (sel, v) => { const el=$(sel); if (el) el.textContent = String(v); };
   const setHTML = (sel, v) => { const el=$(sel); if (el) el.innerHTML = String(v); };
@@ -430,10 +431,18 @@ let pendingBody = null;
     pushMsg('bot', ruleReply(text));
     }
   });
-  function pushMsg(who, text){
+  async function pushMsg(who, text){
     const m = document.createElement('div');
-    m.className = `msg ${who}`; m.textContent = (who==='bot'?'😈 ':'🫵 ')+text;
-    if (!chat.log) return; chat.log.appendChild(m); chat.log.scrollTop = chat.log.scrollHeight;
+    m.className = `msg ${who}`;
+    if (who==='bot' && TYPED_BOT_MESSAGES){
+      m.textContent = '😈 ';
+      if (!chat.log) return; chat.log.appendChild(m);
+      try{ const mod = await import('./typewriter.js'); await mod.typeInto(m, text, { speedMs: 18, jitterMs: 6, neon: false, caret: true, prefix: m.textContent }); }catch{ m.textContent = '😈 '+text; }
+    } else {
+      m.textContent = (who==='bot'?'😈 ':'🫵 ')+text;
+      if (!chat.log) return; chat.log.appendChild(m);
+    }
+    if (chat.log) chat.log.scrollTop = chat.log.scrollHeight;
   }
   function ruleReply(txt){
       // tone-aware quick replies
@@ -706,7 +715,7 @@ let pendingBody = null;
   if (cEl) cEl.textContent = rare ? "Limited run. Flex quietly and keep working." : "Pocket this and move on.";
   if (mEl) mEl.classList.remove('hidden');
   }
-  window.closeReward = ()=> $("#rewardModal").classList.add('hidden');
+  window.closeReward = ()=> { $("#rewardModal").classList.add('hidden'); try{ import('./ui-nav.js').then(m=> m.smoothScrollTo('#lockerSection')); }catch{} };
 
         function showSuccess(){
      // Sprinkle a kind word at wrap unless user opted out of next session
