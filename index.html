@@ -30,6 +30,15 @@
     </header>
 
     <header class="topbar">
+      <button id="menuToggle" class="btn btn-secondary" style="margin-right:8px">☰</button>
+      <nav id="menuPanel" class="panel hidden" style="position:fixed;inset:auto 18px 18px auto;z-index:300;width:min(320px,92vw);display:none">
+        <div class="panel-card">
+          <div class="panel-hd"><h3>Menu</h3><button class="btn btn-secondary" onclick="document.getElementById('menuPanel').classList.remove('open');document.getElementById('menuPanel').style.display='none'">Close</button></div>
+          <button class="btn btn-secondary" onclick="document.querySelector('.hud-grid')?.scrollIntoView({behavior:'smooth'})">Analytics</button>
+          <button class="btn btn-secondary" onclick="document.getElementById('settingsPanel')?.classList.remove('hidden')">Settings</button>
+          <button class="btn btn-secondary" onclick="document.getElementById('cityPanel')?.classList.remove('hidden')">City</button>
+        </div>
+      </nav>
       <div class="brand">
         <img src="assets/brand.svg" alt="" onerror="this.style.display='none'"/>
         <span class="title">THE NUKES</span>

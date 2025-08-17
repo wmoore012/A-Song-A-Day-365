@@ -122,6 +122,7 @@ a.btn{text-decoration:none}
 /* Slide-out panel */
 .panel{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;justify-content:flex-end;z-index:210}
 .panel.hidden{display:none}
+.panel.open{display:block}
 .panel-card{background:#10111c;border-left:1px solid #22243a;width:min(520px,92vw);padding:14px}
 .panel-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .city-row{display:flex;gap:8px}

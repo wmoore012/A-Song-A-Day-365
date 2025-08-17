@@ -312,6 +312,15 @@ let pendingBody = null;
     document.getElementById('surveyModal')?.classList.add('hidden');
     finalizeSession(allNight, null, null);
     setTimeout(()=> showSuccess(), 200);
+    // After wrap, ask if cooking again or done
+    try {
+      import('./ui-nav.js').then(mod => {
+        const { askCookAgainOrDone, smoothScrollTo } = mod;
+        askCookAgainOrDone((choice)=>{
+          if (choice === 'done') smoothScrollTo('#hudAnalytics');
+        });
+      });
+    } catch {}
   });
 
   // Beeper encouragements
@@ -1153,8 +1162,9 @@ export   function fadeLobbyBackdrop(){
   }, 50_000);
 })();
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   // Initialize mute chip and lobby fade if buttons exist
   initVillainMuteChip();
   document.getElementById('startBtn')?.addEventListener('click', fadeLobbyBackdrop);
+  try { const { bootProPlugins } = await import('./pro-loader.js'); await bootProPlugins({ LS }); } catch {}
 });
