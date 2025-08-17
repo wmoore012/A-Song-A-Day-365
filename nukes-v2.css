@@ -215,3 +215,14 @@ a.btn{text-decoration:none}
 .day-cell .dot.active.moon::after {
   content: "🌙"; position:absolute; top:-8px; right:-8px; font-size:10px;
 }
+
+/* HUD header + analytics grid minimal styles */
+.hud-header{position:sticky;top:0;z-index:10;display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:rgba(11,15,20,.85);backdrop-filter:blur(8px);border-bottom:1px solid #1c2230;margin-bottom:8px}
+.hud-title{color:#e6f2ff;font-size:1.1rem}
+.hud-nowplaying{color:#c9e7ff}
+.hud-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;padding:16px}
+.hud-card{background:linear-gradient(180deg,#0f1420,#0a0d14);border:1px solid #1f2a3a;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.35);padding:12px}
+.hud-echarts{height:280px}
+.card-frost{margin:16px;padding:20px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);color:#eaf6ff;border-radius:16px;backdrop-filter:blur(10px) saturate(120%)}
+.panel-animated{opacity:0;transform:translateY(24px)}
+@media (prefers-reduced-motion: reduce){.panel-animated{opacity:1 !important;transform:none !important}}

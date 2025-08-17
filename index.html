@@ -23,6 +23,12 @@
 <body>
   <div class="wrap">
 
+    <!-- HUD (Now Playing + FX toggle) -->
+    <header class="hud-header" role="banner" aria-label="HUD">
+      <div class="hud-title sporty">SONG‑PER‑DAY‑365</div>
+      <div id="hudNowPlaying" class="hud-nowplaying" aria-live="polite">Now Playing: —</div>
+    </header>
+
     <header class="topbar">
       <div class="brand">
         <img src="assets/brand.svg" alt="" onerror="this.style.display='none'"/>
@@ -138,6 +144,25 @@
       </section>
     </main>
   </div>
+
+  <!-- Analytics HUD panel (placeholders) -->
+  <section id="hudAnalytics" class="hud-grid">
+    <div id="chartStreak" class="hud-card hud-echarts" aria-label="Streak momentum chart"></div>
+    <div id="chartBars" class="hud-card hud-echarts" aria-label="Freezes and Genres"></div>
+    <div id="chartCalendar" class="hud-card hud-echarts" aria-label="Calendar heatmap"></div>
+    <div id="chartMultiplier" class="hud-card hud-echarts" aria-label="Multiplier gauge"></div>
+  </section>
+
+  <!-- Coming-Soon frosted card -->
+  <div class="coming-soon card-frost panel-animated" role="note">
+    <div class="sporty">Portfolio &amp; iCatalog Builder</div>
+    <p>Coming Soon — wired to your Notion/iCatalog stats.</p>
+  </div>
+
+  <!-- ECharts + GSAP (CDN) for HUD analytics; safe if network blocked -->
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
 
   <!-- Villain chat -->
   <aside id="chatDock" class="chat-dock">

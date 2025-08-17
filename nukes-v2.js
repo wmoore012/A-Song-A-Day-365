@@ -9,6 +9,7 @@
 */
 
 import { playlistIdFromUrl, videoIdFromUrl, clampMultiplier, rotatePick, bumpMultiplierCalc } from './web-utils.js';
+import { createMusicDucker } from './audio-utils.js';
 import { LS } from './storage.js';
 import { api } from './api.js';
 
@@ -484,6 +485,7 @@ let pendingBody = null;
   let musicPlayer, noisePlayer, hintPlayer;
   let musicReady=false, noiseReady=false, hintReady=false;
   let musicVol=15, noiseVol=15;
+  let musicDucker = null;
   let noisePending=false;
   let ytInited = false;
 
@@ -542,6 +544,7 @@ let pendingBody = null;
       }
       e.target.unMute();
       setVol(musicPlayer, musicVol);
+      if (!musicDucker) musicDucker = createMusicDucker(musicPlayer, { initialVolume: musicVol });
       e.target.playVideo();
     }catch{}
   }
@@ -561,6 +564,7 @@ let pendingBody = null;
       try {
         const d = e.target.getVideoData();
         const np=document.getElementById(EL.nowPlaying); if (np) np.textContent = `${d?.title || '—'}`;
+        const hud=document.getElementById('hudNowPlaying'); if (hud) hud.textContent = `Now Playing: ${d?.title || '—'}`;
       } catch { /* ignore */ }
     }
   }
@@ -582,12 +586,10 @@ let pendingBody = null;
   }
   function fadeOutMusic(){
     if (!musicPlayer||!musicReady) return;
-    let v = musicVol;
-    const tick = setInterval(()=>{
-      v = Math.max(0, v-3);
-      setVol(musicPlayer, v);
-      if (v<=0){ clearInterval(tick); try{ musicPlayer.pauseVideo(); }catch{} }
-    }, 120);
+    try{
+      if (!musicDucker) musicDucker = createMusicDucker(musicPlayer, { initialVolume: musicVol });
+      musicDucker.fadeOutAndPause(3, 120);
+    }catch{}
   }
   { const el = $("#toggleNoise"); if (el) el.onclick = ()=>{
     initYouTubeOnce();
@@ -626,15 +628,18 @@ let pendingBody = null;
     modal.classList.remove('hidden');
     initYouTubeOnce();
     ensureHintPlayer();
-    // fade out music if playing
-    fadeOutMusic();
+    // gently duck music while hints play; restore on close
+    try{
+      if (!musicDucker && musicPlayer) musicDucker = createMusicDucker(musicPlayer, { initialVolume: musicVol });
+      musicDucker?.duckForHints({ target: 5, step: 3, intervalMs: 120 });
+    }catch{}
     // load a fresh hint
-  const v = rotPickHint();
-  if (hintPlayer && v){ try{ hintPlayer.loadVideoById(v); }catch{} }
-  const a = document.getElementById('openInYoutube');
-  if (a && v){ a.href = openInYouTubeHrefFor(v); }
+    const v = rotPickHint();
+    if (hintPlayer && v){ try{ hintPlayer.loadVideoById(v); }catch{} }
+    const a = document.getElementById('openInYoutube');
+    if (a && v){ a.href = openInYouTubeHrefFor(v); }
   }
-  function closeHints(){ document.getElementById('hintsModal')?.classList.add('hidden'); try{ hintPlayer?.pauseVideo(); }catch{} }
+  function closeHints(){ document.getElementById('hintsModal')?.classList.add('hidden'); try{ hintPlayer?.pauseVideo(); }catch{} try{ musicDucker?.restore(); }catch{} }
   window.openHints = openHints; window.closeHints = closeHints;
   function rotPickHint(){
     if (!HINTS.length) return null;
