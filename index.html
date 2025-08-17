@@ -143,10 +143,13 @@
   <aside id="chatDock" class="chat-dock">
   <button id="chatToggle" class="chat-tab">😈 Heel</button>
     <div class="chat-wrap">
-      <div class="chat-head">
-  <div id="sidekickHeader">😈 Heel</div>
-  <div class="muted small">LLM Mode: <span id="llmModeLabel">Off</span></div>
-  <button id="openSettings" class="btn btn-secondary" style="padding:6px 10px;font-size:12px">⚙️</button>
+            <div class="chat-head">
+	  <div id="sidekickHeader">😈 Heel</div>
+	  <div class="muted small">LLM Mode: <span id="llmModeLabel">Off</span></div>
+	  <div style="display:flex;gap:6px">
+	    <button id="openSettings" class="btn btn-secondary" style="padding:6px 10px;font-size:12px" title="Settings">⚙️</button>
+	    <button id="chatCloseBtn" class="btn btn-secondary" style="padding:6px 10px;font-size:12px" title="Close">✖️</button>
+	  </div>
       </div>
       <div id="chatLog" class="chat-log"></div>
   <div class="kbd" id="kbd">
@@ -155,7 +158,7 @@
         <div class="row"><span data-k="Z">Z</span><span data-k="X">X</span><span data-k="C">C</span><span data-k="V">V</span><span data-k="B">B</span><span data-k="N">N</span><span data-k="M">M</span></div>
       </div>
       <form id="chatForm" class="chat-form">
-        <input id="chatInput" placeholder="Villain: “I started 20 minutes ago, champ.”" />
+        <input id="chatInput" placeholder="Turn on LLM & Send message to …" />
         <button class="btn btn-volt" type="submit">Send</button>
       </form>
       <details class="chat-settings">
@@ -195,14 +198,24 @@
       <div class="divider"></div>
       <label class="tgl">Studio Vibes source (YouTube Video or Playlist URL)</label>
       <input id="vibesUrl" placeholder="https://youtu.be/... or https://youtube.com/playlist?..." />
-      <small class="muted">No default. Add your own video/playlist.</small>
+      <small class="muted">Inspiring visuals for your session (your choice of ambient studio vibes).</small>
       <div class="divider"></div>
       <label class="tgl">Music playlist (Now Playing at startup)</label>
       <input id="musicUrl" placeholder="https://youtube.com/playlist?list=... (optional)" />
       <small class="muted">Defaults to the built-in playlist unless you set one here.</small>
       <div class="divider"></div>
+      <label class="tgl">Villain emoji</label>
+      <select id="villainEmoji">
+        <option>😈</option><option>👹</option><option>🦂</option><option>💀</option>
+      </select>
+      <div class="divider"></div>
+      <label class="tgl">White noise source (YouTube URL)</label>
+      <input id="noiseUrl" placeholder="https://www.youtube.com/watch?v=..." />
+      <small class="muted">Pick your favorite white-noise/room/lofi ambience.</small>
+      <div class="divider"></div>
       <label class="tgl">Hints videos (one YouTube URL per line)</label>
       <textarea id="hintsList" placeholder="https://www.youtube.com/watch?v=...\nhttps://www.youtube.com/watch?v=..." style="width:100%;min-height:100px;background:#0f0f18;border:1px solid var(--line);border-radius:12px;color:#fff;padding:10px"></textarea>
+      <small class="muted">Name some idea-sparking clips we should suggest if you get stuck mid‑session.</small>
       <div style="margin-top:8px">
         <button id="saveSettings" class="btn btn-primary">Save</button>
       </div>

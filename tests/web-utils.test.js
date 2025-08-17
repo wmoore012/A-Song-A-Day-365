@@ -14,7 +14,13 @@ describe('web-utils', () => {
   it('clamps multiplier', () => {
     expect(clampMultiplier(220)).toBe(200);
     expect(clampMultiplier(-4)).toBe(0);
-    expect(clampMultiplier(95)).toBe(95);
+  });
+
+  it('rounds multiplier to 10s and clamps to 0-200', () => {
+    expect(bumpMultiplierCalc(97, +3, 0, 200)).toBe(100);
+    expect(bumpMultiplierCalc(101, -6, 0, 200)).toBe(100);
+    expect(bumpMultiplierCalc(0, -5, 0, 200)).toBe(0);
+    expect(bumpMultiplierCalc(199, +6, 0, 200)).toBe(200);
   });
   it('rotatePick cycles and returns nextIdx', () => {
     const pool = ['a','b','c'];
@@ -25,12 +31,12 @@ describe('web-utils', () => {
   });
 
   it('bumpMultiplierCalc clamps and sums safely', () => {
-    expect(bumpMultiplierCalc(100, +5)).toBe(105);
+    expect(bumpMultiplierCalc(100, +5)).toBe(110);
   expect(bumpMultiplierCalc(98, +10)).toBe(110);
   expect(bumpMultiplierCalc(0, -4)).toBe(0);
   expect(bumpMultiplierCalc(195, +20)).toBe(200);
   expect(bumpMultiplierCalc('x', 'y')).toBe(0);
-  expect(bumpMultiplierCalc(100, +3)).toBe(105);
-  expect(bumpMultiplierCalc(100, -3)).toBe(95);
+  expect(bumpMultiplierCalc(100, +3)).toBe(100);
+  expect(bumpMultiplierCalc(100, -3)).toBe(100);
   });
 });

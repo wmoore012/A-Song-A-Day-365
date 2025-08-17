@@ -100,7 +100,7 @@ import { api } from './api.js';
   setText('#freezes', LS.freezes);
   setText('#tipTag', pick(CFG.ENCOURAGEMENT_TIPS));
   buildTicker();
-  const heelHdr = document.getElementById('sidekickHeader'); if (heelHdr) heelHdr.textContent = `😈 ${LS.heelName||'Heel'}`;
+  const heelHdr = document.getElementById('sidekickHeader'); if (heelHdr) heelHdr.textContent = `${LS.heelEmoji||'😈'} ${LS.heelName||'Heel'}`;
   // init multiplier UI
   updateMultiplier(LS.mult);
 
@@ -376,11 +376,17 @@ let pendingBody = null;
   { const el = $("#chatToggle"); if (el) el.onclick = ()=>{
     chat.open = !chat.open;
     $("#chatDock")?.classList.toggle('open', chat.open);
-  setText('#llmModeLabel', chat.mode()==='LLM' ? 'On' : 'Off');
+    const name = LS.heelName || 'Villain';
+    chat.input?.setAttribute('placeholder', `Turn on LLM & Send message to ${name}`);
+    setText('#llmModeLabel', chat.mode()==='LLM' ? 'On' : 'Off');
     if (chat.open && chat.log && chat.log.childElementCount===0) {
       const l = rotPick('seed');
       if (l) pushMsg('bot', l);
     }
+  }; }
+  { const el = $("#chatCloseBtn"); if (el) el.onclick = ()=>{
+    chat.open = false;
+    $("#chatDock")?.classList.remove('open');
   }; }
   { const el = $("#saveLLM"); if (el) el.onclick = ()=>{
     const keyEl=$("#openrouterKey"); const mdlEl=$("#openrouterModel");
@@ -550,11 +556,11 @@ let pendingBody = null;
     }
   }
   function onMusicState(e){
-    // Track title
+    // Track title only; do not touch volume here to avoid mid-song dips
     if (e?.data === (window.YT?.PlayerState?.PLAYING)){
       try {
         const d = e.target.getVideoData();
-  const np=document.getElementById(EL.nowPlaying); if (np) np.textContent = `${d?.title || '—'}`;
+        const np=document.getElementById(EL.nowPlaying); if (np) np.textContent = `${d?.title || '—'}`;
       } catch { /* ignore */ }
     }
   }
@@ -562,9 +568,12 @@ let pendingBody = null;
     noiseReady=true;
     setVol(noisePlayer, noiseVol);
     if (noisePending){
-      const id = videoIdFromUrl(CFG.NOISE_LIFEAT);
-      noisePlayer.loadVideoById(id);
-      noisePlayer.playVideo();
+      const src = (LS.noiseUrl && LS.noiseUrl.trim()) || CFG.NOISE_LIFEAT;
+      const id = videoIdFromUrl(src);
+      if (id){
+        noisePlayer.loadVideoById(id);
+        noisePlayer.playVideo();
+      }
       noisePending=false;
     }
   }
@@ -587,10 +596,13 @@ let pendingBody = null;
       const s = noisePlayer.getPlayerState();
       if (s===(window.YT?.PlayerState?.PLAYING)){ noisePlayer.pauseVideo(); }
       else {
-        const id = videoIdFromUrl(CFG.NOISE_LIFEAT);
-        noisePlayer.loadVideoById(id);
-        setVol(noisePlayer, noiseVol);
-        noisePlayer.playVideo();
+        const src = (LS.noiseUrl && LS.noiseUrl.trim()) || CFG.NOISE_LIFEAT;
+        const id = videoIdFromUrl(src);
+        if (id){
+          noisePlayer.loadVideoById(id);
+          setVol(noisePlayer, noiseVol);
+          noisePlayer.playVideo();
+        }
       }
     }catch{}
   }; }
@@ -764,7 +776,7 @@ let pendingBody = null;
   }
   function stingVillain(text, kind='seed'){
     const box=document.createElement('div'); box.className='villain-toast';
-  const hdr=document.createElement('div'); hdr.className='hdr'; hdr.innerHTML=`😈 ${LS.heelName||'Heel'}`;
+    const hdr=document.createElement('div'); hdr.className='hdr'; hdr.innerHTML=`${LS.heelEmoji||'😈'} ${LS.heelName||'Heel'}`;
     const msg=document.createElement('div'); msg.className='msg'; msg.textContent=text;
     box.appendChild(hdr); box.appendChild(msg);
     document.body.appendChild(box);
@@ -807,8 +819,9 @@ let pendingBody = null;
   function updateMultiplier(v){
     const el = document.getElementById('multVal'); const bar = document.getElementById('multBar');
     const cv = clampMultiplier(Math.round(v), 0, 200);
-    if (el) el.textContent = `${cv}%`;
-    if (bar) bar.style.width = `${Math.max(0, Math.min(100, cv))}%`;
+    const display = Math.max(0, Math.min(100, cv));
+    if (el) el.textContent = `${display}%`;
+    if (bar) bar.style.width = `${display}%`;
   }
   function bumpMultiplier(delta){
     const prev = LS.mult;
@@ -976,7 +989,11 @@ let pendingBody = null;
     const vu = document.getElementById('vibesUrl'); if (vu) vu.value = LS.vibesUrl || '';
     const mu = document.getElementById('musicUrl'); if (mu) mu.value = LS.musicUrl || '';
     const hl = document.getElementById('hintsList'); if (hl) hl.value = (LS.hintsUrls||[]).join('\n');
+    const ve = document.getElementById('villainEmoji'); if (ve) ve.value = LS.heelEmoji || '😈';
+    const nu = document.getElementById('noiseUrl'); if (nu) nu.value = LS.noiseUrl || '';
     document.getElementById('settingsPanel')?.classList.remove('hidden');
+    // Auto-close chat so settings are unobstructed
+    document.getElementById('chatDock')?.classList.remove('open');
   });
   document.getElementById('closeSettings')?.addEventListener('click', ()=>{
     document.getElementById('settingsPanel')?.classList.add('hidden');
@@ -992,6 +1009,13 @@ let pendingBody = null;
     // Save hints list
     const hintsRaw = (document.getElementById('hintsList')?.value||'').split('\n').map(s=>s.trim()).filter(Boolean);
     LS.hintsUrls = hintsRaw;
+    // Save villain emoji
+    const vEm = document.getElementById('villainEmoji')?.value || '😈';
+    LS.heelEmoji = vEm;
+    const hdr=document.getElementById('sidekickHeader'); if(hdr) hdr.textContent=`${LS.heelEmoji||'😈'} ${LS.heelName||'Heel'}`;
+    // Save noise URL
+    const noise = document.getElementById('noiseUrl')?.value?.trim() || '';
+    LS.noiseUrl = noise;
 
     toastGoodPager('Settings saved');
     document.getElementById('settingsPanel')?.classList.add('hidden');
@@ -1024,7 +1048,7 @@ let pendingBody = null;
           LS.musicUrl = document.getElementById('setupMusicUrl')?.value?.trim() || '';
           LS.tone = Number(document.getElementById('setupTone')?.value || 1);
           p.classList.add('hidden');
-          const hdr=document.getElementById('sidekickHeader'); if(hdr) hdr.textContent=`😈 ${LS.heelName||'Heel'}`;
+          const hdr=document.getElementById('sidekickHeader'); if(hdr) hdr.textContent=`${LS.heelEmoji||'😈'} ${LS.heelName||'Heel'}`;
           toastGoodPager('Setup saved');
         });
       }
@@ -1105,10 +1129,22 @@ export function finishSessionRecord(base){
   return record;
 }
 
-export function fadeLobbyBackdrop(){
+export   function fadeLobbyBackdrop(){
   const el = document.getElementById("lobbyBackdrop");
   if (el) el.classList.add("lobby-faded");
 }
+
+// Idle bounce for chat tab every 50s
+(function villainIdleBounce(){
+  const btn = document.getElementById('chatToggle');
+  if (!btn) return;
+  setInterval(()=>{
+    try{
+      if (window.gsap) window.gsap.to(btn, { y:-8, duration:0.22, yoyo:true, repeat:1, ease:'power1.out' });
+      else { btn.style.transform='translateY(-8px)'; setTimeout(()=>btn.style.transform='', 240); }
+    }catch{}
+  }, 50_000);
+})();
 
 document.addEventListener('DOMContentLoaded', () => {
   // Initialize mute chip and lobby fade if buttons exist

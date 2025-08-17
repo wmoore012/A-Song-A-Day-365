@@ -113,6 +113,14 @@ export function createStorage(store = (typeof localStorage !== 'undefined' ? loc
     set heelGifs(v){ setArr('heel_gifs', v || []); },
     get tone(){ return getNum('tone', 1); },
     set tone(v){ setNum('tone', Number(v)||0); },
+
+    // Villain emoji (UI personalization)
+    get heelEmoji(){ return getStr('heel_emoji', '😈'); },
+    set heelEmoji(v){ setStr('heel_emoji', v || '😈'); },
+
+    // White noise custom source (YouTube URL)
+    get noiseUrl(){ return getStr('noise_url', ''); },
+    set noiseUrl(v){ setStr('noise_url', v || ''); },
   };
 }
 
