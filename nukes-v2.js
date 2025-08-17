@@ -583,17 +583,16 @@ let pendingBody = null;
       const id = videoIdFromUrl(singles[0]);
       e.target.loadVideoById(id);
     }
+function onMusicState(e){
+  // Track title only; do not touch volume here to avoid mid-song dips
+  if (e?.data === (window.YT?.PlayerState?.PLAYING)){
+    try {
+      const d = e.target.getVideoData();
+      const np=document.getElementById(EL.nowPlaying); if (np) np.textContent = `${d?.title || '—'}`;
+      const hud=document.getElementById('hudNowPlaying'); if (hud) hud.textContent = `Now Playing: ${d?.title || '—'}`;
+    } catch { /* ignore */ }
   }
-  function onMusicState(e){
-    // Track title only; do not touch volume here to avoid mid-song dips
-    if (e?.data === (window.YT?.PlayerState?.PLAYING)){
-      try {
-        const d = e.target.getVideoData();
-        const np=document.getElementById(EL.nowPlaying); if (np) np.textContent = `${d?.title || '—'}`;
-        const hud=document.getElementById('hudNowPlaying'); if (hud) hud.textContent = `Now Playing: ${d?.title || '—'}`;
-      } catch { /* ignore */ }
-    }
-  }
+}
   function onNoiseReady(e){
     noiseReady=true;
     setVol(noisePlayer, noiseVol);
