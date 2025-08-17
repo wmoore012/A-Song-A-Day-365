@@ -583,7 +583,8 @@ let pendingBody = null;
       const id = videoIdFromUrl(singles[0]);
       e.target.loadVideoById(id);
     }
-function onMusicState(e){
+  }
+  function onMusicState(e){
   // Track title only; do not touch volume here to avoid mid-song dips
   if (e?.data === (window.YT?.PlayerState?.PLAYING)){
     try {
