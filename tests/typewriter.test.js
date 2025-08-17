@@ -13,6 +13,7 @@ describe('typewriter', () => {
 	});
 	it('throws on missing element', async () => {
 		expect(()=> clearTyped(null)).toThrow();
-		await expect(typeInto(null, 'x')).rejects.toThrow();
+		let err=null; try{ await typeInto(null, 'x'); }catch(e){ err=e; }
+		expect(err).toBeInstanceOf(Error);
 	});
 });

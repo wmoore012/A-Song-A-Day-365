@@ -735,11 +735,15 @@ let pendingBody = null;
   window.closeRun = ()=> $("#runOverlay").classList.add('hidden');
   function showPowerup(){
     try{
-      const box=document.createElement('div');
-      box.style.cssText='position:fixed;right:18px;bottom:110px;z-index:9998;background:#0f0f18;border:1px solid #24253a;border-radius:12px;overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,.45)';
-      const img=document.createElement('img'); img.src=CFG.GIFS.POWERUP; img.alt='powerup'; img.style.cssText='width:180px;height:auto;display:block';
-      box.appendChild(img); document.body.appendChild(box);
-      setTimeout(()=>box.remove(), 1400);
+      if (window.__PRO__){
+        import('./pro/analytics-hud.js').then(m=> m.rotateVillainAnnounce('award', { durationMs: 1800 }));
+      } else {
+        const box=document.createElement('div');
+        box.style.cssText='position:fixed;right:18px;bottom:110px;z-index:9998;background:#0f0f18;border:1px solid #24253a;border-radius:12px;overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,.45)';
+        const img=document.createElement('img'); img.src=CFG.GIFS.POWERUP; img.alt='powerup'; img.style.cssText='width:180px;height:auto;display:block';
+        box.appendChild(img); document.body.appendChild(box);
+        setTimeout(()=>box.remove(), 1400);
+      }
     }catch{}
   }
 
