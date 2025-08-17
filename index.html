@@ -23,7 +23,22 @@
 <body>
   <div class="wrap">
 
+    <!-- HUD (Now Playing + FX toggle) -->
+    <header class="hud-header" role="banner" aria-label="HUD">
+      <div class="hud-title sporty">SONG‑PER‑DAY‑365</div>
+      <div id="hudNowPlaying" class="hud-nowplaying" aria-live="polite">Now Playing: —</div>
+    </header>
+
     <header class="topbar">
+      <button id="menuToggle" class="btn btn-secondary" style="margin-right:8px">☰</button>
+      <nav id="menuPanel" class="panel hidden" style="position:fixed;inset:auto 18px 18px auto;z-index:300;width:min(320px,92vw);display:none">
+        <div class="panel-card">
+          <div class="panel-hd"><h3>Menu</h3><button class="btn btn-secondary" onclick="document.getElementById('menuPanel').classList.remove('open');document.getElementById('menuPanel').style.display='none'">Close</button></div>
+          <button class="btn btn-secondary" onclick="document.querySelector('.hud-grid')?.scrollIntoView({behavior:'smooth'})">Analytics</button>
+          <button class="btn btn-secondary" onclick="document.getElementById('settingsPanel')?.classList.remove('hidden')">Settings</button>
+          <button class="btn btn-secondary" onclick="document.getElementById('cityPanel')?.classList.remove('hidden')">City</button>
+        </div>
+      </nav>
       <div class="brand">
         <img src="assets/brand.svg" alt="" onerror="this.style.display='none'"/>
         <span class="title">THE NUKES</span>
@@ -139,6 +154,28 @@
     </main>
   </div>
 
+  <!-- Analytics HUD panel (placeholders) -->
+  <section id="hudAnalytics" class="hud-grid">
+    <div id="chartStreak" class="hud-card hud-echarts" aria-label="Streak momentum chart"></div>
+    <div id="chartBars" class="hud-card hud-echarts" aria-label="Freezes and Genres"></div>
+    <div id="chartCalendar" class="hud-card hud-echarts" aria-label="Calendar heatmap"></div>
+    <div id="chartMultiplier" class="hud-card hud-echarts" aria-label="Multiplier gauge"></div>
+  </section>
+
+  <!-- Coming-Soon frosted card -->
+  <div class="coming-soon card-frost panel-animated" role="note">
+    <div class="sporty">Portfolio &amp; iCatalog Builder</div>
+    <p>Coming Soon — wired to your Notion/iCatalog stats.</p>
+  </div>
+
+  <!-- Pro Locker Section -->
+  <section id="lockerSection" class="card panel-animated" aria-label="Villain Locker"></section>
+
+  <!-- ECharts + GSAP (CDN) for HUD analytics; safe if network blocked -->
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
+
   <!-- Villain chat -->
   <aside id="chatDock" class="chat-dock">
   <button id="chatToggle" class="chat-tab">😈 Heel</button>
@@ -204,10 +241,31 @@
       <input id="musicUrl" placeholder="https://youtube.com/playlist?list=... (optional)" />
       <small class="muted">Defaults to the built-in playlist unless you set one here.</small>
       <div class="divider"></div>
-      <label class="tgl">Villain emoji</label>
-      <select id="villainEmoji">
-        <option>😈</option><option>👹</option><option>🦂</option><option>💀</option>
-      </select>
+
+      <label class="tgl">Villain Emoji Builder</label>
+      <div id="villainWarning" class="muted" style="background:#071008;border:1px solid #236d42;border-radius:10px;padding:8px;color:#b6ff00;font-family:monospace;box-shadow:0 0 10px rgba(182,255,0,.35)">Warning… this is all make believe, but not everybody will think that! so 9x out of 10 it’s better to use one of the non‑humans emojis lol — Use at your own risk</div>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:8px">
+        <label>Subject
+          <select id="villainSubject"><option value="nonhuman">Non‑human</option><option value="human">Human</option></select>
+        </label>
+        <label>Presenting
+          <select id="villainPresenting"><option value="neutral">Neutral</option><option value="male">Male</option><option value="female">Female</option></select>
+        </label>
+        <label>Age
+          <select id="villainAge"><option value="adult">Adult</option><option value="old">Old</option></select>
+        </label>
+        <label>Hair
+          <select id="villainHair"><option value="default">Default</option><option value="short">Short</option><option value="long">Long</option></select>
+        </label>
+        <label class="tgl"><input type="checkbox" id="villainBeard"> Beard (male only)</label>
+        <label>Skin tone
+          <select id="villainTone"><option value="light">Light</option><option value="mediumLight">Medium‑light</option><option value="medium" selected>Medium</option><option value="mediumDark">Medium‑dark</option><option value="dark">Dark</option></select>
+        </label>
+        <label>Non‑human emoji
+          <select id="villainNonHuman"><option>😈</option><option>👹</option><option>💀</option><option>🤖</option><option>👾</option><option>🦂</option><option>🐍</option></select>
+        </label>
+      </div>
+
       <div class="divider"></div>
       <label class="tgl">White noise source (YouTube URL)</label>
       <input id="noiseUrl" placeholder="https://www.youtube.com/watch?v=..." />

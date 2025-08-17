@@ -9,11 +9,14 @@
 */
 
 import { playlistIdFromUrl, videoIdFromUrl, clampMultiplier, rotatePick, bumpMultiplierCalc } from './web-utils.js';
+import { createMusicDucker } from './audio-utils.js';
+import { buildVillainEmoji, isHumanSelection } from './emoji-builder.js';
 import { LS } from './storage.js';
 import { api } from './api.js';
 
 (() => {
   'use strict';
+  const TYPED_BOT_MESSAGES = true;
   const $ = s => document.querySelector(s);
   const setText = (sel, v) => { const el=$(sel); if (el) el.textContent = String(v); };
   const setHTML = (sel, v) => { const el=$(sel); if (el) el.innerHTML = String(v); };
@@ -219,6 +222,11 @@ let pendingBody = null;
   // One-time pre-start sting in the message bar
   const preTaunt = ()=> setText('#messageBar', 'LOCK IN — '+rotPick('pre'));
   preTaunt();
+  // Type warning when settings open
+  document.getElementById('openSettings')?.addEventListener('click', ()=>{
+    const w = document.getElementById('villainWarning');
+    if (w) import('./typewriter.js').then(m=> m.typeInto(w, w.textContent || w.innerText || '', { speedMs: 8, neon:true }));
+  });
 
   { const el = $("#startBtn"); if (el) el.onclick = ()=>{
     if (started) return;
@@ -232,6 +240,8 @@ let pendingBody = null;
   startIso = new Date().toISOString();
   // Small start sting
   stingVillainMaybeLLM(rotPick('pre'));
+  // Pro: show villain announce
+  try { if (window.__PRO__) import('./pro/analytics-hud.js').then(m=> m.rotateVillainAnnounce('start', { frameSrc: 'pro/video/TC - VIEWFINDER 235 - BLACK.png', durationMs: 1800 })); } catch {}
   }; }
 
   { const el = $("#doneBtn"); if (el) el.onclick = ()=>{
@@ -311,6 +321,15 @@ let pendingBody = null;
     document.getElementById('surveyModal')?.classList.add('hidden');
     finalizeSession(allNight, null, null);
     setTimeout(()=> showSuccess(), 200);
+    // After wrap, ask if cooking again or done
+    try {
+      import('./ui-nav.js').then(mod => {
+        const { askCookAgainOrDone, smoothScrollTo } = mod;
+        askCookAgainOrDone((choice)=>{
+          if (choice === 'done') smoothScrollTo('#hudAnalytics');
+        });
+      });
+    } catch {}
   });
 
   // Beeper encouragements
@@ -412,10 +431,18 @@ let pendingBody = null;
     pushMsg('bot', ruleReply(text));
     }
   });
-  function pushMsg(who, text){
+  async function pushMsg(who, text){
     const m = document.createElement('div');
-    m.className = `msg ${who}`; m.textContent = (who==='bot'?'😈 ':'🫵 ')+text;
-    if (!chat.log) return; chat.log.appendChild(m); chat.log.scrollTop = chat.log.scrollHeight;
+    m.className = `msg ${who}`;
+    if (who==='bot' && TYPED_BOT_MESSAGES){
+      m.textContent = '😈 ';
+      if (!chat.log) return; chat.log.appendChild(m);
+      try{ const mod = await import('./typewriter.js'); await mod.typeInto(m, text, { speedMs: 18, jitterMs: 6, neon: false, caret: true, prefix: m.textContent }); }catch{ m.textContent = '😈 '+text; }
+    } else {
+      m.textContent = (who==='bot'?'😈 ':'🫵 ')+text;
+      if (!chat.log) return; chat.log.appendChild(m);
+    }
+    if (chat.log) chat.log.scrollTop = chat.log.scrollHeight;
   }
   function ruleReply(txt){
       // tone-aware quick replies
@@ -484,6 +511,7 @@ let pendingBody = null;
   let musicPlayer, noisePlayer, hintPlayer;
   let musicReady=false, noiseReady=false, hintReady=false;
   let musicVol=15, noiseVol=15;
+  let musicDucker = null;
   let noisePending=false;
   let ytInited = false;
 
@@ -542,6 +570,7 @@ let pendingBody = null;
       }
       e.target.unMute();
       setVol(musicPlayer, musicVol);
+      if (!musicDucker) musicDucker = createMusicDucker(musicPlayer, { initialVolume: musicVol });
       e.target.playVideo();
     }catch{}
   }
@@ -554,16 +583,16 @@ let pendingBody = null;
       const id = videoIdFromUrl(singles[0]);
       e.target.loadVideoById(id);
     }
+function onMusicState(e){
+  // Track title only; do not touch volume here to avoid mid-song dips
+  if (e?.data === (window.YT?.PlayerState?.PLAYING)){
+    try {
+      const d = e.target.getVideoData();
+      const np=document.getElementById(EL.nowPlaying); if (np) np.textContent = `${d?.title || '—'}`;
+      const hud=document.getElementById('hudNowPlaying'); if (hud) hud.textContent = `Now Playing: ${d?.title || '—'}`;
+    } catch { /* ignore */ }
   }
-  function onMusicState(e){
-    // Track title only; do not touch volume here to avoid mid-song dips
-    if (e?.data === (window.YT?.PlayerState?.PLAYING)){
-      try {
-        const d = e.target.getVideoData();
-        const np=document.getElementById(EL.nowPlaying); if (np) np.textContent = `${d?.title || '—'}`;
-      } catch { /* ignore */ }
-    }
-  }
+}
   function onNoiseReady(e){
     noiseReady=true;
     setVol(noisePlayer, noiseVol);
@@ -582,12 +611,10 @@ let pendingBody = null;
   }
   function fadeOutMusic(){
     if (!musicPlayer||!musicReady) return;
-    let v = musicVol;
-    const tick = setInterval(()=>{
-      v = Math.max(0, v-3);
-      setVol(musicPlayer, v);
-      if (v<=0){ clearInterval(tick); try{ musicPlayer.pauseVideo(); }catch{} }
-    }, 120);
+    try{
+      if (!musicDucker) musicDucker = createMusicDucker(musicPlayer, { initialVolume: musicVol });
+      musicDucker.fadeOutAndPause(3, 120);
+    }catch{}
   }
   { const el = $("#toggleNoise"); if (el) el.onclick = ()=>{
     initYouTubeOnce();
@@ -626,15 +653,18 @@ let pendingBody = null;
     modal.classList.remove('hidden');
     initYouTubeOnce();
     ensureHintPlayer();
-    // fade out music if playing
-    fadeOutMusic();
+    // gently duck music while hints play; restore on close
+    try{
+      if (!musicDucker && musicPlayer) musicDucker = createMusicDucker(musicPlayer, { initialVolume: musicVol });
+      musicDucker?.duckForHints({ target: 5, step: 3, intervalMs: 120 });
+    }catch{}
     // load a fresh hint
-  const v = rotPickHint();
-  if (hintPlayer && v){ try{ hintPlayer.loadVideoById(v); }catch{} }
-  const a = document.getElementById('openInYoutube');
-  if (a && v){ a.href = openInYouTubeHrefFor(v); }
+    const v = rotPickHint();
+    if (hintPlayer && v){ try{ hintPlayer.loadVideoById(v); }catch{} }
+    const a = document.getElementById('openInYoutube');
+    if (a && v){ a.href = openInYouTubeHrefFor(v); }
   }
-  function closeHints(){ document.getElementById('hintsModal')?.classList.add('hidden'); try{ hintPlayer?.pauseVideo(); }catch{} }
+  function closeHints(){ document.getElementById('hintsModal')?.classList.add('hidden'); try{ hintPlayer?.pauseVideo(); }catch{} try{ musicDucker?.restore(); }catch{} }
   window.openHints = openHints; window.closeHints = closeHints;
   function rotPickHint(){
     if (!HINTS.length) return null;
@@ -684,24 +714,26 @@ let pendingBody = null;
   if (cEl) cEl.textContent = rare ? "Limited run. Flex quietly and keep working." : "Pocket this and move on.";
   if (mEl) mEl.classList.remove('hidden');
   }
-  window.closeReward = ()=> $("#rewardModal").classList.add('hidden');
+  window.closeReward = ()=> { $("#rewardModal").classList.add('hidden'); try{ import('./ui-nav.js').then(m=> m.smoothScrollTo('#lockerSection')); }catch{} };
 
-  function showSuccess(){
-    const line = rotPick('pocket');
-    if (line) stingVillainMaybeLLM(line, 'seed');
-    setTimeout(()=>{
-      $("#successGif").src = CFG.GIFS.SUCCESS_HOME;
-      $("#successHome").classList.remove('hidden');
-      sideConfetti(2200);
-    }, 700);
-  }
+        function showSuccess(){
+     // Sprinkle a kind word at wrap unless user opted out of next session
+     try{ const line = Math.random()<0.5 ? rotPick('hype') : rotPick('pocket'); if (line) stingVillain(line, 'seed'); }catch{}
+     try { if (window.__PRO__) import('./pro/analytics-hud.js').then(m=> m.rotateVillainAnnounce('done', { frameSrc: 'pro/video/TC - 35mm_MATTE.png', durationMs: 2200 })); } catch {}
+     setTimeout(()=>{
+       $("#successGif").src = CFG.GIFS.SUCCESS_HOME;
+       $("#successHome").classList.remove('hidden');
+       sideConfetti(2200);
+     }, 700);
+   }
   window.closeSuccess = ()=> $("#successHome").classList.add('hidden');
 
-  function showFail(){
-    $("#failGif").src = CFG.GIFS.FAIL_HOME;
-    $("#willGif").src = CFG.GIFS.WILL_PLACEHOLDER;
-    $("#failHome").classList.remove('hidden');
-  }
+     function showFail(){
+     $("#failGif").src = CFG.GIFS.FAIL_HOME;
+     $("#willGif").src = CFG.GIFS.WILL_PLACEHOLDER;
+     $("#failHome").classList.remove('hidden');
+     try { if (window.__PRO__) import('./pro/analytics-hud.js').then(m=> m.rotateVillainAnnounce('low-time', { frameSrc: 'pro/video/TC - VIEWFINDER 235 - BLACK.png', durationMs: 2000 })); } catch {}
+   }
   window.closeFail = ()=> $("#failHome").classList.add('hidden');
 
   function showRun(){
@@ -711,11 +743,15 @@ let pendingBody = null;
   window.closeRun = ()=> $("#runOverlay").classList.add('hidden');
   function showPowerup(){
     try{
-      const box=document.createElement('div');
-      box.style.cssText='position:fixed;right:18px;bottom:110px;z-index:9998;background:#0f0f18;border:1px solid #24253a;border-radius:12px;overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,.45)';
-      const img=document.createElement('img'); img.src=CFG.GIFS.POWERUP; img.alt='powerup'; img.style.cssText='width:180px;height:auto;display:block';
-      box.appendChild(img); document.body.appendChild(box);
-      setTimeout(()=>box.remove(), 1400);
+      if (window.__PRO__){
+        import('./pro/analytics-hud.js').then(m=> m.rotateVillainAnnounce('award', { durationMs: 1800 }));
+      } else {
+        const box=document.createElement('div');
+        box.style.cssText='position:fixed;right:18px;bottom:110px;z-index:9998;background:#0f0f18;border:1px solid #24253a;border-radius:12px;overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,.45)';
+        const img=document.createElement('img'); img.src=CFG.GIFS.POWERUP; img.alt='powerup'; img.style.cssText='width:180px;height:auto;display:block';
+        box.appendChild(img); document.body.appendChild(box);
+        setTimeout(()=>box.remove(), 1400);
+      }
     }catch{}
   }
 
@@ -865,6 +901,8 @@ let pendingBody = null;
       btn.classList.add('jiggle'); setTimeout(()=>btn.classList.remove('jiggle'), 500);
       const hc = LS.heatCounts; hc[key] = (hc[key]||0) + 1; LS.heatCounts = hc;
       toastGoodPager(`HEAT: ${label}`);
+      // Sprinkle a hype line occasionally
+      try{ if (Math.random() < 0.35) { const hype = rotPick('hype'); if (hype) stingVillain(hype, 'seed'); } }catch{}
       // Update badge
       const badge = btn.querySelector('.badge'); if (badge){ badge.textContent = String(hc[key]); }
       // Cooldown glow
@@ -1010,8 +1048,22 @@ let pendingBody = null;
     const hintsRaw = (document.getElementById('hintsList')?.value||'').split('\n').map(s=>s.trim()).filter(Boolean);
     LS.hintsUrls = hintsRaw;
     // Save villain emoji
-    const vEm = document.getElementById('villainEmoji')?.value || '😈';
-    LS.heelEmoji = vEm;
+    try{
+      const chooser = {
+        subject: (document.getElementById('villainSubject')?.value || 'nonhuman'),
+        presenting: (document.getElementById('villainPresenting')?.value || 'neutral'),
+        age: (document.getElementById('villainAge')?.value || 'adult'),
+        hair: (document.getElementById('villainHair')?.value || 'default'),
+        beard: !!(document.getElementById('villainBeard')?.checked),
+        tone: (document.getElementById('villainTone')?.value || 'medium'),
+        nonHuman: (document.getElementById('villainNonHuman')?.value || '😈')
+      };
+      const vEm = buildVillainEmoji(chooser);
+      LS.heelEmoji = vEm;
+      // React to choice
+      const msg = isHumanSelection(chooser) ? "4 real you picked me?!? That's craaaazzzzy fam... Aight" : 'Good choice.';
+      stingVillain(msg, 'seed');
+    }catch{}
     const hdr=document.getElementById('sidekickHeader'); if(hdr) hdr.textContent=`${LS.heelEmoji||'😈'} ${LS.heelName||'Heel'}`;
     // Save noise URL
     const noise = document.getElementById('noiseUrl')?.value?.trim() || '';
@@ -1146,8 +1198,9 @@ export   function fadeLobbyBackdrop(){
   }, 50_000);
 })();
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   // Initialize mute chip and lobby fade if buttons exist
   initVillainMuteChip();
   document.getElementById('startBtn')?.addEventListener('click', fadeLobbyBackdrop);
+  try { const { bootProPlugins } = await import('./pro-loader.js'); await bootProPlugins({ LS }); } catch {}
 });

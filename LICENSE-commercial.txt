@@ -1,0 +1,29 @@
+THE NUKES — COMMERCIAL END‑USER LICENSE AGREEMENT (EULA)
+
+Effective date: 2025‑01‑01
+
+1. License Grant
+Subject to payment of applicable fees and your compliance with this EULA, Licensor grants you a limited, non‑exclusive, non‑transferable, non‑sublicensable license to install and use the Pro Software (including code, assets, scripts, overlays, personalities, and documentation) solely for your internal business or personal creative use.
+
+2. Restrictions
+You shall not: (a) copy, distribute, sell, rent, lease, sublicense, or host the Pro Software for third parties; (b) modify, reverse‑engineer, decompile, or disassemble the Pro Software except to the extent expressly permitted by law; (c) remove or alter proprietary notices; (d) use any content (including villain scripts and assets) to train models or generate derivative datasets.
+
+3. Ownership
+The Pro Software is licensed, not sold. Licensor retains all rights, title, and interest, including all intellectual property rights. No rights are granted by implication, estoppel, or otherwise except as expressly set forth herein.
+
+4. Updates & Support
+Updates and support may be provided at Licensor’s discretion under a separate support policy. Licensor may update, modify, or discontinue features.
+
+5. Termination
+This EULA terminates automatically if you breach its terms. Upon termination, you must cease all use and destroy copies of the Pro Software.
+
+6. Disclaimer
+THE PRO SOFTWARE IS PROVIDED “AS IS.” LICENSOR DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON‑INFRINGEMENT.
+
+7. Limitation of Liability
+TO THE MAXIMUM EXTENT PERMITTED BY LAW, LICENSOR SHALL NOT BE LIABLE FOR ANY INDIRECT, SPECIAL, INCIDENTAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES.
+
+8. General
+This EULA is governed by the laws of your primary place of business or residence unless otherwise agreed in writing. If any provision is unenforceable, the remainder remains in effect.
+
+© 2025 J. Smash — All rights reserved.
