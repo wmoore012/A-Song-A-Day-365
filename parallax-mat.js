@@ -47,20 +47,32 @@ export function bootParallaxMat(gsapRef){
 	const deck = document.getElementById('laserDeck');
 	const sweepLasers = ()=>{
 		if (!deck || !lasers.length) return;
-		const h = deck.clientHeight || (typeof window !== 'undefined' ? window.innerHeight * 0.3 : 240);
+		const h = deck.clientHeight || (typeof window !== 'undefined' ? window.innerHeight : 600);
 		lasers.forEach((el, i)=>{
 			const y = (i+1) * (h/(lasers.length+1));
 			gsap.fromTo(el,
-				{ y:y-8, opacity:0 },
+				{ y:y-16, opacity:0 },
 				{ y:y, opacity:.7, duration:.28, ease:'power1.out',
 					onComplete: ()=> gsap.to(el, {opacity:0, duration:.22, ease:'power1.in'})
 				}
 			);
+			const speed = parseFloat(el.dataset.speed || (0.2 + i*0.15));
+			gsap.to(el, {
+				y: `+=${speed * 200}`,
+				ease: 'none',
+				scrollTrigger: {
+					trigger: document.body,
+					start: 'top top',
+					end: 'bottom bottom',
+					scrub: true
+				}
+			});
 		});
 	};
 	layers.forEach(layer=>{
 		ScrollTrigger.create({ trigger: layer, start:'top 80%', onEnter: sweepLasers, onEnterBack: sweepLasers });
 	});
+	sweepLasers();
 
 	// Ruler
 	const ruler = document.getElementById('scrollRuler');

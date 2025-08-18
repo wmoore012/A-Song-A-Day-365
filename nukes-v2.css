@@ -5,6 +5,7 @@
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;background:linear-gradient(135deg,#0c0c12 0%, #111224 30%, #1a1032 60%, #120f1a 100%);color:var(--fg);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial}
 .wrap{max-width:1280px;margin:0 auto;padding:18px}
+.wrap{position:relative;z-index:1}
 
 /* Topbar */
 .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
@@ -91,7 +92,7 @@ a.btn{text-decoration:none}
 #gradeSlider{width:100%}
 
 /* Overlays & modals */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;z-index:200}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;z-index:1000}
 .overlay.hidden{display:none}
 .modal{background:#141524;border:1px solid var(--line);border-radius:16px;padding:14px;width:min(520px,92vw);text-align:center}
 .modal .actions{display:flex;gap:8px;justify-content:center}
@@ -157,6 +158,12 @@ a.btn{text-decoration:none}
 .villain-toast .msg{font-family:Inter}
 @keyframes stingIn{from{transform:translateY(-8px);opacity:.75}to{transform:translateY(0);opacity:1}}
 @keyframes stingPulse{0%{filter:brightness(1)}50%{filter:brightness(1.25)}100%{filter:brightness(1)}}
+.villain-toast.float{animation:floatY 12s ease-in-out infinite alternate}
+.villain-toast::after{content:"";position:absolute;inset:auto 10px -6px 10px;height:6px;border-radius:6px;background:radial-gradient(50% 100% at 50% 50%, rgba(0,0,0,.35), transparent);filter:blur(2px);opacity:.6;animation:shadowSlide 6s ease-in-out infinite alternate}
+@keyframes floatY{0%{transform:translateY(0)}50%{transform:translateY(2px)}100%{transform:translateY(-2px)}}
+@keyframes shadowSlide{0%{transform:translateX(-4px)}100%{transform:translateX(4px)}}
+.villain-toast.shake5{animation:toastShake 5s ease-in-out 1}
+@keyframes toastShake{0%,100%{transform:translateX(0)}10%{transform:translateX(-2px)}20%{transform:translateX(2px)}30%{transform:translateX(-2px)}40%{transform:translateX(2px)}50%{transform:translateX(-1px)}60%{transform:translateX(1px)}70%{transform:translateX(-1px)}80%{transform:translateX(1px)}90%{transform:translateX(0)}}
 
 /* Shake hint button */
 .shake{animation:shake .3s ease-in-out 0s 4}
@@ -221,6 +228,8 @@ a.btn{text-decoration:none}
 .hud-header{position:sticky;top:0;z-index:10;display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:rgba(11,15,20,.85);backdrop-filter:blur(8px);border-bottom:1px solid #1c2230;margin-bottom:8px}
 .hud-title{color:#e6f2ff;font-size:1.1rem}
 .hud-nowplaying{color:#c9e7ff}
+.hud-controls{display:flex;gap:6px;align-items:center}
+.hud-controls .btn{padding:6px 8px;border-radius:8px}
 .hud-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;padding:16px}
 .hud-card{background:linear-gradient(180deg,#0f1420,#0a0d14);border:1px solid #1f2a3a;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.35);padding:12px}
 .hud-echarts{height:280px}
@@ -236,8 +245,8 @@ a.btn{text-decoration:none}
 .parallax-mat{position:relative;z-index:0;pointer-events:none}
 .parallax-mat .mat-layer{position:relative;height:60vh;margin-bottom:140px;background:var(--slab);box-shadow:inset 0 0 180px rgba(0,0,0,.45)}
 .mat-content{position:relative;z-index:1;pointer-events:auto;padding:28px}
-#laserDeck{position:fixed;inset:0 0 auto 0;height:30vh;pointer-events:none;z-index:2}
-#laserDeck .laser{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#b6ff00,transparent);filter:drop-shadow(0 0 6px #b6ff00);opacity:.0}
+#laserDeck{position:fixed;inset:0;height:100vh;pointer-events:none;z-index:0}
+#laserDeck .laser{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#b6ff00,transparent);filter:drop-shadow(0 0 6px #b6ff00);opacity:.0;transform:translateY(0)}
 .card-frost--refract{position:relative;overflow:hidden}
 .card-frost--refract::before{content:"";position:absolute;inset:-20%;background:inherit;backdrop-filter:blur(24px) saturate(140%) contrast(105%);opacity:.35;mix-blend-mode:screen;transform:translate3d(0,0,0) scale(1.02);pointer-events:none;mask-image:radial-gradient(120% 120% at 40% 40%, rgba(255,255,255,.4), rgba(255,255,255,0) 70%)}
 .neon-type{color:#b6ff00;text-shadow:0 0 6px rgba(182,255,0,.55),0 0 14px rgba(182,255,0,.35)}

@@ -1,6 +1,7 @@
 export function typeInto(element, text, opts = {}){
 	if (!element) throw new Error('typeInto: missing target element');
-	const speedMs = Number.isFinite(opts.speedMs) ? Math.max(0, opts.speedMs) : 20;
+	// Slow down default typing ~2.5x
+	const speedMs = Number.isFinite(opts.speedMs) ? Math.max(0, opts.speedMs) : 50;
 	const jitterMs = Number.isFinite(opts.jitterMs) ? Math.max(0, opts.jitterMs) : 6;
 	const prefix = opts.prefix || '';
 	const finalText = String(text ?? '');
