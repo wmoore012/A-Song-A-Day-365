@@ -50,3 +50,23 @@ We welcome issues/feedback for the public preview UI and docs. Code contribution
 A public demo of the open preview is planned. The Pro experience (FX, personalities, HUD) is only available to licensed users.
 
 © 2025 J. Smash. See `LICENSE-commercial.txt` for closed‑core terms and `docs/licensing.md` for details.
+
+## Deployment
+
+Production deploys are handled by GitHub Actions using Netlify CLI.
+
+Set these GitHub secrets:
+
+- `NETLIFY_AUTH_TOKEN`
+- `NETLIFY_SITE_ID`
+
+The CI job links non-interactively and deploys:
+```
+netlify link --id "$NETLIFY_SITE_ID" --auth "$NETLIFY_AUTH_TOKEN"
+netlify deploy --dir=dist --prod --site "$NETLIFY_SITE_ID" --auth "$NETLIFY_AUTH_TOKEN"
+```
+
+Manual deploy locally:
+1. `npm ci && npm run build`
+2. `netlify link --id $NETLIFY_SITE_ID --auth $NETLIFY_AUTH_TOKEN`
+3. `netlify deploy --dir=dist --prod --site $NETLIFY_SITE_ID --auth $NETLIFY_AUTH_TOKEN`
