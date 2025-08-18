@@ -34,15 +34,17 @@ export function createMusicDucker(player, opts = {}){
 		clearFade();
 		isDucking = true;
 		let v = safeGetVolume();
-		fadeTimer = setInterval(()=>{
+		const tick = ()=>{
 			v = Math.max(0, v - step);
 			safeSetVolume(v);
 			if (v <= 0){
-				clearFade();
 				try{ player.pauseVideo?.(); }catch{}
 				isDucking = false;
+				return;
 			}
-		}, intervalMs);
+			fadeTimer = setTimeout(tick, intervalMs);
+		};
+		fadeTimer = setTimeout(tick, intervalMs);
 	}
 	function keepUpright(){
 		// Call periodically if you want to enforce a floor; avoids accidental dips
