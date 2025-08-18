@@ -13,6 +13,8 @@ import { createMusicDucker } from './audio-utils.js';
 import { buildVillainEmoji, isHumanSelection } from './emoji-builder.js';
 import { LS } from './storage.js';
 import { api } from './api.js';
+import { bootParallaxMat } from './parallax-mat.js';
+import { initHamburger } from './ui-nav.js';
 
 (() => {
   'use strict';
@@ -1199,9 +1201,38 @@ export   function fadeLobbyBackdrop(){
   }, 50_000);
 })();
 
+function renderParallaxError(message){
+  try{
+    const bar = document.createElement('div');
+    bar.setAttribute('role','alert');
+    bar.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#3a0c0c;color:#fff;border-bottom:2px solid #ff3b30;padding:10px 14px;font-weight:900;font-family:system-ui,Segoe UI,Inter,Arial';
+    bar.textContent = message;
+    document.body.appendChild(bar);
+  }catch{}
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
   // Initialize mute chip and lobby fade if buttons exist
   initVillainMuteChip();
+  initHamburger();
   document.getElementById('startBtn')?.addEventListener('click', fadeLobbyBackdrop);
   try { const { bootProPlugins } = await import('./pro-loader.js'); await bootProPlugins({ LS }); } catch {}
+
+  // GSAP parallax boot — fail loudly if missing
+  if (!window.gsap || !window.ScrollTrigger){
+    renderParallaxError('Parallax requires GSAP + ScrollTrigger. Verify CDN or local import.');
+    throw new Error('GSAP/ScrollTrigger missing for parallax');
+  }
+  bootParallaxMat(window.gsap);
+
+  // Animate panels into view using GSAP (no silent fallback)
+  try {
+    const gsap = window.gsap; const ScrollTrigger = window.ScrollTrigger;
+    gsap.utils.toArray('.panel-animated').forEach((el)=>{
+      gsap.fromTo(el, { opacity:0, y:24 }, { opacity:1, y:0, duration:.4, ease:'power2.out', scrollTrigger:{ trigger: el, start:'top 85%' } });
+    });
+  } catch (e) {
+    renderParallaxError('Panel animations require GSAP.');
+    throw e;
+  }
 });
