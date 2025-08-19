@@ -1,4 +1,4 @@
-// License: Business Source License 1.1 (BSL)
+// Proprietary. All rights reserved.
 // Premium analytics HUD (ECharts) — plus villain GIF announcer
 
 function el(tag, attrs={}, parent){ const e=document.createElement(tag); Object.entries(attrs).forEach(([k,v])=>{ if(k==='style'&&typeof v==='object') Object.assign(e.style,v); else if(k in e) e[k]=v; else e.setAttribute(k,v); }); if(parent) parent.appendChild(e); return e; }

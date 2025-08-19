@@ -1,4 +1,4 @@
-// License: Business Source License 1.1 (BSL)
+// Proprietary. All rights reserved.
 // Premium FX overlays (film burn, glitch, cursor trail)
 
 function el(tag, attrs={}, parent){

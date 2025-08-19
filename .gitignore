@@ -1,6 +1,9 @@
+# Ignore Pro source and assets
+pro/
 node_modules
 dist
 .DS_Store
 .vscode
 .idea
 .env
+pro/fonts/made_soulmaze/License READ ME FIRST.txt

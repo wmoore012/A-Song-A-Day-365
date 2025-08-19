@@ -40,7 +40,7 @@ import { initHamburger } from './ui-nav.js';
       "Five good minutes beats zero perfect ones.",
       "Set one outcome. Everything else is extra.",
     ],
-    // Villain lines are provided by /pro/villain-lines.js (BSL). Empty by default in open core.
+  // Villain lines are provided by /pro/villain-lines.js. Empty by default in open core.
     VILLAIN_SEED: [],
     VILLAIN_PRESTART: [],
     VILLAIN_HYPE: [],
@@ -74,7 +74,7 @@ import { initHamburger } from './ui-nav.js';
     NOISE_LIFEAT: "https://www.youtube.com/live/xdJ58r0k340"
   };
 
-  // Load Pro villain lines (BSL) if available
+  // Load Pro villain lines if available
   (async () => {
     try {
       const mod = await import('./pro/villain-lines.js');
@@ -87,7 +87,7 @@ import { initHamburger } from './ui-nav.js';
       if (Array.isArray(v.pocket)) CFG.VILLAIN_POCKET = v.pocket;
     } catch (e) {
       console.error('Pro villain scripts missing or invalid.', e);
-      try { if (location && location.hostname === 'localhost') throw new Error('Missing /pro/villain-lines.js (BSL): add your villain packs.'); } catch {}
+  try { if (location && location.hostname === 'localhost') throw new Error('Missing /pro/villain-lines.js: add your villain packs.'); } catch {}
     }
   })();
 

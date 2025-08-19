@@ -1,8 +1,8 @@
-# Pro (BSL 1.1)
+# Pro (Closed Source)
 
 This folder contains proprietary features licensed under Business Source License 1.1.
 
-- License file: ../licenses/PRO-LICENSE.BSL
+// ...existing code...
 - Change Date: see license file. On/after that date, the contents convert to Apache-2.0.
 
 Guidelines

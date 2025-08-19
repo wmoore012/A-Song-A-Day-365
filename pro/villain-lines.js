@@ -1,4 +1,4 @@
-// License: Business Source License 1.1 (see licenses/PRO-LICENSE.BSL)
+// Proprietary. All rights reserved.
 // Proprietary villain scripts (seed lines, hype, shade, prestart, pocket). Do not copy outside BSL terms.
 
 export function getProVillainLines(){
