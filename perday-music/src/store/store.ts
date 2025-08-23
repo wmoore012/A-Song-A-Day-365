@@ -2,12 +2,6 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import localforage from "localforage";
 
-// Guard window access at module level
-const prefersReduced =
-  typeof window !== "undefined" &&
-  typeof window.matchMedia === "function" &&
-  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
 export type Phase = "prestart" | "lockin" | "wrap";
 export type Grade = "A" | "B" | "C";
 
@@ -26,7 +20,7 @@ type SessionState = {
 };
 
 type SettingsState = {
-  motionOk: boolean;         // from prefers-reduced-motion or UI toggle
+  motionOk: boolean;         // SAFE default for SSR/cold boot
   soundEnabled: boolean;     // gated by "Enable Sound"
   playlistId?: string;
 };
@@ -42,21 +36,30 @@ type Actions = {
   decFreeze: () => void;
   incFreeze: () => void;
   resetPrestart: () => void;
+  hydrateMotion: () => void; // Safe motion detection after mount
+};
+
+const initialSession: SessionState = {
+  phase: "prestart",
+  prestartTotalMs: 7 * 60_000,
+  prestartReadyAtMs: null,
+  lockinTotalMs: 7 * 60_000,
+  grades: [],
+  latencies: [],
+  streak: 0,
+  freezes: 0,
+};
+
+const initialSettings: SettingsState = {
+  motionOk: false,           // SAFE default - no window access at init
+  soundEnabled: false,
 };
 
 export const useAppStore = create<SessionState & SettingsState & Actions>()(
   persist(
     (set, get) => ({
-      phase: "prestart",
-      prestartTotalMs: 7 * 60_000,
-      prestartReadyAtMs: null,
-      lockinTotalMs: 7 * 60_000,
-      grades: [],
-      latencies: [],
-      streak: 0,
-      freezes: 0,
-      motionOk: !prefersReduced,
-      soundEnabled: false,
+      ...initialSession,
+      ...initialSettings,
 
       setPhase: (p) => set({ phase: p }),
       setSoundEnabled: (v) => set({ soundEnabled: v }),
@@ -68,12 +71,29 @@ export const useAppStore = create<SessionState & SettingsState & Actions>()(
       decFreeze: () => set({ freezes: Math.max(0, get().freezes - 1) }),
       incFreeze: () => set({ freezes: get().freezes + 1 }),
       resetPrestart: () => set({ prestartReadyAtMs: null, phase: "prestart" }),
+      
+      hydrateMotion: () => {
+        // Safe motion detection after component mount
+        const ok = typeof window !== "undefined" &&
+          typeof window.matchMedia === "function" &&
+          !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        set({ motionOk: !!ok });
+      },
     }),
     {
       name: "perday-store",
       storage: createJSONStorage(() => localforage),
-      version: 1,
+      version: 2,
       migrate: (state) => state as SessionState & SettingsState & Actions,
+      partialize: (s) => ({
+        // persist only what you need
+        grades: s.grades,
+        latencies: s.latencies,
+        streak: s.streak,
+        freezes: s.freezes,
+        soundEnabled: s.soundEnabled,
+        playlistId: s.playlistId,
+      }),
     }
   )
 );

@@ -1,6 +1,6 @@
 
 
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import { useAppStore } from "./store/store";
 import PageVisibilityBadge from "./ui/PageVisibilityBadge";
 import AudioHud from "./features/sound/AudioHud";
@@ -20,6 +20,11 @@ export default function App() {
   const setPhase = useAppStore((s) => s.setPhase);
   const prestartTotalMs = useAppStore((s) => s.prestartTotalMs);
   const motionOk = useAppStore((s) => s.motionOk);
+
+  // Safe motion detection after mount
+  useEffect(() => {
+    useAppStore.getState().hydrateMotion();
+  }, []);
 
   // Validate store state
   must(phase, "Phase must be defined");
