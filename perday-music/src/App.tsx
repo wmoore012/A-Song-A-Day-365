@@ -74,7 +74,7 @@ export default function App() {
       </div>
       
       {/* Neon Isometric Maze Footer */}
-      <div className="fixed bottom-0 left-0 w-full h-32 z-0">
+      <div className="fixed bottom-0 left-0 w-full h-32 -z-10">
         <NeonIsometricMaze />
       </div>
     </div>

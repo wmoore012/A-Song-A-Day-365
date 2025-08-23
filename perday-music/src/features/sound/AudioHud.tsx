@@ -66,14 +66,14 @@ export default function AudioHud({ fadeOutRef }: { fadeOutRef: React.MutableRefO
   }, [armed]);
 
   return (
-    <section className="rounded-2xl bg-white/5 ring-1 ring-white/10 p-6">
-      <div className="text-lg font-semibold text-white/90 mb-4">🎵 Music & Room Tone</div>
+    <section className="rounded-2xl bg-gradient-to-br from-synth-violet/5 to-synth-aqua/5 ring-1 ring-synth-icy/20 p-6 shadow-xl backdrop-blur-sm">
+      <div className="text-lg font-semibold text-synth-white mb-4">🎵 Music & Room Tone</div>
       
       {!armed ? (
         <div className="text-center">
-          <div className="text-sm text-white/60 mb-4">Enable sound to get the full experience</div>
+          <div className="text-sm text-synth-icy/80 mb-4">Enable sound to get the full experience</div>
           <button 
-            className="px-6 py-3 rounded-xl bg-[#7c5cff] hover:bg-[#8e77ff] font-bold shadow hover:shadow-[0_8px_20px_rgba(124,92,255,.25)] transition" 
+            className="px-6 py-3 rounded-xl bg-gradient-to-r from-synth-violet to-synth-magenta hover:from-synth-magenta hover:to-synth-violet font-bold shadow-lg hover:shadow-[0_8px_20px_rgba(108,26,237,0.4)] transition-all duration-300" 
             onClick={() => setArmed(true)}
           >
             🔊 Enable Sound
@@ -82,9 +82,9 @@ export default function AudioHud({ fadeOutRef }: { fadeOutRef: React.MutableRefO
       ) : (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium">🎵 Music</span>
+            <span className="text-sm font-medium text-synth-icy">🎵 Music</span>
             <button 
-              className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/15 text-xs font-medium"
+              className="px-3 py-1 rounded-lg bg-synth-icy/10 hover:bg-synth-icy/20 text-xs font-medium"
               onClick={() => {
                 try { 
                   if (m.current?.getPlayerState() === 1) {
@@ -100,9 +100,9 @@ export default function AudioHud({ fadeOutRef }: { fadeOutRef: React.MutableRefO
           </div>
           
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium">🌊 White Noise</span>
+            <span className="text-sm font-medium text-synth-icy">🌊 White Noise</span>
             <button 
-              className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/15 text-xs font-medium"
+              className="px-3 py-1 rounded-lg bg-synth-icy/10 hover:bg-synth-icy/20 text-xs font-medium"
               onClick={() => {
                 try { 
                   if (n.current?.getPlayerState() === 1) {
