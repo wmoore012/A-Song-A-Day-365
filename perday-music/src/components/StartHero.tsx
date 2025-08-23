@@ -1,6 +1,7 @@
 import { useSessionStore } from '../state/store';
 import { FlowState } from '../state/types';
 import { useVillainAnnounce } from '../features/fx/useVillainAnnounce';
+import { useStartupScript } from '../features/villain/useStartupScript';
 import { usePrestart } from '../features/prestart/usePrestart';
 import { useState, useEffect } from 'react';
 import MultiplierBar from './MultiplierBar';
@@ -20,11 +21,15 @@ import HeatButtons from './HeatButtons';
 import ThemeSwitcher from './ThemeSwitcher';
 import GearCarousel from './GearCarousel';
 import SongInfoDialog from './SongInfoDialog';
+import UserQuestionnaire from './UserQuestionnaire';
+import SettingsSheet from './SettingsSheet';
+import AudioControls from './AudioControls';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import { toast } from 'sonner';
+import { Settings } from 'lucide-react';
 
 export default function StartHero() {
   const { session, dispatch } = useSessionStore();
-  const { mmss } = usePrestart();
-  const { villainNudge } = useVillainAnnounce();
   const [error, setError] = useState<string | null>(null);
   const [note, setNote] = useState('');
   const [target, setTarget] = useState('');
@@ -33,7 +38,57 @@ export default function StartHero() {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [allNighter, setAllNighter] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(false);
-  const [showVault, setShowVault] = useState(false);
+  const [showVault, setShowVault] = useState(true); // Start with vault open
+  const [showQuestionnaire, setShowQuestionnaire] = useState(false);
+  const [userData, setUserData] = useState<{ name: string; collaborators: string } | null>(null);
+  const [volume, setVolume] = useState(0.7);
+  const [settings, setSettings] = useState({
+    defaultDuration: 25,
+    defaultMultiplier: 1.5,
+    autoStartTimer: true,
+    soundEnabled: true,
+    volume: 0.7,
+    notifications: true,
+    accountabilityEmail: '',
+  });
+  
+  const { mmss } = usePrestart();
+  const { villainNudge } = useVillainAnnounce();
+  const { isComplete: startupComplete } = useStartupScript(userData?.name || 'Producer');
+  
+  const [showSettingsChoice, setShowSettingsChoice] = useState(false);
+  
+  const handleQuestionnaireComplete = (data: { name: string; collaborators: string }) => {
+    setUserData(data);
+    setShowQuestionnaire(false);
+    setShowSettingsChoice(true);
+    toast.success(`Welcome back, ${data.name}! Let's make some music.`);
+  };
+  
+  const handleUseDefaults = () => {
+    setShowSettingsChoice(false);
+    // Start the villain startup script
+    setTimeout(() => {
+      villainNudge(`Welcome Back ${userData?.name}!`);
+    }, 500);
+    
+    // Trigger gear spinning animation
+    if (settings.defaultMultiplier !== 1.5) {
+      toast.success('Using your default settings!');
+    }
+  };
+  
+  const handleCustomizeSession = () => {
+    setShowSettingsChoice(false);
+    // Open settings sheet
+    // This will be handled by the settings button
+  };
+  
+  const handleSettingsSave = (newSettings: any) => {
+    setSettings(newSettings);
+    setVolume(newSettings.volume);
+    toast.success('Settings saved successfully!');
+  };
 
   // Timer effect to decrease multiplier by 10% every 30 seconds after timer starts
   useEffect(() => {
@@ -90,19 +145,33 @@ export default function StartHero() {
             <PerdayLogo size={60} />
           </div>
           
-          {/* Villain Display - Top Right */}
-          <div className="absolute top-8 right-8">
-            <div className="text-synth-amber text-sm font-medium bg-synth-violet/20 backdrop-blur-xl border border-synth-violet/40 rounded-xl px-4 py-2">
-              😈 Villain is watching...
+          {/* User Avatar & Settings */}
+          <div className="absolute top-8 right-8 flex items-center gap-3">
+            <SettingsSheet onSave={handleSettingsSave} currentSettings={settings} />
+            <Avatar className="h-10 w-10 border-2 border-cyan-400/40">
+              <AvatarImage src={userData ? `https://api.dicebear.com/7.x/avataaars/svg?seed=${userData.name}` : undefined} />
+              <AvatarFallback className="bg-gradient-to-r from-magenta-500 to-cyan-400 text-synth-white font-bold">
+                {userData?.name?.charAt(0) || 'P'}
+              </AvatarFallback>
+            </Avatar>
+          </div>
+          
+          {/* Villain Status Display */}
+          <div className="absolute top-20 right-8">
+            <div className="text-synth-amber text-sm font-medium bg-synth-violet/20 backdrop-blur-xl border border-synth-violet/40 rounded-xl px-4 py-2 animate-pulse">
+              {!startupComplete ? '😈 Villain is speaking...' : '😈 Villain is watching...'}
             </div>
           </div>
+          
+          {/* Audio Controls */}
+          <AudioControls onVolumeChange={setVolume} currentVolume={volume} />
           
           {/* Atom Orbit Background */}
           <div className="absolute inset-0 flex items-center justify-center opacity-20">
             <AtomOrbit />
           </div>
           
-          <div className="rounded-2xl bg-black/40 backdrop-blur-xl ring-1 ring-synth-icy/30 p-8 max-w-md w-full text-center shadow-2xl relative z-10">
+          <div className="rounded-2xl bg-gradient-to-br from-magenta-900/20 via-cyan-900/20 to-purple-900/20 backdrop-blur-xl ring-1 ring-cyan-400/30 p-8 max-w-md w-full text-center shadow-2xl relative z-10">
             <div className="text-xl font-bold text-synth-white mb-2">
               7-minute Pre-Start to get your mind right.
             </div>
@@ -110,7 +179,7 @@ export default function StartHero() {
               This is the EASY step. We'll start the timer for you if you don't do anything!
             </div>
             
-            <div className={`text-8xl font-black tabular-nums mb-8 font-mono ${mmss === "00:00" ? "text-synth-amber animate-amberPulse" : "text-synth-white"}`}>
+            <div className={`text-8xl font-black tabular-nums mb-8 font-mono ${mmss === "00:00" ? "text-synth-amber animate-amberPulse" : "text-synth-white animate-breathe"}`}>
               {mmss}
             </div>
             
@@ -152,7 +221,7 @@ export default function StartHero() {
                 <TooltipTrigger asChild>
                   <Button
                     size="default"
-                    className="w-full h-12 text-base font-semibold bg-gradient-to-r from-synth-amber to-synth-amberLight hover:from-synth-amberLight hover:to-synth-amber text-synth-white shadow-lg hover:shadow-[0_8px_20px_rgba(255,176,32,0.4)] transition-all duration-300 transform hover:scale-[1.02] animate-amberGlow rounded-2xl"
+                    className="w-full h-12 text-base font-semibold bg-gradient-to-r from-magenta-500 via-cyan-400 to-purple-600 hover:from-magenta-600 hover:via-cyan-500 hover:to-purple-700 text-synth-white shadow-lg hover:shadow-[0_8px_20px_rgba(236,72,153,0.4)] transition-all duration-300 transform hover:scale-[1.02] animate-pulse rounded-2xl"
                     onClick={() => handleAction({ type: 'READY' })}
                     disabled={session.readyPressed}
                   >
@@ -169,7 +238,7 @@ export default function StartHero() {
                   <Button
                     variant="outline"
                     size="default"
-                    className="w-full h-12 text-base font-semibold border-synth-violet/40 hover:border-synth-violet/60 text-synth-violet hover:bg-synth-violet/10 transition-all duration-300 rounded-2xl"
+                    className="w-full h-12 text-base font-semibold border-cyan-400/60 hover:border-cyan-300/80 text-cyan-300 hover:bg-cyan-400/20 transition-all duration-300 rounded-2xl"
                     onClick={handleTimerZero}
                   >
                     🚀 Start Now (Skip Pre-Start)
@@ -180,15 +249,58 @@ export default function StartHero() {
                 </TooltipContent>
               </Tooltip>
               
-              {/* Test villain button */}
-              <Button
-                variant="secondary"
-                size="default"
-                className="w-full bg-synth-magenta/20 hover:bg-synth-magenta/30 border-synth-magenta/40 hover:border-synth-magenta/60"
-                onClick={() => villainNudge('🧪 TEST: Villain system is working!')}
-              >
-                🧪 Test Villain System
-              </Button>
+              {/* Studio Vibes & Focusmate Buttons */}
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                <Button
+                  variant="outline"
+                  size="default"
+                  className="h-12 bg-gradient-to-r from-magenta-500/20 to-cyan-400/20 border-magenta-400/40 hover:border-magenta-300/60 text-magenta-300 hover:bg-magenta-500/30 transition-all duration-300 rounded-2xl"
+                  onClick={() => {
+                    villainNudge('🎵 Studio vibes activated! Let the creativity flow...');
+                    toast.success('Studio Vibes playlist loaded');
+                  }}
+                >
+                  🎵 Studio Vibes
+                </Button>
+                <Button
+                  variant="outline"
+                  size="default"
+                  className="h-12 bg-gradient-to-r from-cyan-500/20 to-purple-400/20 border-cyan-400/40 hover:border-cyan-300/60 text-cyan-300 hover:bg-cyan-500/30 transition-all duration-300 rounded-2xl"
+                  onClick={() => {
+                    villainNudge('🎯 Focus mode engaged. Time to get serious...');
+                    toast.success('FocusMate session started');
+                  }}
+                >
+                  🎯 FocusMate
+                </Button>
+              </div>
+              
+              {/* FREE COOK Button */}
+              <div className="mb-4">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="default"
+                      className="w-full h-12 bg-gradient-to-r from-yellow-400/20 to-orange-400/20 border-yellow-400/40 hover:border-yellow-300/60 text-yellow-300 hover:bg-yellow-400/30 transition-all duration-300 rounded-2xl font-bold text-lg animate-pulse"
+                      onClick={() => {
+                        villainNudge('⚡ FREE COOK mode! No time limits, pure creativity!');
+                        toast.success('FREE COOK mode activated - no time limits!');
+                      }}
+                    >
+                      ⚡ FREE COOK ⚡
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent className="bg-black/90 border-cyan-400/40 text-synth-white">
+                    <p>No time limits - pure creative freedom!</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+              
+              {/* Heat check buttons */}
+              <div className="grid grid-cols-2 gap-3">
+                <HeatButtons />
+              </div>
             </div>
             
             {session.readyPressed && (
@@ -204,17 +316,71 @@ export default function StartHero() {
               isOpen={showVault}
               onTransitionComplete={() => {
                 setShowVault(false);
-                // Here you would transition to the next state
-                handleAction({ type: 'READY' });
+                setShowQuestionnaire(true);
               }}
             >
               <div className="min-h-screen bg-black flex items-center justify-center">
                 <div className="text-center">
-                  <h1 className="text-6xl font-bold text-synth-amber mb-8">VAULT ACCESSED</h1>
-                  <p className="text-2xl text-synth-icy">Welcome to your creative space</p>
+                  <h1 className="text-6xl font-bold text-synth-amber mb-8 animate-pulse">VAULT ACCESSED</h1>
+                  <p className="text-2xl text-synth-icy animate-breathe">Welcome to your creative space</p>
+                  <div className="mt-8">
+                    <PerdayLogo size={80} />
+                  </div>
                 </div>
               </div>
             </VaultTransition>
+          )}
+          
+          {/* User Questionnaire */}
+          {showQuestionnaire && (
+            <div className="fixed inset-0 bg-black/90 backdrop-blur-xl flex items-center justify-center z-50">
+              <div className="relative">
+                {/* Settings Gear Icon - Top Right of Questionnaire */}
+                <div className="absolute -top-4 -right-4">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-8 w-8 bg-black/40 border-cyan-400/40 text-cyan-300 hover:bg-cyan-400/20 rounded-full"
+                    onClick={() => setShowQuestionnaire(false)}
+                  >
+                    <Settings className="h-4 w-4" />
+                  </Button>
+                </div>
+                <UserQuestionnaire onComplete={handleQuestionnaireComplete} />
+              </div>
+            </div>
+          )}
+          
+          {/* Settings Choice */}
+          {showSettingsChoice && (
+            <div className="fixed inset-0 bg-black/90 backdrop-blur-xl flex items-center justify-center z-50">
+              <div className="bg-gradient-to-br from-magenta-900/20 via-cyan-900/20 to-purple-900/20 backdrop-blur-xl ring-1 ring-cyan-400/30 rounded-2xl p-8 max-w-md w-full text-center">
+                <div className="flex items-center justify-center gap-2 mb-6">
+                  <Settings className="h-8 w-8 text-cyan-300" />
+                  <h2 className="text-2xl font-bold text-synth-white">Session Setup</h2>
+                </div>
+                <p className="text-synth-icy/70 mb-8">
+                  How would you like to configure your session?
+                </p>
+                
+                <div className="space-y-4">
+                  <Button
+                    onClick={handleUseDefaults}
+                    className="w-full h-14 bg-gradient-to-r from-magenta-500 via-cyan-400 to-purple-600 hover:from-magenta-600 hover:via-cyan-500 hover:to-purple-700 text-synth-white text-lg font-semibold rounded-2xl"
+                  >
+                    ⚡ Use My Default Settings
+                  </Button>
+                  
+                  <Button
+                    variant="outline"
+                    onClick={handleCustomizeSession}
+                    className="w-full h-14 border-cyan-400/40 text-cyan-300 hover:bg-cyan-400/20 text-lg font-semibold rounded-2xl"
+                  >
+                    ⚙️ Customize Session
+                  </Button>
+                </div>
+              </div>
+            </div>
           )}
         </div>
       );

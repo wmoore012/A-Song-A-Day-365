@@ -7,6 +7,7 @@ import AudioHud from "./features/sound/AudioHud";
 import { AnalyticsHud } from "./features/AnalyticsHud";
 import GateLayout from "./components/GateLayout";
 import PerdayLogo from "./components/PerdayLogo";
+import { Toaster } from "./components/ui/sonner";
 
 // Fail loud: validate preconditions
 function must<T>(value: T | null | undefined, msg: string): T {
@@ -62,6 +63,9 @@ export default function App() {
           </div>
         </div>
       </GateLayout>
+      
+      {/* Toast Notifications */}
+      <Toaster />
     </div>
   );
 }

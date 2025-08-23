@@ -2,11 +2,7 @@ import { useState, useCallback } from 'react';
 import LiquidGlassButton from './LiquidGlassButton';
 import { gsap } from 'gsap';
 
-interface HeatButtonProps {
-  label: string;
-  color: string;
-  onClick?: () => void;
-}
+// HeatButtonProps interface removed as it's not used
 
 export default function HeatButtons() {
   const [heatCount, setHeatCount] = useState(0);
@@ -68,7 +64,7 @@ export default function HeatButtons() {
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 gap-4 p-6">
-      {heatButtons.map((button, index) => (
+      {heatButtons.map((button) => (
         <LiquidGlassButton
           key={button.label}
           variant={button.variant}

@@ -128,12 +128,17 @@ export default function MultiplierBar({
         {isActive && (
           <div className="absolute inset-0 rounded-full bg-gradient-to-r from-synth-amber/20 to-synth-amberLight/20 animate-pulse" />
         )}
+        
+        {/* Neon purple glow when multiplier is dying */}
+        {isActive && currentMultiplier < 1.5 && (
+          <div className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-400/40 via-magenta-500/40 to-cyan-400/40 animate-pulse shadow-[0_0_20px_rgba(168,85,247,0.6)]" />
+        )}
       </div>
       
       {/* Multiplier status */}
       <div className="mt-2 text-xs text-synth-icy/70">
         {isActive ? (
-          <span className="text-synth-amber">Active - Finish sooner to maintain!</span>
+          <span className="text-synth-amber animate-pulse">Activate and maintain YOUR multiplier</span>
         ) : (
           <span>Press Ready to activate multiplier</span>
         )}

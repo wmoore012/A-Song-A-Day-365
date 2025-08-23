@@ -82,6 +82,13 @@ export default function AtomOrbit() {
         <circle cx="50" cy="35" className="dot" r="0.75" fill="#FFB020" filter="url(#glow)" />
         <circle cx="50" cy="60" className="dot" r="0.75" fill="#FFD700" filter="url(#glow)" />
       </svg>
+      
+      {/* Perday Music 365 text overlay */}
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="text-xs text-synth-amber font-bold animate-pulse bg-black/20 backdrop-blur-sm px-2 py-1 rounded-full">
+          Perday Music 365
+        </div>
+      </div>
     </div>
   );
 }

@@ -22,10 +22,12 @@ export default {
         },
         breathe: {
           '0%, 100%': { 
+            transform: 'scale(1)',
             boxShadow: '0 0 28px 14px #B2EBFF, inset 0 0 36px #F16DFB',
             filter: 'brightness(1)'
           },
           '50%': { 
+            transform: 'scale(1.05)',
             boxShadow: '0 0 32px 18px #B2EBFF, inset 0 0 40px #F16DFB',
             filter: 'brightness(1.3)'
           },

@@ -1,5 +1,5 @@
 import { useRef, useState, useCallback } from 'react';
-import { gsap } from 'gsap';
+// gsap import removed as it's not used
 
 interface LiquidGlassButtonProps {
   children: React.ReactNode;
@@ -144,7 +144,7 @@ export default function LiquidGlassButton({
 
       {buttonContent}
 
-      <style jsx>{`
+      <style>{`
         .liquid-glass-button {
           background: rgba(255, 255, 255, 0.1);
           backdrop-filter: blur(20px);

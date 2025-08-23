@@ -35,6 +35,13 @@ vi.mock('echarts-for-react', () => ({
   default: () => null
 }));
 
+// ResizeObserver polyfill
+global.ResizeObserver = vi.fn().mockImplementation(() => ({
+  observe: vi.fn(),
+  unobserve: vi.fn(),
+  disconnect: vi.fn(),
+}));
+
 // Mock GSAP (named export)
 vi.mock('gsap', () => {
   const to = vi.fn().mockReturnValue({
@@ -48,22 +55,16 @@ vi.mock('gsap', () => {
     kill: vi.fn(),
   });
   const set = vi.fn();
-  const timeline = vi.fn(() => ({
-    to: vi.fn().mockReturnValue({
-      onComplete: vi.fn(),
-      onUpdate: vi.fn(),
-      kill: vi.fn(),
-    }),
-    fromTo: vi.fn().mockReturnValue({
-      onComplete: vi.fn(),
-      onUpdate: vi.fn(),
-      kill: vi.fn(),
-    }),
-    set: vi.fn(),
-    add: vi.fn(),
-    play: vi.fn(),
-    kill: vi.fn(),
-  }));
+  const timeline = vi.fn(() => {
+    const tl: any = {};
+    tl.to = vi.fn().mockReturnValue(tl);
+    tl.fromTo = vi.fn().mockReturnValue(tl);
+    tl.set = vi.fn().mockReturnValue(tl);
+    tl.add = vi.fn().mockReturnValue(tl);
+    tl.play = vi.fn().mockReturnValue(tl);
+    tl.kill = vi.fn();
+    return tl;
+  });
   const gsap = { 
     to, 
     fromTo, 
