@@ -45,7 +45,7 @@ export default function App() {
       <PremiumSidebar />
       
       {/* Main Content - adjusted for sidebar */}
-      <div className="ml-64 min-h-screen">
+      <div className="ml-64 min-h-screen relative">
         {/* Logo */}
         <div className="fixed top-6 left-72 z-10">
           <div className="text-2xl font-black text-white">
@@ -54,7 +54,7 @@ export default function App() {
           <div className="text-xs text-synth-icy">Music</div>
         </div>
         
-        <div className="p-8">
+        <div className="p-8 pt-20">
           <PrestartPanel 
             onLockIn={handleLockIn}
             fadeOutMusic={fadeOutRef.current}

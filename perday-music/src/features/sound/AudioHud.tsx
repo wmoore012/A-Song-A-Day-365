@@ -66,8 +66,11 @@ export default function AudioHud({ fadeOutRef }: { fadeOutRef: React.MutableRefO
   }, [armed]);
 
   return (
-    <section className="rounded-2xl bg-gradient-to-br from-synth-violet/5 to-synth-aqua/5 ring-1 ring-synth-icy/20 p-6 shadow-xl backdrop-blur-sm">
-      <div className="text-lg font-semibold text-synth-white mb-4">🎵 Music & Room Tone</div>
+    <section className="rounded-2xl bg-gradient-to-br from-synth-violet/10 to-synth-aqua/10 ring-1 ring-synth-icy/30 p-8 shadow-2xl backdrop-blur-sm border border-synth-icy/20">
+      <div className="text-xl font-bold text-synth-white mb-6 flex items-center">
+        <span className="text-2xl mr-3">🎵</span>
+        Music & Room Tone
+      </div>
       
       {!armed ? (
         <div className="text-center">
@@ -80,11 +83,17 @@ export default function AudioHud({ fadeOutRef }: { fadeOutRef: React.MutableRefO
           </button>
         </div>
       ) : (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-synth-icy">🎵 Music</span>
+        <div className="space-y-6">
+          <div className="bg-gradient-to-r from-synth-violet/20 to-synth-magenta/10 rounded-xl p-4 border border-synth-violet/30">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-lg font-semibold text-synth-white flex items-center">
+                <span className="text-2xl mr-2">🎵</span>
+                Music
+              </span>
+              <div className="text-xs text-synth-icy">vol 15%</div>
+            </div>
             <button 
-              className="px-3 py-1 rounded-lg bg-synth-icy/10 hover:bg-synth-icy/20 text-xs font-medium"
+              className="w-full px-4 py-3 rounded-lg bg-gradient-to-r from-synth-violet to-synth-magenta hover:from-synth-magenta hover:to-synth-violet font-bold shadow-lg hover:shadow-[0_8px_20px_rgba(108,26,237,0.4)] transition-all duration-300 transform hover:scale-[1.02]"
               onClick={() => {
                 try { 
                   if (m.current?.getPlayerState() === 1) {
@@ -95,14 +104,20 @@ export default function AudioHud({ fadeOutRef }: { fadeOutRef: React.MutableRefO
                 } catch { /* YouTube API error */ }
               }}
             >
-              ⏯️ Toggle
+              ⏯️ Toggle Music
             </button>
           </div>
           
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-synth-icy">🌊 White Noise</span>
+          <div className="bg-gradient-to-r from-synth-aqua/20 to-synth-icy/10 rounded-xl p-4 border border-synth-aqua/30">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-lg font-semibold text-synth-white flex items-center">
+                <span className="text-2xl mr-2">🌊</span>
+                White Noise
+              </span>
+              <div className="text-xs text-synth-icy">vol 15%</div>
+            </div>
             <button 
-              className="px-3 py-1 rounded-lg bg-synth-icy/10 hover:bg-synth-icy/20 text-xs font-medium"
+              className="w-full px-4 py-3 rounded-lg bg-gradient-to-r from-synth-aqua to-synth-icy hover:from-synth-icy hover:to-synth-aqua font-bold shadow-lg hover:shadow-[0_8px_20px_rgba(85,203,220,0.4)] transition-all duration-300 transform hover:scale-[1.02]"
               onClick={() => {
                 try { 
                   if (n.current?.getPlayerState() === 1) {
@@ -113,7 +128,7 @@ export default function AudioHud({ fadeOutRef }: { fadeOutRef: React.MutableRefO
                 } catch { /* YouTube API error */ }
               }}
             >
-              ⏯️ Toggle
+              ⏯️ Toggle White Noise
             </button>
           </div>
         </div>
