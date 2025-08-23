@@ -2,7 +2,8 @@ import { useSessionStore } from '../state/store';
 import { FlowState } from '../state/types';
 import { useVillainAnnounce } from '../features/fx/useVillainAnnounce';
 import { usePrestart } from '../features/prestart/usePrestart';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import MultiplierBar from './MultiplierBar';
 
 export default function StartHero() {
   const { session, dispatch } = useSessionStore();
@@ -12,6 +13,18 @@ export default function StartHero() {
   const [note, setNote] = useState('');
   const [target, setTarget] = useState('');
   const [duration, setDuration] = useState(25);
+  const [multiplier, setMultiplier] = useState(1.0);
+
+  // Timer effect to decrease multiplier by 10% every 30 seconds after timer starts
+  useEffect(() => {
+    if (!session.readyPressed || mmss === "07:00") return;
+    
+    const interval = setInterval(() => {
+      setMultiplier(prev => Math.max(0.5, prev - 0.1)); // Don't go below 0.5x
+    }, 30000); // 30 seconds
+    
+    return () => clearInterval(interval);
+  }, [session.readyPressed, mmss]);
 
   const handleAction = (action: any) => {
     try {
@@ -20,6 +33,7 @@ export default function StartHero() {
       
       // Special handling for READY action
       if (action.type === 'READY') {
+        setMultiplier(1.5); // Boost to 1.5x when Ready is pressed
         villainNudge('First baby step locked. 🔒✨');
       }
     } catch (err: any) {
@@ -60,6 +74,15 @@ export default function StartHero() {
             
             <div className={`text-8xl font-black tabular-nums mb-8 font-mono ${mmss === "00:00" ? "text-synth-amber animate-amberPulse" : "text-synth-white"}`}>
               {mmss}
+            </div>
+            
+            {/* Multiplier Bar */}
+            <div className="mb-6">
+              <MultiplierBar 
+                currentMultiplier={multiplier}
+                maxMultiplier={2.0}
+                isActive={session.readyPressed}
+              />
             </div>
             
             <div className="space-y-4">
