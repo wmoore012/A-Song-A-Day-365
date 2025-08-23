@@ -4,6 +4,7 @@ import PageVisibilityBadge from "./ui/PageVisibilityBadge";
 import PrestartPanel from "./features/prestart/PrestartPanel";
 import AudioHud from "./features/sound/AudioHud";
 import { AnalyticsHud } from "./features/AnalyticsHud";
+import { PremiumSidebar } from "./components/PremiumSidebar";
 
 // Fail loud: validate preconditions
 function must<T>(value: T | null | undefined, msg: string): T {
@@ -37,25 +38,37 @@ export default function App() {
     >
       <PageVisibilityBadge />
       
-      {/* Logo */}
-      <div className="fixed top-6 left-6 z-10">
-        <div className="text-2xl font-black text-white">
-          <span className="text-[#7c5cff]">Per</span>day
+      {/* Premium Sidebar */}
+      <PremiumSidebar />
+      
+      {/* Main Content - adjusted for sidebar */}
+      <div className="ml-64 min-h-screen">
+        {/* Logo */}
+        <div className="fixed top-6 left-72 z-10">
+          <div className="text-2xl font-black text-white">
+            <span className="text-synth-violet">Per</span>day
+          </div>
+          <div className="text-xs text-synth-icy">Music</div>
         </div>
-        <div className="text-xs text-white/60">Music</div>
-      </div>
-      
-      <PrestartPanel 
-        onLockIn={handleLockIn}
-        fadeOutMusic={fadeOutRef.current}
-      />
+        
+        <div className="p-8">
+          <PrestartPanel 
+            onLockIn={handleLockIn}
+            fadeOutMusic={fadeOutRef.current}
+          />
 
-      <AudioHud fadeOutRef={fadeOutRef} />
-      
-      <AnalyticsHud 
-        grades={[85, 92, 78, 88, 95, 82, 90]}
-        latencies={[1200, 800, 1500, 1100, 900, 1300, 1000]}
-      />
+          <div className="mt-8">
+            <AudioHud fadeOutRef={fadeOutRef} />
+          </div>
+          
+          <div className="mt-8">
+            <AnalyticsHud 
+              grades={[85, 92, 78, 88, 95, 82, 90]}
+              latencies={[1200, 800, 1500, 1100, 900, 1300, 1000]}
+            />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

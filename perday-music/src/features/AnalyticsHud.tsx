@@ -83,38 +83,39 @@ export function AnalyticsHud({ grades, latencies }: AnalyticsHudProps) {
            xAxis: { 
              type: "category", 
              data: labels, 
-             axisLine: { lineStyle: { color: "#405" } },
-             axisLabel: { color: "#888", fontSize: 10 }
+             axisLine: { lineStyle: { color: "#6C1AED22" } },
+             axisLabel: { color: "#B2EBFF", fontSize: 10 }
            },
            yAxis: { 
              type: "value", 
-             axisLine: { lineStyle: { color: "#405" } }, 
+             axisLine: { lineStyle: { color: "#6C1AED22" } }, 
              splitLine: { lineStyle: { color: "#1a1a2a" } },
-             axisLabel: { color: "#888", fontSize: 10 }
+             axisLabel: { color: "#B2EBFF", fontSize: 10 }
            },
            series: [{ 
              type: "line", 
              data: grades, 
              smooth: true, 
              areaStyle: { 
-               opacity: .2,
+               opacity: .3,
                color: {
                  type: 'linear',
                  x: 0, y: 0, x2: 0, y2: 1,
                  colorStops: [
-                   { offset: 0, color: 'rgba(124, 92, 255, 0.3)' },
-                   { offset: 1, color: 'rgba(124, 92, 255, 0.05)' }
+                   { offset: 0, color: 'rgba(108, 26, 237, 0.4)' },
+                   { offset: 0.5, color: 'rgba(241, 109, 251, 0.2)' },
+                   { offset: 1, color: 'rgba(178, 235, 255, 0.1)' }
                  ]
                }
              }, 
              lineStyle: { 
                width: 3,
-               color: '#7c5cff'
+               color: '#6C1AED'
              },
              itemStyle: {
-               color: '#7c5cff',
+               color: '#F16DFB',
                borderWidth: 2,
-               borderColor: '#fff'
+               borderColor: '#B2EBFF'
              }
            }]
          };
@@ -124,14 +125,14 @@ export function AnalyticsHud({ grades, latencies }: AnalyticsHudProps) {
            xAxis: { 
              type: "category", 
              data: labels,
-             axisLine: { lineStyle: { color: "#405" } },
-             axisLabel: { color: "#888", fontSize: 10 }
+             axisLine: { lineStyle: { color: "#55CBDC22" } },
+             axisLabel: { color: "#B2EBFF", fontSize: 10 }
            },
            yAxis: { 
              type: "value",
-             axisLine: { lineStyle: { color: "#405" } },
+             axisLine: { lineStyle: { color: "#55CBDC22" } },
              splitLine: { lineStyle: { color: "#1a1a2a" } },
-             axisLabel: { color: "#888", fontSize: 10 }
+             axisLabel: { color: "#B2EBFF", fontSize: 10 }
            },
            series: [{ 
              type: "bar", 
@@ -141,25 +142,26 @@ export function AnalyticsHud({ grades, latencies }: AnalyticsHudProps) {
                  type: 'linear',
                  x: 0, y: 0, x2: 0, y2: 1,
                  colorStops: [
-                   { offset: 0, color: '#24E6B7' },
-                   { offset: 1, color: '#1a9b7a' }
+                   { offset: 0, color: '#55CBDC' },
+                   { offset: 0.5, color: '#B2EBFF' },
+                   { offset: 1, color: '#F16DFB' }
                  ]
                },
-               borderRadius: [4, 4, 0, 0]
+               borderRadius: [6, 6, 0, 0]
              }
            }]
          };
 
          return (
-           <div className="rounded-2xl bg-gradient-to-br from-white/5 to-white/3 ring-1 ring-white/10 p-6 shadow-xl">
-             <div className="text-lg font-semibold text-white/90 mb-4">📊 Your Progress</div>
+           <div className="rounded-2xl bg-gradient-to-br from-synth-violet/5 to-synth-aqua/5 ring-1 ring-synth-icy/20 p-6 shadow-xl backdrop-blur-sm">
+             <div className="text-lg font-semibold text-synth-white mb-4">📊 Your Progress</div>
              <div className="grid md:grid-cols-2 gap-6">
                <div>
-                 <div className="text-sm font-medium text-white/70 mb-2">Success Grades</div>
+                 <div className="text-sm font-medium text-synth-icy mb-2">Success Grades</div>
                  <ReactECharts style={{ height: 240 }} option={lineOpt} />
                </div>
                <div>
-                 <div className="text-sm font-medium text-white/70 mb-2">Start Latencies</div>
+                 <div className="text-sm font-medium text-synth-icy mb-2">Start Latencies</div>
                  <ReactECharts style={{ height: 240 }} option={barOpt} />
                </div>
              </div>
