@@ -201,17 +201,12 @@ a.btn{text-decoration:none}
 .devil-head{position:fixed;top:-24px;pointer-events:none;z-index:9997;filter:drop-shadow(0 6px 10px rgba(0,0,0,.35));animation:devilFall linear forwards}
 @keyframes devilFall{to{transform:translateY(110vh) translateX(var(--drift, 0px)) rotate(8deg);opacity:.9}}
 
-/* Lobby hero with the same speaker image on both sides + dark gradient */
+/* Lobby hero — gradient only (no speaker image) */
 #lobbyBackdrop {
   height: 200px;
   border-radius: 16px;
-  background-image:
-    url("/img/speaker-dark.jpg"),
-    url("/img/speaker-dark.jpg"),
-    linear-gradient(180deg, #0b0c10, #07090c);
-  background-repeat: no-repeat, no-repeat, no-repeat;
-  background-size: 33% auto, 33% auto, cover;
-  background-position: left center, right center, center;
+  background: radial-gradient(900px 300px at 70% -100px, rgba(138,91,255,.25), transparent),
+              linear-gradient(180deg, #0b0c10, #07090c);
   box-shadow: inset 0 -80px 120px rgba(0,0,0,.65);
   transition: opacity 4s ease;
 }
@@ -250,3 +245,111 @@ a.btn{text-decoration:none}
 .card-frost--refract{position:relative;overflow:hidden}
 .card-frost--refract::before{content:"";position:absolute;inset:-20%;background:inherit;backdrop-filter:blur(24px) saturate(140%) contrast(105%);opacity:.35;mix-blend-mode:screen;transform:translate3d(0,0,0) scale(1.02);pointer-events:none;mask-image:radial-gradient(120% 120% at 40% 40%, rgba(255,255,255,.4), rgba(255,255,255,0) 70%)}
 .neon-type{color:#b6ff00;text-shadow:0 0 6px rgba(182,255,0,.55),0 0 14px rgba(182,255,0,.35)}
+
+/* ---- Design polish overrides (non-breaking) ---- */
+/* Tokens */
+:root{
+  --bg2:#12131a;
+  --card:#161821;
+  --accent:#7cf;      /* volt-cyan */
+  --accent-2:#8a5bff; /* purple */
+  --radius:16px; --pad:24px; --gap:20px;
+}
+
+/* Sport + clean type and dark gradient background */
+html,body{
+  color:var(--fg);
+  background: radial-gradient(1200px 600px at 70% -100px, rgba(138,91,255,.25), transparent),
+             linear-gradient(180deg, #0b0c10 0%, #0f1016 30%, #0b0c10 100%);
+  line-height:1.55;
+}
+
+/* Container spacing */
+.wrap{max-width:1120px;margin:28px auto;padding:0 20px 60px}
+
+/* Title */
+.title{font-family:Anton, Inter, system-ui;letter-spacing:.3px;font-size:32px}
+
+/* Card surface */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:var(--pad);box-shadow:0 12px 26px rgba(0,0,0,.28)}
+
+/* Rhythm helpers */
+.row{display:flex;flex-wrap:wrap;gap:var(--gap);align-items:center}
+.grid{display:grid;grid-template-columns:1fr;gap:var(--gap)}
+.prestarted .grid{grid-template-columns:1fr 1fr}
+@media (max-width: 900px){ .grid{ grid-template-columns: 1fr; } }
+
+/* Chips */
+.chip{display:flex;gap:8px;align-items:center;padding:8px 12px;border-radius:999px;background:#1a1c26;border:1px solid #2a2e3b}
+
+/* Buttons */
+.btn, .btn-secondary, .btn-good, .btn-warn, .btn-bad{
+  --btn-bg: var(--accent);
+  --btn-fg: #001018;
+  display:inline-flex;align-items:center;justify-content:center;
+  gap:8px;padding:14px 18px;border-radius:14px;border:1px solid transparent;
+  font-weight:800;cursor:pointer;transition: transform .08s ease, box-shadow .12s ease, background .12s ease, color .12s ease, border-color .12s ease;
+  box-shadow: 0 6px 12px rgba(0,0,0,.25);
+  background: var(--btn-bg); color: var(--btn-fg);
+}
+.btn-secondary{ --btn-bg:#232633; --btn-fg:var(--fg); border-color:#2b3142 }
+.btn-good{ --btn-bg:var(--good); --btn-fg:#04110b }
+.btn-warn{ --btn-bg:var(--warn); --btn-fg:#1a0d00 }
+.btn-bad{  --btn-bg:#2a2030; --btn-fg:#ffd8e0; border-color:#4b2742 }
+.btn:hover{ transform: translateY(-1px) scale(1.02); box-shadow: 0 10px 20px rgba(0,0,0,.35) }
+.btn:active{ transform: translateY(0) scale(.99) }
+.btn-secondary:hover{ background:#2d3244; border-color:#3b435a }
+
+/* Primary CTA bigger (map to existing id) */
+#startSession, #startBtn{ font-size:18px; padding:16px 22px }
+
+/* Message bar under Start */
+#coachBar, #messageBar{
+  margin-top:8px;font-weight:800;color:#cfe7ff;
+  background: linear-gradient(90deg, rgba(138,91,255,.22), rgba(124,255,255,.10));
+  border:1px solid #2b2e3c;border-radius:12px;padding:10px 12px
+}
+
+/* Non-interactive map panel */
+#map{height:220px;border-radius:14px;overflow:hidden;border:1px solid #242733;pointer-events:none}
+
+/* Focus visible */
+:focus-visible{ outline:2px solid var(--accent-2); outline-offset:2px }
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .btn, .btn-secondary { transition:none }
+}
+
+/* Right-align helper for header clusters */
+@media (min-width: 900px){ .row.header-right { margin-left:auto } }
+
+/* Progressive disclosure: hide secondary panels until Start */
+.prestart-hide{ display:none }
+.prestarted .prestart-hide{ display:block }
+
+/* Coach bar (top, prominent) */
+.coach-bar{position:sticky;top:48px;z-index:12;margin:0 auto 12px;max-width:1120px;border:1px solid #2b2e3c;border-radius:12px;padding:10px 12px;font-weight:900;color:#cfe7ff;background:linear-gradient(90deg, rgba(138,91,255,.22), rgba(124,255,255,.10))}
+
+/* Spotlight ribbon layout */
+.spotlight-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:20px 0}
+.spot-item{background:linear-gradient(180deg,#0f1420,#0a0d14);border:1px solid #1f2a3a;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.35);padding:8px;display:flex;align-items:center;justify-content:center;min-height:160px}
+.spot-item img{max-width:100%;height:auto;border-radius:10px;display:block}
+.spot-item.video video{width:100%;height:auto;border-radius:12px}
+
+/* Tactical menu styles (summary) */
+.menu{position:fixed;top:16px;left:50%;transform:translateX(-50%);width:min(600px,50vw);z-index:1000;transition:transform .4s ease}
+.menu.hidden{transform:translateX(-50%) translateY(-200%)}
+.menu-header{position:relative;padding:1rem 1.5rem 1rem 1.75rem;display:flex;justify-content:space-between;align-items:center;background:#1C1B1A;border-radius:8px;cursor:pointer}
+.menu-logo img{width:20px;transition:transform .5s ease}
+.menu-hamburger-icon{width:20px;height:25px;position:absolute;top:10px;right:0;cursor:pointer}
+.menu-item{display:block;width:20px;height:2px;margin:0 0 4px;background:#f9f4eb;border-radius:1px;transition:all .2s ease}
+.menu-hamburger-icon.open .menu-item:first-child{transform:rotate(45deg);transform-origin:5px}
+.menu-hamburger-icon.open .menu-item:nth-child(2){transform:rotate(-45deg);transform-origin:6px}
+.menu-overlay{position:absolute;top:100%;left:0;right:0;background:#1C1B1A;border-radius:0 0 8px 8px;margin-top:-8px;padding-top:8px;transform-origin:top;transform:scaleY(0);overflow:hidden}
+.menu-nav{padding:2rem 0 3rem 0}
+.menu-nav ul{list-style:none;margin:0;padding:0}
+.menu-nav li{margin:-4px 0;opacity:0}
+.menu-nav a{display:block;padding:.5rem 1.75rem;color:#f9f4eb;font-family:Anton,Inter;text-transform:uppercase;font-size:2.6rem;letter-spacing:-.02rem;font-weight:900;line-height:.9}
+.menu-footer{padding:1rem 1.75rem 1.5rem 1.75rem;opacity:0;display:flex;justify-content:space-between;align-items:center}
+@media (max-width:1000px){.menu{width:90%}.menu-nav a{font-size:2rem}}/* trigger reload */

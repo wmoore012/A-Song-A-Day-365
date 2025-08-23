@@ -14,6 +14,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script>window.__PRO__ = true;</script>
 
   <!-- YouTube IFrame API (audio only) -->
   <script src="https://www.youtube.com/iframe_api"></script>
@@ -21,7 +22,7 @@
   <link rel="stylesheet" href="./nukes-v2.css">
 </head>
   <body>
-    <!-- Parallax ruler + lasers + rolodex layers -->
+    <!-- Parallax moved further down to de-emphasize on load (animations later) -->
     <div id="scrollRuler"><div class="ticks"></div><div class="marker"></div></div>
     <div id="laserDeck">
       <div class="laser"></div>
@@ -29,26 +30,6 @@
       <div class="laser"></div>
       <div class="laser"></div>
     </div>
-    <section id="mat" class="parallax-mat" aria-label="Rolodex">
-      <div class="mat-layer" data-speed="0.18" data-theme="dark" style="--slab:#0b0f14">
-        <div class="mat-content card-frost card-frost--refract">
-          <h3 class="sporty">Lock-in Flow</h3>
-          <p class="muted">Tiny steps. 8 bars. Bounce.</p>
-        </div>
-      </div>
-      <div class="mat-layer" data-speed="0.26" data-theme="light" style="--slab:#e6f2ff">
-        <div class="mat-content card-frost card-frost--refract">
-          <h3 class="sporty">City + Weather</h3>
-          <p class="muted">Charlotte defaults. Set yours.</p>
-        </div>
-      </div>
-      <div class="mat-layer" data-speed="0.34" data-theme="dark" style="--slab:#101522">
-        <div class="mat-content card-frost card-frost--refract">
-          <h3 class="sporty">Analytics</h3>
-          <p class="muted">Streak momentum. Grades. Latency.</p>
-        </div>
-      </div>
-    </section>
 
     <div class="wrap">
 
@@ -58,18 +39,39 @@
       <div id="hudNowPlaying" class="hud-nowplaying" aria-live="polite">Now Playing: —</div>
     </header>
 
+    <div id="coachBar" class="coach-bar prestart-hide" aria-live="polite">LOCK IN — loading tips…</div>
+
     <header class="topbar">
-      <button id="menuToggle" class="btn btn-secondary" style="margin-right:8px">☰</button>
-      <nav id="menuPanel" class="panel hidden" style="position:fixed;inset:auto 18px 18px auto;z-index:300;width:min(320px,92vw);display:none">
-        <div class="panel-card">
-          <div class="panel-hd"><h3>Menu</h3><button class="btn btn-secondary" onclick="document.getElementById('menuPanel').classList.remove('open');document.getElementById('menuPanel').style.display='none'">Close</button></div>
-          <button class="btn btn-secondary" onclick="document.querySelector('.hud-grid')?.scrollIntoView({behavior:'smooth'})">Analytics</button>
-          <button class="btn btn-secondary" onclick="document.getElementById('settingsPanel')?.classList.remove('hidden')">Settings</button>
-          <button class="btn btn-secondary" onclick="document.getElementById('cityPanel')?.classList.remove('hidden')">City</button>
+      <div class="menu hidden" id="tacticalMenu">
+        <div class="menu-header">
+          <div class="menu-logo"><img src="Assets/icon cream.png" alt="logo"/></div>
+          <button class="menu-toggle" aria-label="Open menu">
+            <div class="menu-hamburger-icon" id="menuHamburger">
+              <span class="menu-item"></span>
+              <span class="menu-item"></span>
+            </div>
+          </button>
         </div>
-      </nav>
+        <div class="menu-overlay">
+          <nav class="menu-nav">
+            <ul>
+              <li><a href="#lockin">Lock‑in</a></li>
+              <li><a href="#cardCity">City + Weather</a></li>
+              <li><a href="#cardInsights">Insights</a></li>
+              <li><a href="#hudAnalytics">HUD Analytics</a></li>
+              <li><a href="#proSpotlight">Spotlight</a></li>
+              <li><a href="#" data-action="open-city">Open City Panel</a></li>
+              <li><a href="#" data-action="open-settings">Open Settings</a></li>
+            </ul>
+          </nav>
+          <div class="menu-footer">
+            <div class="menu-social"><span>THE NUKES</span></div>
+            <div class="menu-time">--:-- LOCAL</div>
+          </div>
+        </div>
+      </div>
       <div class="brand">
-        <img src="assets/brand.svg" alt="" onerror="this.style.display='none'"/>
+  <img src="assets/brand.svg" alt="" onerror="this.style.display='none'"/>
         <span class="title">THE NUKES</span>
         <span class="subtitle">Song-A-Day 365</span>
       </div>
@@ -84,7 +86,7 @@
     <div id="lobbyBackdrop" aria-hidden="true"></div>
 
     <main class="grid">
-      <section class="card focus">
+      <section id="lockin" class="card focus">
         <div class="card-hd">
           <h2>Lock-in</h2>
           <div class="tip-tag" id="tipTag">“Make the ugly version. Ship it.”</div>
@@ -153,7 +155,7 @@
         </div>
       </section>
 
-      <section class="card">
+      <section id="cardCity" class="card prestart-hide" aria-hidden="true">
         <div id="lockinTicker" class="ticker muted small" aria-label="Lock-in Tips"></div>
         <div class="card-hd">
           <h2>City + Weather</h2>
@@ -163,7 +165,7 @@
         <div id="map" class="map"></div>
       </section>
 
-      <section class="card">
+      <section id="cardInsights" class="card prestart-hide" aria-hidden="true">
         <div class="card-hd"><h2>Insights</h2></div>
         <div class="charts">
           <canvas id="chartGrades" height="160"></canvas>
@@ -184,7 +186,7 @@
   </div>
 
   <!-- Analytics HUD panel (placeholders) -->
-  <section id="hudAnalytics" class="hud-grid">
+  <section id="hudAnalytics" class="hud-grid prestart-hide" aria-hidden="true">
     <div id="chartStreak" class="hud-card hud-echarts" aria-label="Streak momentum chart"></div>
     <div id="chartBars" class="hud-card hud-echarts" aria-label="Freezes and Genres"></div>
     <div id="chartCalendar" class="hud-card hud-echarts" aria-label="Calendar heatmap"></div>
@@ -199,6 +201,42 @@
 
   <!-- Pro Locker Section -->
   <section id="lockerSection" class="card panel-animated" aria-label="Villain Locker"></section>
+
+  <!-- Parallax rolodex placed after primary dashboard and panels -->
+  <section id="mat" class="parallax-mat" aria-label="Rolodex">
+    <div class="mat-layer" data-speed="0.18" data-theme="dark" style="--slab:#0b0f14">
+      <div class="mat-content card-frost card-frost--refract">
+        <h3 class="sporty">Lock-in Flow</h3>
+        <p class="muted">Tiny steps. 8 bars. Bounce.</p>
+      </div>
+    </div>
+    <div class="mat-layer" data-speed="0.26" data-theme="light" style="--slab:#e6f2ff">
+      <div class="mat-content card-frost card-frost--refract">
+        <h3 class="sporty">City + Weather</h3>
+        <p class="muted">Charlotte defaults. Set yours.</p>
+      </div>
+    </div>
+    <div class="mat-layer" data-speed="0.34" data-theme="dark" style="--slab:#101522">
+      <div class="mat-content card-frost card-frost--refract">
+        <h3 class="sporty">Analytics</h3>
+        <p class="muted">Streak momentum. Grades. Latency.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Spotlight ribbon (images/videos, spaced apart) -->
+  <section id="proSpotlight" class="panel-animated" aria-label="Spotlight">
+    <div class="spotlight-grid">
+      <figure class="spot-item"><img src="Assets/Black sym 2.png" alt="Black symbol"/></figure>
+      <figure class="spot-item"><img src="Assets/Cream sym 1.png" alt="Cream sym 1"/></figure>
+      <figure class="spot-item"><img src="Assets/Cream sym 2.png" alt="Cream sym 2"/></figure>
+      <figure class="spot-item"><img src="Assets/ChatGPT Image Aug 18, 2025 at 12_57_38 PM.png" alt="ChatGPT Art"/></figure>
+      <figure class="spot-item"><img src="Assets/Me Data Sci Anime Photo.png" alt="Anime photo"/></figure>
+      <figure class="spot-item video">
+        <video src="Assets/Me Data Sci Anime Video.mp4" muted loop playsinline autoplay></video>
+      </figure>
+    </div>
+  </section>
 
   <!-- ECharts + GSAP (CDN) for HUD analytics; safe if network blocked -->
   <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
@@ -328,7 +366,7 @@
       <div class="divider"></div>
       <label class="tgl">Studio Vibes source (YouTube Video or Playlist URL)</label>
       <input id="setupVibesUrl" placeholder="https://youtu.be/... or https://youtube.com/playlist?..." />
-      <small class="muted">No default: add your own video/playlist.</small>
+  <small class="muted">No default: add your own video/playlist. For local assets, use paths like pro/JS Personal Assets/Me Data Sci Anime Video.mp4</small>
       <div class="divider"></div>
       <label class="tgl">Music playlist (startup Now Playing; optional)</label>
       <input id="setupMusicUrl" placeholder="https://youtube.com/playlist?list=... (optional)" />

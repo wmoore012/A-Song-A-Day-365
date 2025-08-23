@@ -208,6 +208,14 @@ import { initHamburger } from './ui-nav.js';
 /* -------------------- Session flow -------------------- */
 let t0 = Date.now(), started=false, startIso=null, freezeUsedToday=false;
 let pendingBody = null;
+function revealSecondaryPanels(){
+  try{
+    document.body.classList.add('prestarted');
+    const c1 = document.getElementById('cardCity'); if (c1) { c1.removeAttribute('aria-hidden'); }
+    const c2 = document.getElementById('cardInsights'); if (c2) { c2.removeAttribute('aria-hidden'); }
+    const hud = document.getElementById('hudAnalytics'); if (hud) { hud.removeAttribute('aria-hidden'); }
+  }catch{}
+}
   setInterval(()=>{
     const rem = 7*60*1000 - (Date.now()-t0);
     setText('#latencyCountdown', fmt(rem));
@@ -222,7 +230,12 @@ let pendingBody = null;
   }, 250);
 
   // One-time pre-start sting in the message bar
-  const preTaunt = ()=> setText('#messageBar', 'LOCK IN — '+rotPick('pre'));
+  const preTaunt = ()=> {
+    const line = rotPick('pre');
+    setText('#messageBar', 'LOCK IN — '+line);
+    const coach = document.getElementById('coachBar');
+    if (coach) coach.textContent = 'LOCK IN — '+line;
+  };
   preTaunt();
   // Type warning when settings open
   document.getElementById('openSettings')?.addEventListener('click', ()=>{
@@ -237,13 +250,15 @@ let pendingBody = null;
   setText('#latencyMs', `${latency.toLocaleString()} ms`);
     const db=$("#doneBtn"); if (db) db.disabled = false;
   setText('#messageBar', 'LOCKED 🔒');
+    const coach = document.getElementById('coachBar'); if (coach) coach.textContent = 'LOCKED 🔒';
     LS.latencies = [...LS.latencies, latency].slice(-60);
     fadeOutMusic(); // music fade then stop
   startIso = new Date().toISOString();
+    revealSecondaryPanels();
   // Small start sting
   stingVillainMaybeLLM(rotPick('pre'));
   // Pro: show villain announce
-  try { if (window.__PRO__) import('./pro/analytics-hud.js').then(m=> m.rotateVillainAnnounce('start', { frameSrc: 'pro/video/TC - VIEWFINDER 235 - BLACK.png', durationMs: 1800 })); } catch {}
+  try { if (window.__PRO__) import('./pro/analytics-hud.js').then(m=> m.rotateVillainAnnounce('start', { frameSrc: 'pro/JS Personal Assets/Black sym 2.png', durationMs: 1800 })); } catch {}
   }; }
 
   { const el = $("#doneBtn"); if (el) el.onclick = ()=>{
@@ -722,7 +737,7 @@ let pendingBody = null;
         function showSuccess(){
      // Sprinkle a kind word at wrap unless user opted out of next session
      try{ const line = Math.random()<0.5 ? rotPick('hype') : rotPick('pocket'); if (line) stingVillain(line, 'seed'); }catch{}
-     try { if (window.__PRO__) import('./pro/analytics-hud.js').then(m=> m.rotateVillainAnnounce('done', { frameSrc: 'pro/video/TC - 35mm_MATTE.png', durationMs: 2200 })); } catch {}
+  try { if (window.__PRO__) import('./pro/analytics-hud.js').then(m=> m.rotateVillainAnnounce('done', { frameSrc: 'pro/JS Personal Assets/Cream sym 1.png', durationMs: 2200 })); } catch {}
      setTimeout(()=>{
        $("#successGif").src = CFG.GIFS.SUCCESS_HOME;
        $("#successHome").classList.remove('hidden');
@@ -735,7 +750,7 @@ let pendingBody = null;
      $("#failGif").src = CFG.GIFS.FAIL_HOME;
      $("#willGif").src = CFG.GIFS.WILL_PLACEHOLDER;
      $("#failHome").classList.remove('hidden');
-     try { if (window.__PRO__) import('./pro/analytics-hud.js').then(m=> m.rotateVillainAnnounce('low-time', { frameSrc: 'pro/video/TC - VIEWFINDER 235 - BLACK.png', durationMs: 2000 })); } catch {}
+  try { if (window.__PRO__) import('./pro/analytics-hud.js').then(m=> m.rotateVillainAnnounce('low-time', { frameSrc: 'pro/JS Personal Assets/teal sym 1.png', durationMs: 2000 })); } catch {}
    }
   window.closeFail = ()=> $("#failHome").classList.add('hidden');
 

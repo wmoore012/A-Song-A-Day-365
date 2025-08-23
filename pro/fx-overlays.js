@@ -1,3 +1,34 @@
+export async function bootFxOverlays(){
+  try{
+    // Mouse trail sparkle using GSAP
+    const trail = document.createElement('div');
+    trail.style.cssText = 'position:fixed;left:0;top:0;pointer-events:none;z-index:99999;mix-blend-mode:screen;';
+    document.body.appendChild(trail);
+    const dots = Array.from({ length: 14 }).map(()=>{
+      const d=document.createElement('div');
+      d.style.cssText='position:absolute;width:6px;height:6px;border-radius:50%;background:radial-gradient(circle,#7cf,#0000);filter:drop-shadow(0 0 8px #7cf);opacity:.0;';
+      trail.appendChild(d); return d;
+    });
+    let i=0; window.addEventListener('mousemove', (e)=>{
+      const d = dots[i++ % dots.length];
+      d.style.left = (e.clientX-3)+'px'; d.style.top = (e.clientY-3)+'px';
+      if (window.gsap){ window.gsap.killTweensOf(d); window.gsap.fromTo(d,{opacity:.9, scale:1},{opacity:0, scale:0.2, duration:.5, ease:'power2.out'}); }
+    });
+
+    // HUD frame flash + smoke puff (simple)
+    const hud = document.getElementById('hudAnalytics'); if (!hud) return;
+    const frame = document.createElement('div');
+    frame.style.cssText='position:absolute;inset:0;border-radius:16px;pointer-events:none;border:2px solid rgba(124,255,255,.35);box-shadow:0 0 22px rgba(124,255,255,.25) inset;opacity:0;';
+    hud.style.position='relative'; hud.appendChild(frame);
+    try{ window.gsap.fromTo(frame,{opacity:0},{opacity:1,duration:.12,yoyo:true,repeat:1}); }catch{}
+
+    const puff = document.createElement('div');
+    puff.style.cssText='position:absolute;left:18px;top:-6px;width:40px;height:24px;border-radius:50%;background:radial-gradient(closest-side, rgba(255,255,255,.25), rgba(255,255,255,0));filter:blur(4px);opacity:0;';
+    hud.appendChild(puff);
+    try{ window.gsap.fromTo(puff,{opacity:0, y:8},{opacity:.8, y:-6, duration:.35, ease:'power1.out', onComplete:()=>{ puff.remove(); }}); }catch{}
+  }catch{}
+}
+
 // Proprietary. All rights reserved.
 // Premium FX overlays (film burn, glitch, cursor trail)
 

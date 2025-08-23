@@ -15,4 +15,4 @@ Files
 - `licenses/` — any third‑party licenses and notices
 
 Pro source and assets are fully closed. No BSL or open-source license applies to Pro code or content. All rights reserved.
-If you’re interested in a Pro license, contact: team@thenukes.app
+If you’re interested in a Pro license, contact: jsmashmusic@gmail.com

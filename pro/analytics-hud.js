@@ -1,3 +1,44 @@
+// PRO HUD: ECharts boot with playful military HUD vibes
+export async function bootAnalyticsHud(ctx={}){
+  try{
+    const root = document.getElementById('hudAnalytics');
+    if (!root) return;
+    const $ = (s)=> document.querySelector(s);
+    const charts = {
+      streak: echarts.init(document.getElementById('chartStreak')),
+      bars: echarts.init(document.getElementById('chartBars')),
+      calendar: echarts.init(document.getElementById('chartCalendar')),
+      mult: echarts.init(document.getElementById('chartMultiplier')),
+    };
+    const LS = ctx?.LS || (globalThis.LS||{});
+    const grades = (LS.grades||[]).slice(-14);
+    const lat = (LS.latencies||[]).slice(-14);
+    const labels = grades.map((_,i)=>`-${grades.length - i}d`);
+
+    charts.streak.setOption({
+      backgroundColor: 'transparent',
+      grid:{ top:20, left:30, right:10, bottom:20 },
+      xAxis:{ type:'category', data: labels, axisLine:{lineStyle:{color:'#405'}} },
+      yAxis:{ type:'value', axisLine:{lineStyle:{color:'#405'}}, splitLine:{lineStyle:{color:'#1a1a2a'}} },
+      series:[{ type:'line', data: grades, smooth:true, areaStyle:{opacity:.15}, lineStyle:{width:3} }]
+    });
+    charts.bars.setOption({
+      backgroundColor:'transparent',
+      grid:{ top:20, left:30, right:10, bottom:20 },
+      xAxis:{ type:'category', data: labels },
+      yAxis:{ type:'value' },
+      series:[{ type:'bar', data: lat }]
+    });
+    charts.mult.setOption({
+      backgroundColor:'transparent',
+      series:[{ type:'gauge', progress:{show:true}, detail:{formatter:'{value}%'}, data:[{value: Math.max(0, Math.min(100, Math.round(LS.mult||0)))}]}]
+    });
+
+    // HUD entrance sting
+    try{ window.gsap && window.gsap.fromTo('#hudAnalytics', { opacity:0, y:18, filter:'brightness(1.6) contrast(1.2)' }, { opacity:1, y:0, duration:.35, ease:'power2.out', filter:'none' }); }catch{}
+  }catch(e){ console.error('HUD boot failed', e); }
+}
+
 // Proprietary. All rights reserved.
 // Premium analytics HUD (ECharts) — plus villain GIF announcer
 
