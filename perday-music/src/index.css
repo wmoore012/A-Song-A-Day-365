@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --brand-bg: #0b0b0d;
+  --brand-fg: #f5f5f7;
+  --brand-accent1: #6E56FF;
+  --brand-accent2: #24E6B7;
+  --brand-glow: rgba(124,92,255,.35);
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  background: var(--brand-bg);
+  color: var(--brand-fg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

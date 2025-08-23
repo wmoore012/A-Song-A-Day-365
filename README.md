@@ -1,72 +1,72 @@
-# THE NUKES — Song‑Per‑Day 365 (Public Overview)
+# Song-Per-Day-365
 
-Make one song a day. Ship it. Track your streak. Watch momentum grow.
+A gamified daily music production app for rap & R&B producers.
 
-This repo contains the public overview and developer docs. The production app ships in two flavors:
+## Apps
 
-- Open preview (feature‑limited): Web UI shell, basic timers, non‑pro overlays disabled.
-- Pro build (commercial, closed‑core): Cinematic FX, villain personalities/scripts, analytics HUD, award locker, and premium assets.
+### 🚀 Perday Music (React) - **Current**
+The new React + TypeScript app with modern tooling and enhanced UX.
 
-Links
-- Docs for users: `docs/user_guide.md`
-- Pro setup (team/internal): `docs/pro_setup.md`
-- Architecture: `docs/architecture.md`
-- Licensing: `docs/licensing.md`
-
-## What it is
-
-A daily practice engine for creatives. You’ll see:
-- A tight session loop (start, ship, grade)
-- Villain taunts (fun + motivating), with a typed neon “spy console” vibe
-- Streak, heat‑checks, and lightweight analytics
-- Optional ambient FX (white noise, vibes) and cinematic overlays (Pro)
-
-If you’re a producer or songwriter who needs a push every single day, this is for you.
-
-## Quick‑start (public preview)
-
-1) Clone this repo and install dependencies.
 ```bash
-npm i
+cd perday-music
+npm install
 npm run dev
 ```
-2) Run tests
+
+**Features:**
+- 7-minute Pre-Start countdown with Ready gate
+- GSAP animations with reduced motion support
+- YouTube audio integration with fade-out
+- ECharts analytics HUD
+- Progressive disclosure UI
+- Persistent state with Zustand + localforage
+
+### 📁 Legacy App (Vanilla JS)
+The original vanilla JavaScript implementation preserved for reference.
+
 ```bash
-npm test
+cd legacy/nukes-v2
+# Open index.html in browser
 ```
-3) Build
+
+**Features:**
+- All original functionality preserved
+- GSAP animations and effects
+- YouTube integration
+- Notion logging
+- Villain system
+
+## Migration
+
+The project has been migrated from vanilla JavaScript to React + TypeScript with the following improvements:
+
+- **Better UX**: Progressive disclosure, micro-celebrations, cleaner flow
+- **Modern Stack**: React, TypeScript, Vite, Tailwind CSS v4
+- **Enhanced Animations**: GSAP with React hooks, reduced motion support
+- **Persistent State**: Zustand store with IndexedDB persistence
+- **Better Architecture**: Modular components, type safety, better testing
+
+## Development
+
+### New App (React)
 ```bash
-npm run build && npm run preview
+cd perday-music
+npm install
+npm run dev
 ```
 
-Pro features require a private build. See `docs/pro_setup.md`.
-
-## Contributing
-
-We welcome issues/feedback for the public preview UI and docs. Code contributions go through a separate process — see `CONTRIBUTING.md` if present, or open a discussion first.
-
-## Demo
-
-A public demo of the open preview is planned. The Pro experience (FX, personalities, HUD) is only available to licensed users.
-
-© 2025 J. Smash. See `LICENSE-commercial.txt` for closed‑core terms and `docs/licensing.md` for details.
-
-## Deployment
-
-Production deploys are handled by GitHub Actions using Netlify CLI.
-
-Set these GitHub secrets:
-
-- `NETLIFY_AUTH_TOKEN`
-- `NETLIFY_SITE_ID`
-
-The CI job links non-interactively and deploys:
-```
-netlify link --id "$NETLIFY_SITE_ID" --auth "$NETLIFY_AUTH_TOKEN"
-netlify deploy --dir=dist --prod --site "$NETLIFY_SITE_ID" --auth "$NETLIFY_AUTH_TOKEN"
+### Legacy App
+```bash
+cd legacy/nukes-v2
+# Open index.html in browser
 ```
 
-Manual deploy locally:
-1. `npm ci && npm run build`
-2. `netlify link --id $NETLIFY_SITE_ID --auth $NETLIFY_AUTH_TOKEN`
-3. `netlify deploy --dir=dist --prod --site $NETLIFY_SITE_ID --auth $NETLIFY_AUTH_TOKEN`
+## Documentation
+
+- [Migration Requirements](./docs/perday-migration.md) - Detailed migration plan
+- [Architecture](./docs/architecture.md) - System design
+- [Contributing](./docs/CONTRIBUTING.md) - Development guidelines
+
+## License
+
+See [LICENSE](./LICENSE) for details.

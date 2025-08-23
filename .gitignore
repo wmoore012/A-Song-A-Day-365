@@ -7,3 +7,5 @@ dist
 .idea
 .env
 pro/fonts/made_soulmaze/License READ ME FIRST.txt
+docs/private/**
+*.prd.local.md
