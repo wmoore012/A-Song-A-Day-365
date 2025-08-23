@@ -8,12 +8,12 @@ interface StartupMessage {
 }
 
 const STARTUP_SCRIPT: StartupMessage[] = [
-  { id: 'welcome', text: 'Welcome Back {name}!', delay: 1000 },
-  { id: 'first-time', text: 'Ready to make some magic today?', delay: 3000 },
-  { id: 'nervous', text: 'Still nervous? ...I remember my first time producing lol', delay: 4000 },
-  { id: 'focus', text: 'Focus on the music. Everything else is noise.', delay: 5000 },
-  { id: 'multiplier', text: 'Your multiplier is your friend. Keep it alive!', delay: 6000 },
-  { id: 'villain-watching', text: 'I\'ll be watching... don\'t disappoint me.', delay: 7000 },
+  { id: 'welcome', text: 'Welcome Back {name}!', delay: 2000 },
+  { id: 'first-time', text: 'Ready to make some magic today?', delay: 6000 },
+  { id: 'nervous', text: 'Still nervous? ...I remember my first time producing lol', delay: 10000 },
+  { id: 'focus', text: 'Focus on the music. Everything else is noise.', delay: 15000 },
+  { id: 'multiplier', text: 'Your multiplier is your friend. Keep it alive!', delay: 20000 },
+  { id: 'villain-watching', text: 'I\'ll be watching... don\'t disappoint me.', delay: 25000 },
 ];
 
 export function useStartupScript(userName: string = 'Producer') {
@@ -48,5 +48,14 @@ export function useStartupScript(userName: string = 'Producer') {
     setIsComplete(false);
   };
 
-  return { isComplete, restartScript };
+  // Function to reduce villain messages during active work
+  const reduceVillainMessages = () => {
+    setIsComplete(true);
+    // Set a quiet period message
+    setTimeout(() => {
+      _fxEmit('villain-nudge', { msg: 'Focus on your work. I\'ll be quiet for a while...' });
+    }, 30000); // 30 seconds
+  };
+
+  return { isComplete, restartScript, reduceVillainMessages };
 }

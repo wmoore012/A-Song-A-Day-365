@@ -130,7 +130,9 @@ export function transition(session: Session, action: Action): Session {
       return session;
       
     case 'BACK':
-      if (state === FlowState.FOCUS_SETUP) {
+      if (state === FlowState.LOCK_IN) {
+        return { ...session, state: FlowState.PRE_START };
+      } else if (state === FlowState.FOCUS_SETUP) {
         return { ...session, state: FlowState.LOCK_IN };
       } else if (state === FlowState.CHECKPOINT) {
         return { ...session, state: FlowState.FOCUS_RUNNING };

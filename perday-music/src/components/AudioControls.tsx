@@ -8,22 +8,34 @@ import { Label } from './ui/label';
 interface AudioControlsProps {
   onVolumeChange: (volume: number) => void;
   currentVolume: number;
+  enableStudioVibes?: boolean;
 }
 
-export default function AudioControls({ onVolumeChange, currentVolume }: AudioControlsProps) {
+export default function AudioControls({ onVolumeChange, currentVolume, enableStudioVibes = false }: AudioControlsProps) {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTrack, setCurrentTrack] = useState('Studio Vibes - Lo-Fi Beats');
+  const [currentTrack, setCurrentTrack] = useState('Perday Music 365 - Your Playlist');
   const [isOpen, setIsOpen] = useState(false);
+  const [currentPlaylist, setCurrentPlaylist] = useState('default');
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // Legacy playlist tracks
-  const playlist = [
-    'Studio Vibes - Lo-Fi Beats',
-    'Focus Flow - Ambient Sounds',
-    'Creative Energy - Uplifting',
-    'Deep Work - Concentration',
-    'Chill Mode - Relaxing'
-  ];
+  // Playlists - only Studio Vibes should be available after cookup starts
+  const playlists = {
+    default: {
+      name: 'Perday Music 365',
+      description: 'Your main playlist for focus',
+      url: 'https://music.youtube.com/playlist?list=PLl-ShioB5kapLuMhLMqdyx_gKX_MBiXeb&si=By4_9iaE7SmeA8Kj'
+    },
+    'studio-vibes': {
+      name: 'Studio Vibes',
+      description: 'Chill beats for focus (available after cookup)',
+      url: 'https://music.youtube.com/playlist?list=PLl-ShioB5kapLuMhLMqdyx_gKX_MBiXeb&si=By4_9iaE7SmeA8Kj'
+    },
+    'focus-mate': {
+      name: 'FocusMate',
+      description: 'Upbeat energy for productivity',
+      url: 'https://music.youtube.com/playlist?list=PLl-ShioB5kapLuMhLMqdyx_gKX_MBiXeb&si=By4_9iaE7SmeA8Kj'
+    }
+  };
 
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
 
@@ -45,15 +57,22 @@ export default function AudioControls({ onVolumeChange, currentVolume }: AudioCo
   };
 
   const nextTrack = () => {
-    const nextIndex = (currentTrackIndex + 1) % playlist.length;
-    setCurrentTrackIndex(nextIndex);
-    setCurrentTrack(playlist[nextIndex]);
+    // For now, just cycle through playlist names
+    const playlistNames = Object.keys(playlists);
+    const currentIndex = playlistNames.indexOf(currentPlaylist);
+    const nextIndex = (currentIndex + 1) % playlistNames.length;
+    const nextPlaylist = playlistNames[nextIndex];
+    setCurrentPlaylist(nextPlaylist);
+    setCurrentTrack(playlists[nextPlaylist].name);
   };
 
   const previousTrack = () => {
-    const prevIndex = currentTrackIndex === 0 ? playlist.length - 1 : currentTrackIndex - 1;
-    setCurrentTrackIndex(prevIndex);
-    setCurrentTrack(playlist[prevIndex]);
+    const playlistNames = Object.keys(playlists);
+    const currentIndex = playlistNames.indexOf(currentPlaylist);
+    const prevIndex = currentIndex === 0 ? playlistNames.length - 1 : currentIndex - 1;
+    const prevPlaylist = playlistNames[prevIndex];
+    setCurrentPlaylist(prevPlaylist);
+    setCurrentTrack(playlists[prevPlaylist].name);
   };
 
   return (

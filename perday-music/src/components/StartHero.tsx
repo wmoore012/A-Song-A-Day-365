@@ -173,7 +173,11 @@ export default function StartHero() {
           </div>
           
           {/* Audio Controls */}
-          <AudioControls onVolumeChange={setVolume} currentVolume={volume} />
+          <AudioControls 
+            onVolumeChange={setVolume} 
+            currentVolume={volume}
+            enableStudioVibes={session.state !== FlowState.PRE_START}
+          />
           
           {/* Atom Orbit Background */}
           <div className="absolute inset-0 flex items-center justify-center opacity-20">
@@ -210,9 +214,11 @@ export default function StartHero() {
                 <LiquidGlassButton
                   variant="primary"
                   size="lg"
-                  className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-synth-amber/80 to-synth-amberLight/80 hover:from-synth-amberLight/80 hover:to-synth-amber/80 text-synth-white shadow-lg hover:shadow-[0_10px_24px_rgba(255,176,32,0.4)] transition-all duration-300 transform hover:scale-[1.02] animate-amberGlow rounded-2xl"
+                  className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-synth-amber/80 to-synth-amberLight/80 hover:from-synth-amberLight/80 hover:to-synth-amberLight/80 text-synth-white shadow-lg hover:shadow-[0_10px_24px_rgba(255,176,32,0.4)] transition-all duration-300 transform hover:scale-[1.02] animate-amberGlow rounded-2xl"
                   onClick={() => {
                     setSoundEnabled(true);
+                    // Start the main playlist
+                    toast.success('🎵 Starting your Perday Music 365 playlist!');
                     // Trigger vault transition after a short delay
                     setTimeout(() => setShowVault(true), 1000);
                   }}
@@ -234,7 +240,14 @@ export default function StartHero() {
                   <Button
                     size="default"
                     className="w-full h-12 text-base font-semibold bg-gradient-to-r from-magenta-500 via-cyan-400 to-purple-600 hover:from-magenta-600 hover:via-cyan-500 hover:to-purple-700 text-synth-white shadow-lg hover:shadow-[0_8px_20px_rgba(236,72,153,0.4)] transition-all duration-300 transform hover:scale-[1.02] animate-pulse rounded-2xl"
-                    onClick={() => handleAction({ type: 'READY' })}
+                    onClick={() => {
+                      handleAction({ type: 'READY' });
+                      // Fade out music when starting cookup
+                      if (soundEnabled) {
+                        toast.success('🎵 Fading out music for focus...');
+                        // This will trigger the transition to LOCK_IN state
+                      }
+                    }}
                     disabled={session.readyPressed}
                   >
                     ⚡ Ready (Power up your Multiplier)
