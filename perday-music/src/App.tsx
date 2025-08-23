@@ -1,50 +1,61 @@
 import { useRef } from "react";
-import PrestartPanel from "@/features/prestart/PrestartPanel";
-import AudioHud from "@/features/sound/AudioHud";
-import PageVisibilityBadge from "@/ui/PageVisibilityBadge";
-import { AnalyticsHud } from "@/features/AnalyticsHud";
-import { useAppStore } from "@/store/store";
-import "./index.css";
+import { useAppStore } from "./store/store";
+import PageVisibilityBadge from "./ui/PageVisibilityBadge";
+import PrestartPanel from "./features/prestart/PrestartPanel";
+import AudioHud from "./features/sound/AudioHud";
+import { AnalyticsHud } from "./features/AnalyticsHud";
+
+// Fail loud: validate preconditions
+function must<T>(value: T | null | undefined, msg: string): T {
+  if (value == null) throw new Error(msg);
+  return value;
+}
 
 export default function App() {
-  const fadeRef = useRef<() => void>(() => {});
-  const { phase, setPhase } = useAppStore((s: any) => ({
-    phase: s.phase, 
-    setPhase: s.setPhase
-  }));
+  const fadeOutRef = useRef<() => void>(() => {});
+  const phase = useAppStore((s) => s.phase);
+  const setPhase = useAppStore((s) => s.setPhase);
+  const prestartTotalMs = useAppStore((s) => s.prestartTotalMs);
+  const motionOk = useAppStore((s) => s.motionOk);
 
-  // fake sample data for HUD (replace with your LS hydrator)
-  const sampleGrades = [60, 62, 68, 70, 65, 71, 73, 75, 78, 77, 79, 80, 82, 84];
-  const sampleLatencies = [5600, 4800, 7200, 5100, 3900, 4100, 4500, 3600, 5400, 6000, 3800, 3400, 3000, 2800];
+  // Validate store state
+  must(phase, "Phase must be defined");
+  must(setPhase, "setPhase must be defined");
+  must(prestartTotalMs, "prestartTotalMs must be defined");
+  must(motionOk, "motionOk must be defined");
+
+  const handleLockIn = () => {
+    setPhase("prestart");
+    fadeOutRef.current();
+  };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-[#0b0b0d] via-[#121224] to-[#1a132e] text-white">
+    <div 
+      className="min-h-screen bg-[var(--brand-bg)] text-[var(--brand-fg)]"
+      data-testid="app-main"
+      aria-label="Perday Music Application"
+    >
       <PageVisibilityBadge />
-
-      <header className="sticky top-0 z-40 backdrop-blur bg-black/30 border-b border-white/10">
-        <div className="max-w-6xl mx-auto flex items-center justify-between p-3">
-          <h1 className="font-extrabold tracking-wide">Perday Music <span className="opacity-70">+1</span></h1>
-          <div className="text-sm opacity-80">
-            {phase === "prestart" ? "Tip: One hook. One bounce. Next." : 
-             phase === "lockin" ? "LOCKED 🔒" : "Phase: " + phase}
-          </div>
+      
+      {/* Logo */}
+      <div className="fixed top-6 left-6 z-10">
+        <div className="text-2xl font-black text-white">
+          <span className="text-[#7c5cff]">Per</span>day
         </div>
-      </header>
-
-      <div className="max-w-6xl mx-auto p-4 grid md:grid-cols-2 gap-4">
-        <PrestartPanel
-          fadeOutMusic={() => fadeRef.current?.()}
-          onLockIn={() => { 
-            setPhase("lockin"); 
-            console.log("Locked in!");
-          }}
-        />
-        <AudioHud fadeOutRef={fadeRef} />
-
-        <div className="md:col-span-2">
-          <AnalyticsHud grades={sampleGrades} latencies={sampleLatencies} />
-        </div>
+        <div className="text-xs text-white/60">Music</div>
       </div>
-    </main>
+      
+      <PrestartPanel 
+        onLockIn={handleLockIn}
+        fadeOutMusic={fadeOutRef.current}
+      />
+
+      <AudioHud fadeOutRef={fadeOutRef} />
+      
+      <AnalyticsHud 
+        grades={[85, 92, 78, 88, 95, 82, 90]}
+        latencies={[1200, 800, 1500, 1100, 900, 1300, 1000]}
+      />
+    </div>
   );
 }

@@ -1,7 +1,7 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.tsx'
+import { StrictMode } from "react"
+import { createRoot } from "react-dom/client"
+import "./index.css"
+import App from "./App"
 
 // Fail loudly: show any runtime error on screen instead of a blank page.
 function installGlobalErrorOverlay() {
@@ -34,5 +34,5 @@ if (!rootEl) throw new Error("#root not found")
 createRoot(rootEl).render(
   <StrictMode>
     <App />
-  </StrictMode>,
+  </StrictMode>
 )

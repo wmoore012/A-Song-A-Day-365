@@ -1,0 +1,10 @@
+@import "tailwindcss";
+
+:root {
+  --brand-bg: #0b0b0d;
+  --brand-fg: #f5f5f7;
+  --brand-accent1: #6E56FF;
+}
+
+html, body, #root { height: 100%; }
+body { background: var(--brand-bg); color: var(--brand-fg); }

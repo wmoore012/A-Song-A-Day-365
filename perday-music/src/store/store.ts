@@ -2,6 +2,12 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import localforage from "localforage";
 
+// Guard window access at module level
+const prefersReduced =
+  typeof window !== "undefined" &&
+  typeof window.matchMedia === "function" &&
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
 export type Phase = "prestart" | "lockin" | "wrap";
 export type Grade = "A" | "B" | "C";
 
@@ -49,7 +55,7 @@ export const useAppStore = create<SessionState & SettingsState & Actions>()(
       latencies: [],
       streak: 0,
       freezes: 0,
-      motionOk: !window.matchMedia?.("(prefers-reduced-motion: reduce)").matches,
+      motionOk: !prefersReduced,
       soundEnabled: false,
 
       setPhase: (p) => set({ phase: p }),
@@ -67,7 +73,7 @@ export const useAppStore = create<SessionState & SettingsState & Actions>()(
       name: "perday-store",
       storage: createJSONStorage(() => localforage),
       version: 1,
-      migrate: (state, _v) => state as any,
+      migrate: (state) => state as SessionState & SettingsState & Actions,
     }
   )
 );
