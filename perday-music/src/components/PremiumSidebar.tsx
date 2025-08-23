@@ -39,7 +39,7 @@ function NavItem({ icon: Icon, label, active, collapsed }: {
       className={`w-full px-3 py-2 rounded-lg transition-all duration-300 flex items-center space-x-3 text-sm font-medium ${
         active 
           ? 'bg-gradient-to-r from-synth-violet/30 to-synth-magenta/20 text-synth-white shadow-[0_0_15px_rgba(108,26,237,0.2)]' 
-          : 'text-synth-icy hover:bg-synth-icy/10 hover:text-synth-white hover:shadow-[0_0_10px_rgba(178,235,255,0.1)]'
+          : 'text-synth-violet hover:bg-synth-violet/10 hover:text-synth-violet/80 hover:shadow-[0_0_10px_rgba(108,26,237,0.1)]'
       }`}
     >
       <Icon className="h-4 w-4 flex-shrink-0" />
@@ -77,7 +77,7 @@ export default function PremiumSidebar() {
   return (
     <div 
       ref={sidebarRef}
-      className={`fixed left-0 top-0 h-full bg-gradient-to-b from-[#0F0F12] to-[#1F1F23] backdrop-blur-xl transition-all duration-300 shadow-2xl ${
+      className={`fixed left-0 top-0 h-full bg-[#DFD9E2] backdrop-blur-xl transition-all duration-300 shadow-2xl ${
         collapsed ? 'w-16' : 'w-64'
       }`}
     >
@@ -107,7 +107,7 @@ export default function PremiumSidebar() {
       {/* Navigation */}
       <nav className="p-6 space-y-3">
         {!collapsed && (
-          <div className="px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-synth-icy/60">
+          <div className="px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-synth-violet/70">
             Studio
           </div>
         )}
@@ -116,7 +116,7 @@ export default function PremiumSidebar() {
         <NavItem icon={Zap} label="Cookups" active={false} collapsed={collapsed} />
         
         {!collapsed && (
-          <div className="px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-synth-icy/60 mt-6">
+          <div className="px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-synth-violet/70 mt-6">
             Progress
           </div>
         )}
@@ -128,14 +128,14 @@ export default function PremiumSidebar() {
       {!collapsed && (
         <div className="p-6 mt-auto bg-gradient-to-t from-synth-violet/5 to-transparent">
           <div className="space-y-4">
-            <div className="text-synth-icy text-sm font-semibold uppercase tracking-wider">Today's Progress</div>
+            <div className="text-synth-violet text-sm font-semibold uppercase tracking-wider">Today's Progress</div>
             <div className="bg-gradient-to-r from-synth-violet/20 to-synth-magenta/10 rounded-xl p-4 shadow-lg">
-              <div className="text-synth-white font-bold text-2xl">7</div>
-              <div className="text-synth-icy text-xs font-medium">Days Streak</div>
+              <div className="text-synth-violet font-bold text-2xl">7</div>
+              <div className="text-synth-violet/70 text-xs font-medium">Days Streak</div>
             </div>
             <div className="bg-gradient-to-r from-synth-aqua/20 to-synth-icy/10 rounded-xl p-4 shadow-lg">
-              <div className="text-synth-white font-bold text-2xl">85%</div>
-              <div className="text-synth-icy text-xs font-medium">Avg Grade</div>
+              <div className="text-synth-violet font-bold text-2xl">85%</div>
+              <div className="text-synth-violet/70 text-xs font-medium">Avg Grade</div>
             </div>
           </div>
         </div>
