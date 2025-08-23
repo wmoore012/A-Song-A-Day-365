@@ -47,6 +47,16 @@ export default {
           '50%': { 
             boxShadow: '0 0 25px rgba(255, 176, 32, 0.8), 0 0 35px rgba(255, 176, 32, 0.3)',
           },
+        },
+        slideInRight: {
+          '0%': { 
+            transform: 'translateX(100%)',
+            opacity: '0'
+          },
+          '100%': { 
+            transform: 'translateX(0)',
+            opacity: '1'
+          },
         }
       },
       animation: {
@@ -54,6 +64,7 @@ export default {
         breathe: 'breathe 4s ease-in-out infinite',
         amberPulse: 'amberPulse 3s ease-in-out infinite',
         amberGlow: 'amberGlow 2s ease-in-out infinite',
+        slideInRight: 'slideInRight 0.3s ease-out',
       },
     }
   },

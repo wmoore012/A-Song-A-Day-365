@@ -32,10 +32,7 @@ export default function App() {
   must(prestartTotalMs, "prestartTotalMs must be defined");
   must(motionOk, "motionOk must be defined");
 
-  const handleLockIn = () => {
-    setPhase("prestart");
-    fadeOutRef.current();
-  };
+
 
   return (
     <div 

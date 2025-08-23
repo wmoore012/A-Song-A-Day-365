@@ -1,15 +1,17 @@
 // Lightweight event bus for various UI effects
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-let _fxSubscriber: ((type: string, data?: any) => void) | null = null;
+const _fxSubscribers = new Set<(type: string, data?: any) => void>();
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function _fxEmit(type: string, data?: any) {
-  _fxSubscriber?.(type, data);
+  _fxSubscribers.forEach(subscriber => subscriber(type, data));
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function _fxSubscribe(fn: (type: string, data?: any) => void) {
-  _fxSubscriber = fn;
+  _fxSubscribers.add(fn);
+  // Return unsubscribe function
+  return () => _fxSubscribers.delete(fn);
 }
 
 // Public hook to trigger effects

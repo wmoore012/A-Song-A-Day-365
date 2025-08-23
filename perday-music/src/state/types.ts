@@ -21,6 +21,16 @@ export interface Session {
   rating?: number;
   notes?: string;
   proof?: string;
+  allNighter?: boolean;
+  songInfo?: {
+    title?: string;
+    artist?: string;
+    genre?: string;
+    bpm?: number;
+    key?: string;
+    mood?: string;
+    notes?: string;
+  };
 }
 
 export type Action =

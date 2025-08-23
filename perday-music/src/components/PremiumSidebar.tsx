@@ -48,7 +48,7 @@ function NavItem({ icon: Icon, label, active, collapsed }: {
   );
 }
 
-export function PremiumSidebar() {
+export default function PremiumSidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const lightBarRef = useRef<HTMLDivElement>(null);
