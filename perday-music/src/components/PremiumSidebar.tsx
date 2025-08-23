@@ -10,6 +10,7 @@ import {
   ChevronLeft,
   ChevronRight
 } from "lucide-react";
+import PerdayLogo from './PerdayLogo';
 
 gsap.registerPlugin(useGSAP);
 
@@ -89,11 +90,10 @@ export function PremiumSidebar() {
       {/* Header */}
       <div className="p-6 bg-gradient-to-r from-synth-violet/10 to-synth-aqua/10">
         <div className="flex items-center justify-between">
-          {!collapsed && (
-            <div className="text-synth-white font-bold text-xl">
-              <span className="text-synth-violet">Per</span>day
-              <div className="text-xs text-synth-icy font-normal">Music</div>
-            </div>
+          {!collapsed ? (
+            <PerdayLogo size={40} />
+          ) : (
+            <PerdayLogo size={32} showText={false} />
           )}
           <button
             onClick={() => setCollapsed(!collapsed)}
@@ -106,16 +106,20 @@ export function PremiumSidebar() {
 
       {/* Navigation */}
       <nav className="p-6 space-y-3">
-        <div className="px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-synth-icy/60">
-          Studio
-        </div>
+        {!collapsed && (
+          <div className="px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-synth-icy/60">
+            Studio
+          </div>
+        )}
         <NavItem icon={Music} label="Studio" active={true} collapsed={collapsed} />
         <NavItem icon={BarChart2} label="Analytics" active={false} collapsed={collapsed} />
         <NavItem icon={Zap} label="Cookups" active={false} collapsed={collapsed} />
         
-        <div className="px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-synth-icy/60 mt-6">
-          Progress
-        </div>
+        {!collapsed && (
+          <div className="px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-synth-icy/60 mt-6">
+            Progress
+          </div>
+        )}
         <NavItem icon={Target} label="Goals" active={false} collapsed={collapsed} />
         <NavItem icon={Settings} label="Settings" active={false} collapsed={collapsed} />
       </nav>

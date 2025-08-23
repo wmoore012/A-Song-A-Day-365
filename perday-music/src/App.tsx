@@ -3,11 +3,10 @@
 import { useRef } from "react";
 import { useAppStore } from "./store/store";
 import PageVisibilityBadge from "./ui/PageVisibilityBadge";
-import PrestartPanel from "./features/prestart/PrestartPanel";
 import AudioHud from "./features/sound/AudioHud";
 import { AnalyticsHud } from "./features/AnalyticsHud";
-import { PremiumSidebar } from "./components/PremiumSidebar";
-import NeonIsometricMaze from "./components/NeonIsometricMaze";
+import GateLayout from "./components/GateLayout";
+import PerdayLogo from "./components/PerdayLogo";
 
 // Fail loud: validate preconditions
 function must<T>(value: T | null | undefined, msg: string): T {
@@ -41,25 +40,14 @@ export default function App() {
     >
       <PageVisibilityBadge />
       
-      {/* Premium Sidebar */}
-      <PremiumSidebar />
-      
-      {/* Main Content - adjusted for sidebar */}
-      <div className="ml-64 min-h-screen relative">
-        {/* Logo */}
-        <div className="fixed top-6 left-72 z-10">
-          <div className="text-2xl font-black text-white">
-            <span className="text-synth-violet">Per</span>day
-          </div>
-          <div className="text-xs text-synth-icy">Music</div>
-        </div>
-        
+      <GateLayout>
+        {/* Dashboard Content - only shown after POST_ACTIONS */}
         <div className="p-8 pt-20">
-          <PrestartPanel 
-            onLockIn={handleLockIn}
-            fadeOutMusic={fadeOutRef.current}
-          />
-
+          {/* Logo */}
+          <div className="mb-8">
+            <PerdayLogo size={64} />
+          </div>
+          
           <div className="mt-8">
             <AudioHud fadeOutRef={fadeOutRef} />
           </div>
@@ -71,12 +59,7 @@ export default function App() {
             />
           </div>
         </div>
-      </div>
-      
-      {/* Neon Isometric Maze Footer */}
-      <div className="fixed bottom-0 left-0 w-full h-32 -z-10">
-        <NeonIsometricMaze />
-      </div>
+      </GateLayout>
     </div>
   );
 }
