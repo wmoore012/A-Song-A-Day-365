@@ -25,6 +25,6 @@ describe('App', () => {
 
   it('shows audio hud', () => {
     render(<App />);
-    expect(screen.getByText('🎵 Music & Room Tone')).toBeInTheDocument();
+    expect(screen.getByText('Music & Room Tone')).toBeInTheDocument();
   });
 });
