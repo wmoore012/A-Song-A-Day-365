@@ -35,6 +35,56 @@ vi.mock('echarts-for-react', () => ({
   default: () => null
 }));
 
+// Mock GSAP (named export)
+vi.mock('gsap', () => {
+  const to = vi.fn().mockReturnValue({
+    onComplete: vi.fn(),
+    onUpdate: vi.fn(),
+    kill: vi.fn(),
+  });
+  const fromTo = vi.fn().mockReturnValue({
+    onComplete: vi.fn(),
+    onUpdate: vi.fn(),
+    kill: vi.fn(),
+  });
+  const set = vi.fn();
+  const timeline = vi.fn(() => ({
+    to: vi.fn().mockReturnValue({
+      onComplete: vi.fn(),
+      onUpdate: vi.fn(),
+      kill: vi.fn(),
+    }),
+    fromTo: vi.fn().mockReturnValue({
+      onComplete: vi.fn(),
+      onUpdate: vi.fn(),
+      kill: vi.fn(),
+    }),
+    set: vi.fn(),
+    add: vi.fn(),
+    play: vi.fn(),
+    kill: vi.fn(),
+  }));
+  const gsap = { 
+    to, 
+    fromTo, 
+    set, 
+    timeline, 
+    registerPlugin: vi.fn(),
+    killTweensOf: vi.fn(),
+  };
+  return { gsap };
+});
+
+// Mock @gsap/react hook to just run the passed function immediately
+vi.mock('@gsap/react', () => {
+  return {
+    useGSAP: (fn?: any) => {
+      if (typeof fn === 'function') fn();
+      return {}; // shape doesn't matter for your tests
+    },
+  };
+});
+
 // Reset mocks between tests
 beforeEach(() => {
   vi.clearAllMocks();

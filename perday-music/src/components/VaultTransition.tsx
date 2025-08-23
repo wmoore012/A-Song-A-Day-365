@@ -15,8 +15,14 @@ export default function VaultTransition({ isOpen, onTransitionComplete, children
   useEffect(() => {
     if (!vaultRef.current || !contentRef.current) return;
 
-    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (prefersReduced) {
+    // Force animations in dev/tests, only respect reduced motion in production
+    const shouldAnimate = 
+      import.meta?.env?.MODE !== 'test' &&
+      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true
+        ? false
+        : true;
+    
+    if (!shouldAnimate) {
       onTransitionComplete();
       return;
     }

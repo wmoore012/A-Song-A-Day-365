@@ -80,11 +80,29 @@ export default function StartHero() {
   };
 
   switch (session.state) {
-    case FlowState.PRE_START:
+        case FlowState.PRE_START:
       return (
         <div className="min-h-screen flex items-center justify-center p-4 bg-black">
           {renderError()}
-          <div className="rounded-2xl bg-black/40 backdrop-blur-xl ring-1 ring-synth-icy/30 p-8 max-w-md w-full text-center shadow-2xl">
+          
+          {/* Custom Perday Logo */}
+          <div className="absolute top-8 left-8">
+            <PerdayLogo size={60} />
+          </div>
+          
+          {/* Villain Display - Top Right */}
+          <div className="absolute top-8 right-8">
+            <div className="text-synth-amber text-sm font-medium bg-synth-violet/20 backdrop-blur-xl border border-synth-violet/40 rounded-xl px-4 py-2">
+              😈 Villain is watching...
+            </div>
+          </div>
+          
+          {/* Atom Orbit Background */}
+          <div className="absolute inset-0 flex items-center justify-center opacity-20">
+            <AtomOrbit />
+          </div>
+          
+          <div className="rounded-2xl bg-black/40 backdrop-blur-xl ring-1 ring-synth-icy/30 p-8 max-w-md w-full text-center shadow-2xl relative z-10">
             <div className="text-xl font-bold text-synth-white mb-2">
               7-minute Pre-Start to get your mind right.
             </div>
@@ -105,17 +123,41 @@ export default function StartHero() {
               />
             </div>
             
+            {/* Enable Sound Button */}
+            {!soundEnabled ? (
+              <div className="mb-6">
+                <LiquidGlassButton
+                  variant="primary"
+                  size="lg"
+                  className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-synth-amber/80 to-synth-amberLight/80 hover:from-synth-amberLight/80 hover:to-synth-amber/80 text-synth-white shadow-lg hover:shadow-[0_10px_24px_rgba(255,176,32,0.4)] transition-all duration-300 transform hover:scale-[1.02] animate-amberGlow rounded-2xl"
+                  onClick={() => {
+                    setSoundEnabled(true);
+                    // Trigger vault transition after a short delay
+                    setTimeout(() => setShowVault(true), 1000);
+                  }}
+                >
+                  🔊 Enable Sound
+                </LiquidGlassButton>
+              </div>
+            ) : (
+              <div className="mb-6">
+                <div className="text-synth-amber text-lg font-semibold mb-4">
+                  Click here for 7 min till cookup! 'I Dare You'
+                </div>
+              </div>
+            )}
+            
             <div className="space-y-4">
               <Tooltip>
                 <TooltipTrigger asChild>
-                                <Button
-                size="default"
-                className="w-full h-12 text-base font-semibold bg-gradient-to-r from-synth-amber to-synth-amberLight hover:from-synth-amberLight hover:to-synth-amber text-synth-white shadow-lg hover:shadow-[0_8px_20px_rgba(255,176,32,0.4)] transition-all duration-300 transform hover:scale-[1.02] animate-amberGlow rounded-2xl"
-                onClick={() => handleAction({ type: 'READY' })}
-                disabled={session.readyPressed}
-              >
-                ⚡ Ready (Power up your Multiplier)
-              </Button>
+                  <Button
+                    size="default"
+                    className="w-full h-12 text-base font-semibold bg-gradient-to-r from-synth-amber to-synth-amberLight hover:from-synth-amberLight hover:to-synth-amber text-synth-white shadow-lg hover:shadow-[0_8px_20px_rgba(255,176,32,0.4)] transition-all duration-300 transform hover:scale-[1.02] animate-amberGlow rounded-2xl"
+                    onClick={() => handleAction({ type: 'READY' })}
+                    disabled={session.readyPressed}
+                  >
+                    ⚡ Ready (Power up your Multiplier)
+                  </Button>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>Tap this to power up your multiplier before the timer starts!</p>
@@ -124,14 +166,14 @@ export default function StartHero() {
               
               <Tooltip>
                 <TooltipTrigger asChild>
-                                <Button
-                variant="outline"
-                size="default"
-                className="w-full h-12 text-base font-semibold border-synth-violet/40 hover:border-synth-violet/60 text-synth-violet hover:bg-synth-violet/10 transition-all duration-300 rounded-2xl"
-                onClick={handleTimerZero}
-              >
-                🚀 Start Now (Skip Pre-Start)
-              </Button>
+                  <Button
+                    variant="outline"
+                    size="default"
+                    className="w-full h-12 text-base font-semibold border-synth-violet/40 hover:border-synth-violet/60 text-synth-violet hover:bg-synth-violet/10 transition-all duration-300 rounded-2xl"
+                    onClick={handleTimerZero}
+                  >
+                    🚀 Start Now (Skip Pre-Start)
+                  </Button>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>Skip the 7-minute warmup and start immediately</p>
@@ -155,6 +197,25 @@ export default function StartHero() {
               </div>
             )}
           </div>
+          
+          {/* Vault Transition */}
+          {showVault && (
+            <VaultTransition
+              isOpen={showVault}
+              onTransitionComplete={() => {
+                setShowVault(false);
+                // Here you would transition to the next state
+                handleAction({ type: 'READY' });
+              }}
+            >
+              <div className="min-h-screen bg-black flex items-center justify-center">
+                <div className="text-center">
+                  <h1 className="text-6xl font-bold text-synth-amber mb-8">VAULT ACCESSED</h1>
+                  <p className="text-2xl text-synth-icy">Welcome to your creative space</p>
+                </div>
+              </div>
+            </VaultTransition>
+          )}
         </div>
       );
 

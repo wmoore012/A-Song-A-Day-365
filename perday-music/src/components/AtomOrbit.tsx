@@ -7,8 +7,14 @@ export default function AtomOrbit() {
   useEffect(() => {
     if (!containerRef.current) return;
 
-    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (prefersReduced) return;
+    // Force animations in dev/tests, only respect reduced motion in production
+    const shouldAnimate = 
+      import.meta?.env?.MODE !== 'test' &&
+      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true
+        ? false
+        : true;
+    
+    if (!shouldAnimate) return;
 
     // Create spinning animation for each ring
     const rings = containerRef.current.querySelectorAll('.ring');

@@ -16,17 +16,18 @@ export default function VillainDisplay() {
   const messageContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Subscribe to villain events
-    const unsubscribe = _fxSubscribe((type: string, data: any) => {
-      if (type === 'villain-nudge' || type === 'announce' || type === 'toast') {
-        const newMessage: VillainMessage = {
-          id: Date.now().toString(),
-          text: data.msg || data.text || 'Villain speaks!',
-          type: type === 'villain-nudge' ? 'villain-nudge' : (data.type || 'info'),
-          timestamp: Date.now()
-        };
+          // Subscribe to villain events
+      const unsubscribe = _fxSubscribe((type: string, data: any) => {
+        if (type === 'villain-nudge' || type === 'announce' || type === 'toast') {
+          const newMessage: VillainMessage = {
+            id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            text: data.msg || data.text || 'Villain speaks!',
+            type: type === 'villain-nudge' ? 'villain-nudge' : 
+                  type === 'toast' ? (data.type || 'info') : 'info',
+            timestamp: Date.now()
+          };
 
-        setMessages(prev => [...prev.slice(-4), newMessage]); // Keep last 4 messages
+          setMessages(prev => [...prev.slice(-4), newMessage]);
 
         // Auto-remove message after 5 seconds
         setTimeout(() => {

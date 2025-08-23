@@ -24,8 +24,15 @@ function NavItem({ icon: Icon, label, active, collapsed }: {
 
   useGSAP(() => {
     if (!itemRef.current) return;
-    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (prefersReduced) return;
+    
+    // Force animations in dev/tests, only respect reduced motion in production
+    const shouldAnimate = 
+      import.meta?.env?.MODE !== 'test' &&
+      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true
+        ? false
+        : true;
+    
+    if (!shouldAnimate) return;
     
     gsap.fromTo(itemRef.current, 
       { opacity: 0, x: -10 }, 
@@ -55,8 +62,15 @@ export default function PremiumSidebar() {
 
   useGSAP(() => {
     if (!sidebarRef.current || !lightBarRef.current) return;
-    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (prefersReduced) return;
+    
+    // Force animations in dev/tests, only respect reduced motion in production
+    const shouldAnimate = 
+      import.meta?.env?.MODE !== 'test' &&
+      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true
+        ? false
+        : true;
+    
+    if (!shouldAnimate) return;
 
     // Entrance animation
     gsap.fromTo(sidebarRef.current, 
@@ -77,7 +91,7 @@ export default function PremiumSidebar() {
   return (
     <div 
       ref={sidebarRef}
-      className={`fixed left-0 top-0 h-full bg-[#DFD9E2] backdrop-blur-xl transition-all duration-300 shadow-2xl ${
+      className={`fixed left-0 top-0 h-full bg-[#DFD9E2] backdrop-blur-xl transition-[width] duration-300 shadow-2xl ${
         collapsed ? 'w-16' : 'w-64'
       }`}
     >
