@@ -29,6 +29,7 @@ interface SettingsData {
 interface SettingsSheetProps {
   onSave: (settings: SettingsData) => void;
   currentSettings: SettingsData;
+  onResetAll?: () => void;
 }
 
 export default function SettingsSheet({ onSave, currentSettings }: SettingsSheetProps) {
@@ -194,13 +195,25 @@ export default function SettingsSheet({ onSave, currentSettings }: SettingsSheet
           </div>
         </div>
 
-        <div className="flex gap-3 mt-8">
-          <Button variant="outline" onClick={resetToDefaults} className="flex-1 border-cyan-400/40 text-cyan-300 hover:bg-cyan-400/20">
-            Reset to Defaults
-          </Button>
-          <Button onClick={handleSave} className="flex-1 bg-gradient-to-r from-magenta-500 via-cyan-400 to-purple-600 hover:from-magenta-600 hover:via-cyan-500 hover:to-purple-700">
-            Save Settings
-          </Button>
+        <div className="space-y-3 mt-8">
+          <div className="flex gap-3">
+            <Button variant="outline" onClick={resetToDefaults} className="flex-1 border-cyan-400/40 text-cyan-300 hover:bg-cyan-400/20">
+              Reset to Defaults
+            </Button>
+            <Button onClick={handleSave} className="flex-1 bg-gradient-to-r from-magenta-500 via-cyan-400 to-purple-600 hover:from-magenta-600 hover:via-cyan-500 hover:to-purple-700">
+              Save Settings
+            </Button>
+          </div>
+          
+          {onResetAll && (
+            <Button 
+              variant="outline" 
+              onClick={onResetAll} 
+              className="w-full border-red-400/40 text-red-300 hover:bg-cyan-400/20"
+            >
+              🗑️ Reset Everything (Start Fresh)
+            </Button>
+          )}
         </div>
       </SheetContent>
     </Sheet>

@@ -5,20 +5,48 @@ import { transition } from './transitions';
 
 interface SessionStore {
   session: Session;
+  userSettings: UserSettings;
   dispatch: (action: Action) => void;
   reset: () => void;
+  resetAll: () => void;
+  updateSettings: (settings: Partial<UserSettings>) => void;
 }
 
-const initialState: Session = {
+interface UserSettings {
+  defaultDuration: number;
+  defaultMultiplier: number;
+  autoStartTimer: boolean;
+  soundEnabled: boolean;
+  volume: number;
+  notifications: boolean;
+  accountabilityEmail: string;
+  userName: string;
+  collaborators: string;
+}
+
+const initialSession: Session = {
   state: FlowState.PRE_START,
   readyPressed: false,
   multiplierPenalty: false
 };
 
+const initialSettings: UserSettings = {
+  defaultDuration: 25,
+  defaultMultiplier: 1.5,
+  autoStartTimer: true,
+  soundEnabled: true,
+  volume: 0.7,
+  notifications: true,
+  accountabilityEmail: '',
+  userName: '',
+  collaborators: ''
+};
+
 export const useSessionStore = create<SessionStore>()(
   persist(
     (set, get) => ({
-      session: initialState,
+      session: initialSession,
+      userSettings: initialSettings,
       dispatch: (action: Action) => {
         try {
           const newSession = transition(get().session, action);
@@ -28,11 +56,20 @@ export const useSessionStore = create<SessionStore>()(
           // Could dispatch to error state here
         }
       },
-      reset: () => set({ session: initialState })
+      reset: () => set({ session: initialSession }),
+      resetAll: () => set({ session: initialSession, userSettings: initialSettings }),
+      updateSettings: (newSettings: Partial<UserSettings>) => {
+        set((state) => ({
+          userSettings: { ...state.userSettings, ...newSettings }
+        }));
+      }
     }),
     {
       name: 'perday-session',
-      partialize: (state) => ({ session: state.session })
+      partialize: (state) => ({ 
+        userSettings: state.userSettings 
+        // Don't persist session state - always start fresh
+      })
     }
   )
 );

@@ -29,28 +29,22 @@ import { toast } from 'sonner';
 import { Settings } from 'lucide-react';
 
 export default function StartHero() {
-  const { session, dispatch } = useSessionStore();
+  const { session, dispatch, userSettings, updateSettings } = useSessionStore();
   const [error, setError] = useState<string | null>(null);
   const [note, setNote] = useState('');
   const [target, setTarget] = useState('');
-  const [duration, setDuration] = useState(25);
-  const [multiplier, setMultiplier] = useState(1.0);
+  const [duration, setDuration] = useState(userSettings.defaultDuration);
+  const [multiplier, setMultiplier] = useState(userSettings.defaultMultiplier);
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [allNighter, setAllNighter] = useState(false);
-  const [soundEnabled, setSoundEnabled] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(userSettings.soundEnabled);
   const [showVault, setShowVault] = useState(true); // Start with vault open
-  const [showQuestionnaire, setShowQuestionnaire] = useState(false);
-  const [userData, setUserData] = useState<{ name: string; collaborators: string } | null>(null);
-  const [volume, setVolume] = useState(0.7);
-  const [settings, setSettings] = useState({
-    defaultDuration: 25,
-    defaultMultiplier: 1.5,
-    autoStartTimer: true,
-    soundEnabled: true,
-    volume: 0.7,
-    notifications: true,
-    accountabilityEmail: '',
+  const [showQuestionnaire, setShowQuestionnaire] = useState(!userSettings.userName);
+  const [userData, setUserData] = useState<{ name: string; collaborators: string } | null>({
+    name: userSettings.userName,
+    collaborators: userSettings.collaborators
   });
+  const [volume, setVolume] = useState(userSettings.volume);
   
   const { mmss } = usePrestart();
   const { villainNudge } = useVillainAnnounce();
@@ -62,6 +56,13 @@ export default function StartHero() {
     setUserData(data);
     setShowQuestionnaire(false);
     setShowSettingsChoice(true);
+    
+    // Save user data to store
+    updateSettings({
+      userName: data.name,
+      collaborators: data.collaborators
+    });
+    
     toast.success(`Welcome back, ${data.name}! Let's make some music.`);
   };
   
@@ -73,7 +74,7 @@ export default function StartHero() {
     }, 500);
     
     // Trigger gear spinning animation
-    if (settings.defaultMultiplier !== 1.5) {
+    if (userSettings.defaultMultiplier !== 1.5) {
       toast.success('Using your default settings!');
     }
   };
@@ -85,7 +86,7 @@ export default function StartHero() {
   };
   
   const handleSettingsSave = (newSettings: any) => {
-    setSettings(newSettings);
+    updateSettings(newSettings);
     setVolume(newSettings.volume);
     toast.success('Settings saved successfully!');
   };
@@ -147,7 +148,15 @@ export default function StartHero() {
           
           {/* User Avatar & Settings */}
           <div className="absolute top-8 right-8 flex items-center gap-3">
-            <SettingsSheet onSave={handleSettingsSave} currentSettings={settings} />
+            <SettingsSheet 
+              onSave={handleSettingsSave} 
+              currentSettings={userSettings}
+              onResetAll={() => {
+                const { resetAll } = useSessionStore.getState();
+                resetAll();
+                toast.success('Everything reset! Starting fresh...');
+              }}
+            />
             <Avatar className="h-10 w-10 border-2 border-cyan-400/40">
               <AvatarImage src={userData ? `https://api.dicebear.com/7.x/avataaars/svg?seed=${userData.name}` : undefined} />
               <AvatarFallback className="bg-gradient-to-r from-magenta-500 to-cyan-400 text-synth-white font-bold">
@@ -173,10 +182,13 @@ export default function StartHero() {
           
           <div className="rounded-2xl bg-gradient-to-br from-magenta-900/20 via-cyan-900/20 to-purple-900/20 backdrop-blur-xl ring-1 ring-cyan-400/30 p-8 max-w-md w-full text-center shadow-2xl relative z-10">
             <div className="text-xl font-bold text-synth-white mb-2">
-              7-minute Pre-Start to get your mind right.
+              {userData?.name ? `Welcome back, ${userData.name}!` : '7-minute Pre-Start to get your mind right.'}
             </div>
             <div className="text-sm text-synth-amber/90 mb-6">
-              This is the EASY step. We'll start the timer for you if you don't do anything!
+              {userData?.name 
+                ? "Ready to make some more music today?"
+                : "This is the EASY step. We'll start the timer for you if you don't do anything!"
+              }
             </div>
             
             <div className={`text-8xl font-black tabular-nums mb-8 font-mono ${mmss === "00:00" ? "text-synth-amber animate-amberPulse" : "text-synth-white animate-breathe"}`}>
