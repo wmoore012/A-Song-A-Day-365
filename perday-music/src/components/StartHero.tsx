@@ -29,7 +29,7 @@ import { toast } from 'sonner';
 import { Settings } from 'lucide-react';
 
 export default function StartHero() {
-  const { session, dispatch, userSettings, updateSettings } = useSessionStore();
+  const { session, dispatch, userSettings, updateSettings, resetAll } = useSessionStore();
   const [error, setError] = useState<string | null>(null);
   const [note, setNote] = useState('');
   const [target, setTarget] = useState('');
@@ -152,7 +152,6 @@ export default function StartHero() {
               onSave={handleSettingsSave} 
               currentSettings={userSettings}
               onResetAll={() => {
-                const { resetAll } = useSessionStore.getState();
                 resetAll();
                 toast.success('Everything reset! Starting fresh...');
               }}

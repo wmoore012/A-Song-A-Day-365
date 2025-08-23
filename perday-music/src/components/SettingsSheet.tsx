@@ -205,11 +205,11 @@ export default function SettingsSheet({ onSave, currentSettings }: SettingsSheet
             </Button>
           </div>
           
-          {onResetAll && (
+          {typeof onResetAll === 'function' && (
             <Button 
               variant="outline" 
               onClick={onResetAll} 
-              className="w-full border-red-400/40 text-red-300 hover:bg-cyan-400/20"
+              className="w-full border-red-400/40 text-red-300 hover:bg-red-400/20"
             >
               🗑️ Reset Everything (Start Fresh)
             </Button>

@@ -37,8 +37,6 @@ export default function AudioControls({ onVolumeChange, currentVolume, enableStu
     }
   };
 
-  const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
-
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.volume = currentVolume;
@@ -133,21 +131,21 @@ export default function AudioControls({ onVolumeChange, currentVolume, enableStu
               <div className="space-y-3">
                 <h3 className="text-synth-white font-medium">Select Playlist</h3>
                 <div className="space-y-2">
-                  {playlist.map((track, index) => (
+                  {Object.entries(playlists).map(([id, playlist]) => (
                     <Button
-                      key={index}
-                      variant={currentTrackIndex === index ? "default" : "outline"}
+                      key={id}
+                      variant={currentPlaylist === id ? "default" : "outline"}
                       onClick={() => {
-                        setCurrentTrackIndex(index);
-                        setCurrentTrack(track);
+                        setCurrentPlaylist(id);
+                        setCurrentTrack(playlist.name);
                       }}
                       className={`w-full justify-start ${
-                        currentTrackIndex === index 
+                        currentPlaylist === id 
                           ? 'bg-gradient-to-r from-magenta-500 via-cyan-400 to-purple-600' 
                           : 'bg-black/40 border-cyan-400/40 text-cyan-300 hover:bg-cyan-400/20'
                       }`}
                     >
-                      {track}
+                      {playlist.name}
                     </Button>
                   ))}
                 </div>
