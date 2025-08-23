@@ -1,3 +1,5 @@
+
+
 import { useRef } from "react";
 import { useAppStore } from "./store/store";
 import PageVisibilityBadge from "./ui/PageVisibilityBadge";
@@ -5,6 +7,7 @@ import PrestartPanel from "./features/prestart/PrestartPanel";
 import AudioHud from "./features/sound/AudioHud";
 import { AnalyticsHud } from "./features/AnalyticsHud";
 import { PremiumSidebar } from "./components/PremiumSidebar";
+import NeonIsometricMaze from "./components/NeonIsometricMaze";
 
 // Fail loud: validate preconditions
 function must<T>(value: T | null | undefined, msg: string): T {
@@ -68,6 +71,11 @@ export default function App() {
             />
           </div>
         </div>
+      </div>
+      
+      {/* Neon Isometric Maze Footer */}
+      <div className="fixed bottom-0 left-0 w-full h-32 z-0">
+        <NeonIsometricMaze />
       </div>
     </div>
   );
