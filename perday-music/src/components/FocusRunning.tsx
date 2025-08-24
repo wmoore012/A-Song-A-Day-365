@@ -1,25 +1,23 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { useSessionStore } from '../state/store';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import { Pause, Square, Target, Clock, MessageSquare } from 'lucide-react';
-import { useSessionStore } from '../state/store';
-import { FlowState } from '../state/types';
+import { Clock, Target, MessageSquare, Pause, Square } from 'lucide-react';
 import MultiplierBar from './MultiplierBar';
-import { useStartupScript } from '../features/villain/useStartupScript';
 
 export default function FocusRunning() {
   const { session, dispatch } = useSessionStore();
-  const [timeRemaining, setTimeRemaining] = useState(session.durationMin! * 60);
+  const [timeRemaining, setTimeRemaining] = useState((session.durationMin || 25) * 60);
   const [isPaused, setIsPaused] = useState(false);
   const [note, setNote] = useState('');
-  const intervalRef = useRef<NodeJS.Timeout>();
-  const { reduceVillainMessages } = useStartupScript();
+  const [notes, setNotes] = useState<string[]>([]);
+  const intervalRef = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     // Reduce villain messages when focus starts
-    reduceVillainMessages();
-  }, [reduceVillainMessages]);
+    // reduceVillainMessages(); // This line was removed as per the new_code
+  }, []); // Removed reduceVillainMessages from dependency array
 
   useEffect(() => {
     if (!isPaused && timeRemaining > 0) {
@@ -113,9 +111,7 @@ export default function FocusRunning() {
         {/* Multiplier Bar */}
         <div className="mb-8">
           <MultiplierBar 
-            currentMultiplier={1.5}
-            maxMultiplier={2.0}
-            isActive={true}
+            multiplier={1.5}
           />
         </div>
 

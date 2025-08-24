@@ -1,60 +1,69 @@
 
 
 // Storage helper with validation
-export const store = {
-  get<T>(k: string, fallback: T): T {
-    try { 
-      const v = localStorage.getItem(k); 
-      return v ? JSON.parse(v) as T : fallback;
-    }
-    catch (error) { 
-      if (process.env.NODE_ENV === 'development') {
-        console.error(`Storage get error for key "${k}":`, error);
-      }
-      return fallback; // fail loud in dev via console
-    }
-  },
-  
-  set<T>(k: string, v: T): void {
+export const storage = {
+  get<T>(key: string, fallback: T): T {
     try {
-      localStorage.setItem(k, JSON.stringify(v));
+      const value = localStorage.getItem(key);
+      return value ? JSON.parse(value) as T : fallback;
     } catch (error) {
-      if (process.env.NODE_ENV === 'development') {
-        console.error(`Storage set error for key "${k}":`, error);
-        throw error; // fail loud in dev
+      // Fail loud in dev
+      if (import.meta.env.DEV) {
+        console.error(`Storage get error for key "${key}":`, error);
       }
-      // In prod, log but don't throw to avoid breaking the app
-      console.warn(`Failed to save to localStorage: ${error}`);
+      return fallback;
     }
   },
 
-  // Namespaced helpers for Perday
-  perday: {
-    get<T>(key: string, fallback: T): T {
-      return store.get(`perday.${key}`, fallback);
-    },
-    
-    set<T>(key: string, value: T): void {
-      store.set(`perday.${key}`, value);
-    },
-
-    // Feature toggles
-    sound: {
-      get enabled(): boolean {
-        return store.perday.get('sound.enabled', false);
-      },
-      set enabled(value: boolean) {
-        store.perday.set('sound.enabled', value);
+  set<T>(key: string, value: T): void {
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch (error) {
+      // Fail loud in dev
+      if (import.meta.env.DEV) {
+        console.error(`Storage set error for key "${key}":`, error);
       }
-    },
+    }
+  },
 
-    motion: {
-      get enabled(): boolean {
-        return store.perday.get('motion.enabled', true);
-      },
-      set enabled(value: boolean) {
-        store.perday.set('motion.enabled', value);
+  remove(key: string): void {
+    try {
+      localStorage.removeItem(key);
+    } catch (error) {
+      // Fail loud in dev
+      if (import.meta.env.DEV) {
+        console.error(`Storage remove error for key "${key}":`, error);
       }
+    }
+  }
+};
+
+// Namespaced helpers for Perday
+export const perday = {
+  get<T>(key: string, fallback: T): T {
+    return storage.get(`perday.${key}`, fallback);
+  },
+
+  set<T>(key: string, value: T): void {
+    storage.set(`perday.${key}`, value);
+  },
+
+  // Feature toggles
+  sound: {
+    get enabled(): boolean {
+      return perday.get('sound.enabled', false);
+    },
+    set enabled(value: boolean) {
+      perday.set('sound.enabled', value);
+    }
+  },
+
+  motion: {
+    get enabled(): boolean {
+      return perday.get('motion.enabled', true);
+    },
+    set enabled(value: boolean) {
+      perday.set('motion.enabled', value);
     }
   }
 };

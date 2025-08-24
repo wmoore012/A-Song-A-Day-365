@@ -16,9 +16,29 @@ const STARTUP_SCRIPT: StartupMessage[] = [
   { id: 'villain-watching', text: 'I\'ll be watching... don\'t disappoint me.', delay: 25000 },
 ];
 
+// Continuous quippy messages for ongoing monitoring
+const CONTINUOUS_MESSAGES = [
+  "Focus on your work, or DON'T! 😂 More placements for me ✅",
+  "I see you scrolling... 👀",
+  "That beat better be fire 🔥",
+  "Time is money, producer 💰",
+  "Still here... still watching 👁️",
+  "Make it count or make it again 🔄",
+  "Your multiplier is getting lonely 😈",
+  "Tick tock... ⏰",
+  "I believe in you... sort of 🤷‍♂️",
+  "This better be worth my time 😏",
+  "Channel that energy into music 🎵",
+  "Less talk, more action 💪",
+  "Your future self will thank me 😌",
+  "Pressure makes diamonds 💎",
+  "Or pressure makes you quit 😅",
+];
+
 export function useStartupScript(userName: string = 'Producer') {
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
+  const [continuousInterval, setContinuousInterval] = useState<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     if (isComplete) return;
@@ -43,14 +63,42 @@ export function useStartupScript(userName: string = 'Producer') {
     return () => clearTimeout(timer);
   }, [currentMessageIndex, isComplete, userName]);
 
+  // Start continuous quippy messages after startup script
+  useEffect(() => {
+    if (isComplete && !continuousInterval) {
+      const interval = setInterval(() => {
+        const randomMessage = CONTINUOUS_MESSAGES[Math.floor(Math.random() * CONTINUOUS_MESSAGES.length)];
+        _fxEmit('villain-nudge', { msg: randomMessage });
+      }, 90000); // 1min 30sec = 90 seconds
+
+      setContinuousInterval(interval);
+    }
+
+    return () => {
+      if (continuousInterval) {
+        clearInterval(continuousInterval);
+      }
+    };
+  }, [isComplete, continuousInterval]);
+
   const restartScript = () => {
     setCurrentMessageIndex(0);
     setIsComplete(false);
+    // Clear continuous interval when restarting
+    if (continuousInterval) {
+      clearInterval(continuousInterval);
+      setContinuousInterval(null);
+    }
   };
 
   // Function to reduce villain messages during active work
   const reduceVillainMessages = () => {
     setIsComplete(true);
+    // Clear continuous messages during focus
+    if (continuousInterval) {
+      clearInterval(continuousInterval);
+      setContinuousInterval(null);
+    }
     // Set a quiet period message
     setTimeout(() => {
       _fxEmit('villain-nudge', { msg: 'Focus on your work. I\'ll be quiet for a while...' });

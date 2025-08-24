@@ -201,9 +201,7 @@ export default function StartHero() {
             {/* Multiplier Bar */}
             <div className="mb-6">
               <MultiplierBar 
-                currentMultiplier={multiplier}
-                maxMultiplier={2.0}
-                isActive={session.readyPressed}
+                multiplier={multiplier}
               />
             </div>
             

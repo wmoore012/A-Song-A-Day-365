@@ -1,7 +1,10 @@
-import { Button } from './ui/button';
-import { ArrowLeft, Music, Target, Clock, Zap } from 'lucide-react';
+import { useState } from 'react';
 import { useSessionStore } from '../state/store';
-import { FlowState } from '../state/types';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
+import { Target, Clock, MessageSquare, ArrowLeft, ArrowRight, Play, Music, Zap } from 'lucide-react';
+import MultiplierBar from './MultiplierBar';
 
 export default function LockInMenu() {
   const { session, dispatch } = useSessionStore();

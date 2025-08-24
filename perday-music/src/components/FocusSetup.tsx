@@ -1,10 +1,10 @@
 import { useState } from 'react';
+import { useSessionStore } from '../state/store';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import { ArrowLeft, Target, Clock, Play, ArrowRight } from 'lucide-react';
-import { useSessionStore } from '../state/store';
-import { FlowState } from '../state/types';
+import { Target, Clock, MessageSquare, ArrowLeft, ArrowRight, Play } from 'lucide-react';
+import MultiplierBar from './MultiplierBar';
 
 export default function FocusSetup() {
   const { session, dispatch } = useSessionStore();

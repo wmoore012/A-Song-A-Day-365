@@ -1,6 +1,155 @@
-@import "tailwindcss";
-@import "tw-animate-css";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
+/* Custom CSS Variables */
+:root {
+  --synth-white: #ffffff;
+  --synth-icy: #b3e5fc;
+  --synth-aqua: #00bcd4;
+  --synth-amber: #ffb74d;
+  --synth-amberLight: #ffcc80;
+  --synth-magenta: #e91e63;
+  --synth-violet: #9c27b0;
+}
+
+/* Enhanced Animations */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes amberGlow {
+  0%, 100% {
+    text-shadow: 0 0 5px rgba(255, 183, 77, 0.5);
+  }
+  50% {
+    text-shadow: 0 0 20px rgba(255, 183, 77, 1), 0 0 30px rgba(255, 183, 77, 0.8);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes breathe {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes amberPulse {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(255, 183, 77, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 183, 77, 0.8), 0 0 30px rgba(255, 183, 77, 0.4);
+  }
+}
+
+/* Neon Typewriter Effects */
+.neon-type {
+  text-shadow: 
+    0 0 5px currentColor,
+    0 0 10px currentColor,
+    0 0 15px currentColor,
+    0 0 20px currentColor;
+}
+
+.neon-caret {
+  animation: blink 1s infinite;
+  color: #00ffff;
+  text-shadow: 
+    0 0 5px #00ffff,
+    0 0 10px #00ffff,
+    0 0 15px #00ffff;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+/* Enhanced Component Classes */
+.animate-slideInRight {
+  animation: slideInRight 0.5s ease-out;
+}
+
+.animate-amberGlow {
+  animation: amberGlow 2s ease-in-out infinite;
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-breathe {
+  animation: breathe 3s ease-in-out infinite;
+}
+
+.animate-amberPulse {
+  animation: amberPulse 2s ease-in-out infinite;
+}
+
+/* Color Pops and Trails */
+.color-trail {
+  position: relative;
+}
+
+.color-trail::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, transparent, rgba(34, 211, 238, 0.3), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.color-trail:hover::after {
+  opacity: 1;
+}
+
+/* Lazer Smokey Light Trails */
+.lazer-trail {
+  position: relative;
+  overflow: hidden;
+}
+
+.lazer-trail::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(34, 211, 238, 0.6), transparent);
+  animation: lazerSweep 2s ease-in-out infinite;
+}
+
+@keyframes lazerSweep {
+  0% { left: -100%; }
+  50% { left: 100%; }
+  100% { left: 100%; }
+}
+
+/* Restore original CSS structure */
 @custom-variant dark (&:is(.dark *));
 
 :root {

@@ -1,12 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 import { _fxSubscribe } from '../features/fx/useVillainAnnounce';
 import { gsap } from 'gsap';
+import { typeInto } from '../features/villain/typewriter';
+import FlipClock from '../features/villain/flipClock';
 
 interface VillainMessage {
   id: string;
   text: string;
   type: 'success' | 'error' | 'info' | 'villain-nudge';
   timestamp: number;
+  isTyping?: boolean;
 }
 
 export default function VillainDisplay() {
@@ -14,25 +17,27 @@ export default function VillainDisplay() {
   const [devilHeads, setDevilHeads] = useState<Array<{ id: string; x: number; y: number }>>([]);
   const devilLayerRef = useRef<HTMLDivElement>(null);
   const messageContainerRef = useRef<HTMLDivElement>(null);
+  const messageRefs = useRef<Map<string, HTMLDivElement>>(new Map());
 
   useEffect(() => {
-          // Subscribe to villain events
-      const unsubscribe = _fxSubscribe((type: string, data: any) => {
-        if (type === 'villain-nudge' || type === 'announce' || type === 'toast') {
-          const newMessage: VillainMessage = {
-            id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-            text: data.msg || data.text || 'Villain speaks!',
-            type: type === 'villain-nudge' ? 'villain-nudge' : 
-                  type === 'toast' ? (data.type || 'info') : 'info',
-            timestamp: Date.now()
-          };
+    // Subscribe to villain events
+    const unsubscribe = _fxSubscribe((type: string, data: any) => {
+      if (type === 'villain-nudge' || type === 'announce' || type === 'toast') {
+        const newMessage: VillainMessage = {
+          id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          text: data.msg || data.text || 'Villain speaks!',
+          type: type === 'villain-nudge' ? 'villain-nudge' : 
+                type === 'toast' ? (data.type || 'info') : 'info',
+          timestamp: Date.now(),
+          isTyping: type === 'villain-nudge' // Only typewriter for villain messages
+        };
 
-          setMessages(prev => [...prev.slice(-4), newMessage]);
+        setMessages(prev => [...prev.slice(-4), newMessage]);
 
-        // Auto-remove message after 5 seconds
+        // Auto-remove message after 8 seconds (longer for typewriter)
         setTimeout(() => {
           setMessages(prev => prev.filter(m => m.id !== newMessage.id));
-        }, 5000);
+        }, type === 'villain-nudge' ? 8000 : 5000);
 
         // Spawn devil heads for villain-nudge messages
         if (type === 'villain-nudge') {
@@ -46,6 +51,28 @@ export default function VillainDisplay() {
     };
   }, []);
 
+  // Handle typewriter effect after message is added to DOM
+  useEffect(() => {
+    messages.forEach(message => {
+      if (message.isTyping && messageRefs.current.has(message.id)) {
+        const messageEl = messageRefs.current.get(message.id);
+        if (messageEl) {
+          const textEl = messageEl.querySelector('.message-text');
+          if (textEl) {
+            // Clear the text and start typewriter
+            textEl.textContent = '';
+            typeInto(textEl as HTMLElement, message.text, {
+              speedMs: 35, // Slightly faster than legacy
+              jitterMs: 8, // More human-like jitter
+              caret: true,
+              neon: true
+            });
+          }
+        }
+      }
+    });
+  }, [messages]);
+
   const spawnDevilHeads = () => {
     const newDevilHeads = Array.from({ length: 5 }, (_, i) => ({
       id: `devil-${Date.now()}-${i}`,
@@ -55,12 +82,13 @@ export default function VillainDisplay() {
 
     setDevilHeads(prev => [...prev, ...newDevilHeads]);
 
-    // Animate devil heads falling
+    // Animate devil heads falling with enhanced effects
     newDevilHeads.forEach((devil, index) => {
       gsap.to(`#${devil.id}`, {
         y: window.innerHeight + 100,
         x: devil.x + (Math.random() - 0.5) * 200,
         rotation: Math.random() * 360,
+        scale: 0.5 + Math.random() * 0.5,
         duration: 3 + Math.random() * 2,
         delay: index * 0.1,
         ease: "power1.out",
@@ -74,13 +102,13 @@ export default function VillainDisplay() {
   const getMessageStyle = (type: string) => {
     switch (type) {
       case 'villain-nudge':
-        return 'bg-gradient-to-r from-synth-amber/90 to-synth-amberLight/90 text-synth-white border-synth-amber/50';
+        return 'bg-gradient-to-r from-synth-amber/90 to-synth-amberLight/90 text-synth-white border-synth-amber/50 shadow-lg shadow-synth-amber/20';
       case 'success':
-        return 'bg-gradient-to-r from-synth-aqua/90 to-synth-icy/90 text-synth-white border-synth-aqua/50';
+        return 'bg-gradient-to-r from-synth-aqua/90 to-synth-icy/90 text-synth-white border-synth-aqua/50 shadow-lg shadow-synth-aqua/20';
       case 'error':
-        return 'bg-gradient-to-r from-synth-magenta/90 to-synth-violet/90 text-synth-white border-synth-magenta/50';
+        return 'bg-gradient-to-r from-synth-magenta/90 to-synth-violet/90 text-synth-white border-synth-magenta/50 shadow-lg shadow-synth-magenta/20';
       default:
-        return 'bg-gradient-to-r from-synth-violet/90 to-synth-magenta/90 text-synth-white border-synth-violet/50';
+        return 'bg-gradient-to-r from-synth-violet/90 to-synth-magenta/90 text-synth-white border-synth-violet/50 shadow-lg shadow-synth-violet/20';
     }
   };
 
@@ -111,7 +139,10 @@ export default function VillainDisplay() {
         {messages.map(message => (
           <div
             key={message.id}
-            className={`p-4 rounded-lg border-2 shadow-lg backdrop-blur-sm transform transition-all duration-300 animate-slideInRight ${getMessageStyle(message.type)}`}
+            ref={(el) => {
+              if (el) messageRefs.current.set(message.id, el);
+            }}
+            className={`p-4 rounded-lg border-2 backdrop-blur-sm transform transition-all duration-300 animate-slideInRight ${getMessageStyle(message.type)}`}
           >
             <div className="flex items-center gap-2">
               <span className="text-lg">
@@ -119,13 +150,24 @@ export default function VillainDisplay() {
                  message.type === 'success' ? '✅' : 
                  message.type === 'error' ? '❌' : '💬'}
               </span>
-              <span className="font-medium text-sm">{message.text}</span>
+              <span className="font-medium text-sm message-text">
+                {!message.isTyping ? message.text : ''}
+              </span>
             </div>
           </div>
         ))}
       </div>
 
-
+      {/* Special Flip Clock Effect for Important Messages */}
+      {messages.some(m => m.type === 'villain-nudge' && m.isTyping) && (
+        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-60">
+          <FlipClock 
+            text="WATCHING" 
+            className="text-2xl"
+            onComplete={() => console.log('Flip clock complete')}
+          />
+        </div>
+      )}
     </>
   );
 }

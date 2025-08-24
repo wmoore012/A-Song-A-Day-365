@@ -1,20 +1,15 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Switch } from './ui/switch';
 import { Slider } from './ui/slider';
-import { 
-  Sheet, 
-  SheetContent, 
-  SheetDescription, 
-  SheetHeader, 
-  SheetTitle, 
-  SheetTrigger 
-} from './ui/sheet';
-import { Settings, Volume2, Clock, Target, Bell } from 'lucide-react';
-import { gsap } from 'gsap';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from './ui/sheet';
+import { Settings, Volume2, Music, Zap, Target, Clock, RotateCcw, Bell } from 'lucide-react';
+import { useSessionStore } from '../state/store';
+import { toast } from 'sonner';
 
 interface SettingsData {
   defaultDuration: number;
@@ -32,7 +27,7 @@ interface SettingsSheetProps {
   onResetAll?: () => void;
 }
 
-export default function SettingsSheet({ onSave, currentSettings }: SettingsSheetProps) {
+export default function SettingsSheet({ onSave, currentSettings, onResetAll }: SettingsSheetProps) {
   const [settings, setSettings] = useState<SettingsData>(currentSettings);
   const [isOpen, setIsOpen] = useState(false);
   const gearRef = useRef<HTMLDivElement>(null);
@@ -44,15 +39,15 @@ export default function SettingsSheet({ onSave, currentSettings }: SettingsSheet
     const randomSpins = Math.floor(Math.random() * 4) + 4; // 4-7 spins
     const totalRotation = randomSpins * 360;
     
-    gsap.to(gearRef.current, {
-      rotation: totalRotation,
-      duration: 2,
-      ease: "power2.out",
-      onComplete: () => {
-        // Reset to 0 for next animation
-        gsap.set(gearRef.current, { rotation: 0 });
-      }
-    });
+    // gsap.to(gearRef.current, {
+    //   rotation: totalRotation,
+    //   duration: 2,
+    //   ease: "power2.out",
+    //   onComplete: () => {
+    //     // Reset to 0 for next animation
+    //     gsap.set(gearRef.current, { rotation: 0 });
+    //   }
+    // });
   };
 
   const handleSave = () => {
