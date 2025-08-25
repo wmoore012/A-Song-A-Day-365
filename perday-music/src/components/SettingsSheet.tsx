@@ -6,7 +6,7 @@ import { Switch } from './ui/switch';
 import { Slider } from './ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from './ui/sheet';
-import { Settings, Volume2, Target, Clock, Bell } from 'lucide-react';
+import { Settings, Volume2, Target, Clock, Bell, Sparkles, Trash2 } from 'lucide-react';
 import { useAppStore } from '../store/store';
 
 interface SettingsData {
@@ -19,6 +19,7 @@ interface SettingsData {
   accountabilityEmail: string;
   userName?: string;
   collaborators?: string;
+  celebration: 'confetti' | 'fireworks' | 'none';
 }
 
 interface SettingsSheetProps {
@@ -61,7 +62,8 @@ export default function SettingsSheet({ onSave, currentSettings, onResetAll }: S
       notifications: true,
       accountabilityEmail: '',
       userName: '',
-      collaborators: ''
+      collaborators: '',
+      celebration: 'confetti'
     };
     setLocalSettings(defaults);
     
@@ -151,15 +153,33 @@ export default function SettingsSheet({ onSave, currentSettings, onResetAll }: S
               <Bell className="h-4 w-4" />
               Accountability Email
             </Label>
-            <Input
-              value={settings.accountabilityEmail}
-              onChange={(e) => setLocalSettings(prev => ({ ...prev, accountabilityEmail: e.target.value }))}
-              placeholder="your@email.com"
-              className="bg-black/40 border-cyan-400/40 text-synth-white placeholder:text-synth-icy/50"
-            />
-            <p className="text-xs text-synth-icy/70">
-              Get notified about your progress and achievements
-            </p>
+          <Input
+            value={settings.accountabilityEmail}
+            onChange={(e) => setLocalSettings(prev => ({ ...prev, accountabilityEmail: e.target.value }))}
+            placeholder="your@email.com"
+            className="bg-black/40 border-cyan-400/40 text-synth-white placeholder:text-synth-icy/50"
+          />
+          <p className="text-xs text-synth-icy/70">
+            Get notified about your progress and achievements
+          </p>
+        </div>
+
+          {/* Celebration Style */}
+          <div className="space-y-3">
+            <Label className="text-synth-white flex items-center gap-2">
+              <Sparkles className="h-4 w-4" />
+              Celebration
+            </Label>
+            <Select value={settings.celebration} onValueChange={(value) => setLocalSettings(prev => ({ ...prev, celebration: value as SettingsData['celebration'] }))}>
+              <SelectTrigger className="bg-black/40 border-cyan-400/40 text-synth-white">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-black/90 border-cyan-400/40">
+                <SelectItem value="confetti">Confetti</SelectItem>
+                <SelectItem value="fireworks">Fireworks</SelectItem>
+                <SelectItem value="none">None</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Switches */}
@@ -199,12 +219,12 @@ export default function SettingsSheet({ onSave, currentSettings, onResetAll }: S
           </div>
           
           {typeof onResetAll === 'function' && (
-            <Button 
-              variant="outline" 
-              onClick={onResetAll} 
-              className="w-full border-red-400/40 text-red-300 hover:bg-red-400/20"
+            <Button
+              variant="outline"
+              onClick={onResetAll}
+              className="w-full border-red-400/40 text-red-300 hover:bg-red-400/20 flex items-center justify-center gap-2"
             >
-              🗑️ Reset Everything (Start Fresh)
+              <Trash2 className="w-4 h-4" /> Reset Everything (Start Fresh)
             </Button>
           )}
         </div>

@@ -11,9 +11,7 @@ import { toast } from "sonner";
 
 export default function SocialDock() {
   const { session } = useAppStore();
-  const [openCamps, setOpenCamps] = useState(false);
-  const [openVideo, setOpenVideo] = useState(false);
-  const [showVillainChat, setShowVillainChat] = useState(false);
+  const [panel, setPanel] = useState<"video" | "camps" | "villain" | null>(null);
 
   const guard = (fn: () => void) => {
     if (!canUseSocial(session.state)) {
@@ -28,7 +26,7 @@ export default function SocialDock() {
       <div className="fixed right-6 bottom-6 z-[2000] flex gap-3">
         {/* Villain Chat */}
         <button
-          onClick={() => guard(() => setShowVillainChat(!showVillainChat))}
+          onClick={() => guard(() => setPanel(panel === "villain" ? null : "villain"))}
           className="px-4 py-3 rounded-xl bg-white/10 border border-white/15 text-white hover:bg-white/15 transition"
           aria-label="Villain Chat"
           title="Chat with the villain (unlocks on breaks / after stack)"
@@ -38,7 +36,7 @@ export default function SocialDock() {
 
         {/* Video (Whereby/Jitsi inside a Sheet) */}
         <button
-          onClick={() => guard(() => setOpenVideo(true))}
+          onClick={() => guard(() => setPanel("video"))}
           className="px-4 py-3 rounded-xl bg-white/10 border border-white/15 text-white hover:bg-white/15 transition"
           aria-label="Open Video"
           title="Video (unlocks on breaks / after stack)"
@@ -48,7 +46,7 @@ export default function SocialDock() {
 
         {/* Camps (Eventbrite / Cal.com / Focusmate) */}
         <button
-          onClick={() => guard(() => setOpenCamps(true))}
+          onClick={() => guard(() => setPanel("camps"))}
           className="px-4 py-3 rounded-xl bg-white/10 border border-white/15 text-white hover:bg-white/15 transition"
           aria-label="Camps"
           title="Camps (scheduling & signups)"
@@ -57,11 +55,11 @@ export default function SocialDock() {
         </button>
       </div>
 
-      <VideoSheet open={openVideo} onOpenChange={setOpenVideo} />
+      <VideoSheet open={panel === "video"} onOpenChange={(v) => setPanel(v ? "video" : null)} />
 
-      <CampsSheet open={openCamps} onOpenChange={setOpenCamps} />
+      <CampsSheet open={panel === "camps"} onOpenChange={(v) => setPanel(v ? "camps" : null)} />
 
-      {showVillainChat && <VillainChat />}
+      {panel === "villain" && <VillainChat />}
     </>
   );
 }

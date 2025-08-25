@@ -61,7 +61,7 @@ export default function Notepad() {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 left-6 z-50 px-4 py-3 rounded-xl bg-white/10 border border-white/15 text-white hover:bg-white/15 transition"
+        className="fixed bottom-6 left-6 z-50 px-4 py-3 rounded-xl bg-white/10 border border-white/15 text-white hover:bg-white/15 transition shadow-[0_0_12px_rgba(0,255,255,0.6)] hover:shadow-[0_0_24px_rgba(0,255,255,0.9)]"
         title="Open Notepad"
       >
         <FileText className="w-5 h-5" />
@@ -70,7 +70,7 @@ export default function Notepad() {
   }
 
   return (
-    <div className="fixed bottom-6 left-6 z-50 w-80 h-96 bg-black/90 border border-cyan-400/50 rounded-xl shadow-lg shadow-cyan-400/30">
+    <div className="fixed bottom-6 left-6 z-50 w-80 max-h-[24rem] bg-black/90 border border-cyan-400/50 rounded-xl shadow-lg shadow-cyan-400/30 flex flex-col">
       <div className="flex items-center justify-between p-4 border-b border-cyan-400/30">
         <div className="flex items-center gap-2">
           <FileText className="w-5 h-5 text-cyan-300" />
@@ -84,7 +84,7 @@ export default function Notepad() {
         </button>
       </div>
 
-      <div className="p-4 h-64 overflow-y-auto space-y-3">
+      <div className="p-4 flex-1 overflow-y-auto space-y-3">
         {notes.length === 0 ? (
           <p className="text-white/40 text-sm text-center mt-8">
             No notes yet. Start writing your ideas!

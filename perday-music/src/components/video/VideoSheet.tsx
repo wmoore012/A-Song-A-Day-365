@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "../ui/sheet";
+import {
+  DockSheet,
+  DockSheetContent,
+  DockSheetDescription,
+  DockSheetHeader,
+  DockSheetTitle,
+} from "../ui/dock-sheet";
 
 import { ExternalLink } from "lucide-react";
 
@@ -50,14 +56,14 @@ export default function VideoSheet({ open, onOpenChange }: Props) {
   const wherebyRoom = `https://whereby.com/${roomName}?embed`; // NOTE: whitelist your domain in Whereby Embedded.
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="bg-black/95 border-cyan-400/30 text-white w-[720px]">
-        <SheetHeader>
-          <SheetTitle className="text-cyan-300">Video Rooms</SheetTitle>
-          <SheetDescription className="text-white/60">
+    <DockSheet open={open} onOpenChange={onOpenChange}>
+      <DockSheetContent className="bg-black/95 border-cyan-400/30 text-white w-[720px]">
+        <DockSheetHeader>
+          <DockSheetTitle className="text-cyan-300">Video Rooms</DockSheetTitle>
+          <DockSheetDescription className="text-white/60">
             Video unlocks on breaks or after you stack—keep the cookup sacred.
-          </SheetDescription>
-        </SheetHeader>
+          </DockSheetDescription>
+        </DockSheetHeader>
 
         <div className="mt-6 space-y-4">
           {/* Provider toggle */}
@@ -113,7 +119,7 @@ export default function VideoSheet({ open, onOpenChange }: Props) {
             </div>
           )}
         </div>
-      </SheetContent>
-    </Sheet>
+      </DockSheetContent>
+    </DockSheet>
   );
 }

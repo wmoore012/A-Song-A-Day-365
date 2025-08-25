@@ -3,17 +3,19 @@ import { useAppStore } from '../store/store';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from './ui/sheet';
-import { 
-  Play, 
-  Target, 
-  Clock, 
-  Trophy, 
-  TrendingUp, 
+import InviteCollaboratorSheet from './InviteCollaboratorSheet';
+import {
+  Play,
+  Target,
+  Clock,
+  Trophy,
+  TrendingUp,
   Music,
   Settings,
   Plus,
   BarChart3,
   Users,
+  UserPlus,
   Zap
 } from 'lucide-react';
 
@@ -22,6 +24,7 @@ export default function Dashboard() {
   const [showCommunity, setShowCommunity] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showInvite, setShowInvite] = useState(false);
 
   // Mock data for demonstration
   const stats = {
@@ -43,6 +46,7 @@ export default function Dashboard() {
   const quickActions = [
     { title: "Start Focus Session", icon: Play, action: () => dispatch({ type: "START_QUESTIONNAIRE" }) },
     { title: "View Analytics", icon: BarChart3, action: () => setShowAnalytics(true) },
+    { title: "Invite Collaborator", icon: UserPlus, action: () => setShowInvite(true) },
     { title: "Community", icon: Users, action: () => setShowCommunity(true) },
     { title: "Settings", icon: Settings, action: () => setShowSettings(true) }
   ];
@@ -325,6 +329,9 @@ export default function Dashboard() {
           </div>
         </SheetContent>
       </Sheet>
+
+      {/* Invite Collaborator Sheet */}
+      <InviteCollaboratorSheet open={showInvite} onOpenChange={setShowInvite} />
     </div>
   );
 }
