@@ -126,9 +126,9 @@ $RECYCLE.BIN/
 # Package manager files
 yarn.lock
 pnpm-lock.yaml
-package-lock.json
 
-# Testing
+package-lock.json
+!perday-music/package-lock.json# Testing
 coverage/
 .nyc_output/
 *.lcov
