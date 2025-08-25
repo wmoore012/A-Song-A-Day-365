@@ -1,53 +1,51 @@
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { gsap } from 'gsap';
+import { useGSAP } from '@gsap/react';
+
+gsap.registerPlugin(useGSAP);
 
 export default function AtomOrbit() {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const root = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
+  useGSAP(() => {
+    if (!root.current) return;
 
-    const prefersReduce =
+    const reduceMotion =
       typeof window !== 'undefined' &&
-      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+      window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
 
-    const shouldAnimate =
-      import.meta?.env?.MODE !== 'test' && !prefersReduce;
+    if (import.meta?.env?.MODE === 'test' || reduceMotion) return;
 
-    if (!shouldAnimate) return;
+    const rings = root.current.querySelectorAll('.ring');
+    const dots = root.current.querySelectorAll('.dot');
 
     const ctx = gsap.context(() => {
-      const rings = el.querySelectorAll('.ring');
-      const dots = el.querySelectorAll('.dot');
-
       rings.forEach((ring, i) => {
-        gsap.to(ring, {
-          rotation: 360,
-          duration: 8 + i * 2,
-          repeat: -1,
-          ease: 'none',
-          transformOrigin: 'center center',
+        gsap.to(ring, { 
+          rotation: 360, 
+          duration: 8 + i * 2, 
+          repeat: -1, 
+          ease: 'none', 
+          transformOrigin: '50% 50%' 
         });
       });
-
       dots.forEach((dot, i) => {
-        gsap.to(dot, {
-          rotation: 360,
-          duration: 12 + i * 3,
-          repeat: -1,
-          ease: 'none',
-          transformOrigin: 'center center',
+        gsap.to(dot, { 
+          rotation: 360, 
+          duration: 12 + i * 3, 
+          repeat: -1, 
+          ease: 'none', 
+          transformOrigin: '50% 50%' 
         });
       });
-    }, containerRef);
+    }, root);
 
     return () => ctx.revert();
   }, []);
 
   return (
     <div
-      ref={containerRef}
+      ref={root}
       className="relative w-80 h-80 pointer-events-none"
       aria-hidden
     >

@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { _fxSubscribe } from '../hooks/useVillainAnnounce';
 import { gsap } from 'gsap';
 import { typeInto } from '../utils/typewriter';
-import FlipClock from '../hooks/flipClock';
 
 interface VillainMessage {
   id: string;
@@ -159,19 +158,7 @@ export default function VillainDisplay() {
         ))}
       </div>
 
-      {/* Special Flip Clock Effect for Important Messages */}
-      {messages.some(m => m.type === 'villain-nudge' && m.isTyping) && (
-        <div
-          data-testid="flip-clock"
-          className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-60"
-        >
-          <FlipClock
-            text="WATCHING"
-            className="text-2xl"
-            onComplete={() => console.log('Flip clock complete')}
-          />
-        </div>
-      )}
+
     </>
   );
 }

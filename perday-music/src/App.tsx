@@ -1,7 +1,7 @@
 
 import { useAppStore } from "./store/store";
 import { FlowState } from "./types";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import DashboardLayout from "./components/DashboardLayout";
 import ShaderBackground from "./components/ShaderBackground";
 import VaultTransition from "./components/VaultTransition";
@@ -18,6 +18,8 @@ import { AnalyticsHud } from "./components/common/AnalyticsHud";
 import AudioHud from "./components/common/AudioHud";
 import { usePrestart } from "./hooks/usePrestart";
 import { useStartupScript } from "./hooks/useStartupScript";
+import { _fxEmit } from "./hooks/useVillainAnnounce";
+import { playlists } from "./config/playlists";
 
 export default function App() {
   const { session, _hydrated, dispatch, settings } = useAppStore();
@@ -152,9 +154,30 @@ export default function App() {
 
 // Welcome Screen Component
 function WelcomeScreen({ onEnter }: { onEnter: () => void }) {
-  const { dispatch } = useAppStore();
+  const { dispatch, settings } = useAppStore();
+  const [soundEnabled, setSoundEnabled] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+
+  const handleEnableSound = () => {
+    setSoundEnabled(true);
+    // Trigger villain message about sound being enabled
+    _fxEmit('villain-nudge', { msg: "Sound enabled! Now let's get you producing..." });
+  };
+
   return (
-    <div className="text-center space-y-8 max-w-2xl">
+    <div className="text-center space-y-8 max-w-2xl relative">
+      {/* Settings Gear - Top Right */}
+      <button
+        onClick={() => setShowSettings(!showSettings)}
+        className="absolute top-0 right-0 p-3 text-cyan-400 hover:text-cyan-300 transition-colors"
+        aria-label="Settings"
+      >
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+      </button>
+
       <div className="space-y-4">
         <h1 className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400">
           Perday Music 365
@@ -168,32 +191,95 @@ function WelcomeScreen({ onEnter }: { onEnter: () => void }) {
         </p>
       </div>
 
-      <div className="space-y-4">
-        <button
-          onClick={onEnter}
-          className="px-8 py-4 bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-white font-bold text-lg rounded-xl shadow-2xl hover:shadow-cyan-500/25 transition-all duration-300 transform hover:scale-105"
-        >
-          Enter Your Studio
-        </button>
+      <div className="space-y-6">
+        {/* Sound Enable Section */}
+        {!soundEnabled ? (
+          <div className="space-y-4">
+            <div className="p-6 bg-black/20 backdrop-blur-sm border border-cyan-400/30 rounded-xl">
+              <h3 className="text-lg font-semibold text-cyan-300 mb-2">Enable Sound</h3>
+              <p className="text-white/70 mb-4">
+                Get the full experience with background music and audio feedback
+              </p>
+              <button
+                onClick={handleEnableSound}
+                className="px-8 py-4 bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-white font-bold text-lg rounded-xl shadow-2xl hover:shadow-cyan-500/25 transition-all duration-300 transform hover:scale-105"
+              >
+                🎵 Enable Sound
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="p-4 bg-green-500/20 backdrop-blur-sm border border-green-400/30 rounded-xl">
+              <p className="text-green-300 font-medium">✅ Sound Enabled</p>
+              <p className="text-white/70 text-sm">Background music and audio feedback active</p>
+            </div>
+            
+            <button
+              onClick={onEnter}
+              className="px-8 py-4 bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-white font-bold text-lg rounded-xl shadow-2xl hover:shadow-cyan-500/25 transition-all duration-300 transform hover:scale-105"
+            >
+              Enter Your Studio
+            </button>
+          </div>
+        )}
 
-        <button
-          onClick={() => dispatch({ type: "SCROLL_DEMO" })}
-          className="px-6 py-3 border-2 border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-black font-semibold text-base rounded-lg transition-all duration-300 hover:shadow-cyan-400/25"
-        >
-          View Scroll Demo
-        </button>
+        {/* Demo Buttons */}
+        <div className="space-y-3">
+          <button
+            onClick={() => dispatch({ type: "SCROLL_DEMO" })}
+            className="px-6 py-3 border-2 border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-black font-semibold text-base rounded-lg transition-all duration-300 hover:shadow-cyan-400/25"
+          >
+            View Scroll Demo
+          </button>
 
-        <button
-          onClick={() => dispatch({ type: "SHADER_DEMO" })}
-          className="px-6 py-3 border-2 border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-black font-semibold text-base rounded-lg transition-all duration-300 hover:shadow-purple-400/25"
-        >
-          View Shader Demo
-        </button>
+          <button
+            onClick={() => dispatch({ type: "SHADER_DEMO" })}
+            className="px-6 py-3 border-2 border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-black font-semibold text-base rounded-lg transition-all duration-300 hover:shadow-purple-400/25"
+          >
+            View Shader Demo
+          </button>
+        </div>
 
         <p className="text-sm text-white/40">
           Takes ~2 minutes to set up, then you're ready to produce
         </p>
       </div>
+
+      {/* Settings Panel */}
+      {showSettings && (
+        <div className="absolute top-16 right-0 w-80 bg-black/95 backdrop-blur-xl border border-cyan-400/30 rounded-xl p-6 z-50">
+          <h3 className="text-lg font-semibold text-cyan-300 mb-4">Settings</h3>
+          <div className="space-y-4">
+            <div>
+              <label className="text-white/80 text-sm">Default Playlist</label>
+              <select 
+                className="w-full mt-1 bg-black/50 border border-cyan-400/30 rounded px-3 py-2 text-white"
+                value={settings.defaultPlaylist || 'PLl-ShioB5kapLuMhLMqdyx_gKX_MBiXeb'}
+                onChange={(e) => dispatch({ type: 'UPDATE_SETTINGS', payload: { defaultPlaylist: e.target.value } })}
+              >
+                {Object.entries(playlists).map(([key, playlist]) => (
+                  <option key={key} value={playlist.id}>
+                    {playlist.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="text-white/80 text-sm">Default Volume</label>
+              <input 
+                type="range" 
+                min="0" 
+                max="100" 
+                value={Math.round((settings.volume || 0.7) * 100)}
+                onChange={(e) => dispatch({ type: 'UPDATE_SETTINGS', payload: { volume: parseInt(e.target.value) / 100 } })}
+                className="w-full mt-1"
+              />
+              <span className="text-white/60 text-xs">{Math.round((settings.volume || 0.7) * 100)}%</span>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

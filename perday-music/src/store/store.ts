@@ -1,20 +1,8 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import localforage from "localforage";
-import { Action, FlowState, Session } from "../types";
+import { Action, FlowState, Session, Settings } from "../types";
 import { transition } from "./transitions";
-
-type Settings = {
-  defaultDuration: number;
-  defaultMultiplier: number;
-  autoStartTimer: boolean;
-  soundEnabled: boolean;
-  volume: number;
-  notifications: boolean;
-  accountabilityEmail: string;
-  userName?: string;
-  collaborators?: string;
-};
 
 type AppState = {
   session: Session;
@@ -53,7 +41,8 @@ export const useAppStore = create<AppState>()(
         notifications: true, 
         accountabilityEmail: '',
         userName: '',
-        collaborators: ''
+        collaborators: '',
+        defaultPlaylist: 'PLl-ShioB5kapLuMhLMqdyx_gKX_MBiXeb'
       },
       grades: [],
       latencies: [],
@@ -67,7 +56,12 @@ export const useAppStore = create<AppState>()(
       readyAt: null,
       motionOk: true,
       
-      dispatch: (a) => set((s) => ({ session: transition(s.session, a) })),
+      dispatch: (a) => set((s) => {
+        if (a.type === "UPDATE_SETTINGS") {
+          return { settings: { ...s.settings, ...a.payload } };
+        }
+        return { session: transition(s.session, a) };
+      }),
       setSettings: (p) => set((s) => ({ settings: { ...s.settings, ...p } })),
       markHydrated: () => set({ _hydrated: true }),
       

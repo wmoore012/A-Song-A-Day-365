@@ -62,8 +62,22 @@ export type Action =
   | { type: "BACK" }                                // Go back to previous state
   | { type: "RESET" }                               // Reset entire flow
   | { type: "ADD_NOTE"; payload: string }
+  | { type: "UPDATE_SETTINGS"; payload: Partial<Settings> }
   | { type: "SCROLL_DEMO" }
   | { type: "SHADER_DEMO" };
+
+export interface Settings {
+  defaultDuration: number;
+  defaultMultiplier: number;
+  autoStartTimer: boolean;
+  soundEnabled: boolean;
+  volume: number;
+  notifications: boolean;
+  accountabilityEmail: string;
+  userName?: string;
+  collaborators?: string;
+  defaultPlaylist?: string;
+}
 
 export class InvalidTransition extends Error {
   constructor(from: FlowState, action: string) {

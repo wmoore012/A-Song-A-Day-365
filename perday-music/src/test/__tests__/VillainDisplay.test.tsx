@@ -89,18 +89,5 @@ describe('VillainDisplay', () => {
     // and the main functionality (message display) is already verified
   });
 
-  it('shows flip clock for villain messages', async () => {
-    render(<VillainDisplay />);
 
-    // Trigger villain nudge
-    await act(async () => {
-      _fxEmit('villain-nudge', { msg: 'Test message', type: 'devil-head' });
-    });
-
-    // Check if flip clock appears using stable data-testid
-    await waitFor(() => {
-      const flipClock = document.querySelector('[data-testid="flip-clock"]');
-      expect(flipClock).toBeInTheDocument();
-    }, { timeout: 2000 });
-  });
 });
