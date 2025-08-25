@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { gsap } from 'gsap';
 import { useGSAP } from '@gsap/react';
+import { useAppStore } from '../store/store';
 import { 
   BarChart2, 
   Zap, 
@@ -14,11 +15,12 @@ import PerdayLogo from './PerdayLogo';
 
 gsap.registerPlugin(useGSAP);
 
-function NavItem({ icon: Icon, label, active, collapsed }: { 
+function NavItem({ icon: Icon, label, active, collapsed, onClick }: { 
   icon: any; 
   label: string; 
   active: boolean; 
   collapsed: boolean;
+  onClick?: () => void;
 }) {
   const itemRef = useRef<HTMLButtonElement>(null);
 
@@ -43,6 +45,7 @@ function NavItem({ icon: Icon, label, active, collapsed }: {
   return (
     <button
       ref={itemRef}
+      onClick={onClick}
       className={`w-full px-3 py-2 rounded-lg transition-all duration-300 flex items-center space-x-3 text-sm font-medium ${
         active 
           ? 'bg-gradient-to-r from-synth-violet/30 to-synth-magenta/20 text-synth-white shadow-[0_0_15px_rgba(108,26,237,0.2)]' 
@@ -56,6 +59,7 @@ function NavItem({ icon: Icon, label, active, collapsed }: {
 }
 
 export default function PremiumSidebar() {
+  const { dispatch } = useAppStore();
   const [collapsed, setCollapsed] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const lightBarRef = useRef<HTMLDivElement>(null);
@@ -91,7 +95,7 @@ export default function PremiumSidebar() {
   return (
     <div 
       ref={sidebarRef}
-      className={`fixed left-0 top-0 h-full bg-[#DFD9E2] backdrop-blur-xl transition-[width] duration-300 shadow-2xl ${
+      className={`fixed left-0 top-0 h-full bg-black/20 backdrop-blur-xl border-r border-cyan-400/20 transition-[width] duration-300 shadow-2xl ${
         collapsed ? 'w-16' : 'w-64'
       }`}
     >
@@ -135,7 +139,7 @@ export default function PremiumSidebar() {
           </div>
         )}
         <NavItem icon={Target} label="Goals" active={false} collapsed={collapsed} />
-        <NavItem icon={Settings} label="Settings" active={false} collapsed={collapsed} />
+        <NavItem icon={Settings} label="Settings" active={false} collapsed={collapsed} onClick={() => dispatch({ type: "RESET" })} />
       </nav>
 
       {/* Quick Stats */}

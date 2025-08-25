@@ -16,7 +16,7 @@ import VillainDisplay from "./components/VillainDisplay";
 import FeaturesShowcase from "./components/FeaturesShowcase";
 import Dashboard from "./components/Dashboard";
 import ScribbleX from "./components/ScribbleX";
-import SpinningLogo from "./components/SpinningLogo";
+
 import { AnalyticsHud } from "./components/common/AnalyticsHud";
 
 import { usePrestart } from "./hooks/usePrestart";
@@ -71,28 +71,11 @@ export default function App() {
                   {/* Villain Display */}
             <VillainDisplay />
 
-            {/* Settings Gear - Bottom Left (only after welcome screen) */}
-            {session.state !== FlowState.VAULT_CLOSED && (
-              <div className="fixed bottom-4 left-4 z-50">
-                <button
-                  onClick={() => dispatch({ type: "GO_TO_DASHBOARD" })}
-                  className="p-3 text-cyan-400 hover:text-cyan-300 transition-colors bg-black/20 backdrop-blur-sm rounded-full border border-cyan-400/30"
-                  aria-label="Settings"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                </button>
-              </div>
-            )}
+
 
             {/* Show beautiful WelcomeScreen directly - no vault transition */}
             <div className="flex items-center justify-center min-h-screen p-8">
-              <WelcomeScreen onEnter={() => {
-                console.log('App: WelcomeScreen onEnter called, going directly to dashboard');
-                dispatch({ type: "GO_TO_DASHBOARD" });
-              }} />
+              <WelcomeScreen />
             </div>
 
       {/* Demo pages rendered for full-screen experience */}
@@ -156,8 +139,8 @@ export default function App() {
 }
 
 // Welcome Screen Component
-function WelcomeScreen({ onEnter }: { onEnter: () => void }) {
-
+function WelcomeScreen() {
+  const { dispatch } = useAppStore();
   const [soundEnabled, setSoundEnabled] = useState(false);
   const [showFeatures, setShowFeatures] = useState(false);
 
@@ -182,7 +165,7 @@ function WelcomeScreen({ onEnter }: { onEnter: () => void }) {
           <h1 className="text-5xl md:text-7xl font-black leading-tight">
             Get locked in. Make <span className="text-synth-amber"><ScribbleX /></span> beats a day.
           </h1>
-          <SpinningLogo size="large" className="mt-4" />
+
         </div>
         <p className="text-xl text-cyan-300/80 max-w-3xl mx-auto">
           Perday Music 365 turns your studio time into a game: timeboxed cookups, live multipliers, and a squad that only talks when you're on a break (or after you ship). Points for focus. Heat for effort. Streaks for consistency.
@@ -218,12 +201,32 @@ function WelcomeScreen({ onEnter }: { onEnter: () => void }) {
               </div>
             )}
             
-            <button
-              onClick={onEnter}
-              className="px-8 py-4 bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-white font-bold text-lg rounded-xl shadow-2xl hover:shadow-cyan-500/25 transition-all duration-300 transform hover:scale-105"
-            >
-              Enter Your Studio
-            </button>
+                         <div className="grid grid-cols-2 gap-4">
+               <button
+                 onClick={() => dispatch({ type: "PICK_TYPE", payload: "Production" })}
+                 className="px-6 py-4 bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-white font-bold rounded-xl shadow-2xl hover:shadow-cyan-500/25 transition-all duration-300 transform hover:scale-105"
+               >
+                 Write X Songs Per Day
+               </button>
+               <button
+                 onClick={() => dispatch({ type: "PICK_TYPE", payload: "Production" })}
+                 className="px-6 py-4 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-400 hover:to-pink-500 text-white font-bold rounded-xl shadow-2xl hover:shadow-purple-500/25 transition-all duration-300 transform hover:scale-105"
+               >
+                 Produce X Songs Per Day
+               </button>
+               <button
+                 onClick={() => dispatch({ type: "PICK_TYPE", payload: "Production" })}
+                 className="px-6 py-4 bg-gradient-to-r from-pink-500 to-red-600 hover:from-pink-400 hover:to-red-500 text-white font-bold rounded-xl shadow-2xl hover:shadow-pink-500/25 transition-all duration-300 transform hover:scale-105"
+               >
+                 Make X Riffs Per Day
+               </button>
+               <button
+                 onClick={() => dispatch({ type: "PICK_TYPE", payload: "Production" })}
+                 className="px-6 py-4 bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-400 hover:to-orange-500 text-white font-bold rounded-xl shadow-2xl hover:shadow-red-500/25 transition-all duration-300 transform hover:scale-105"
+               >
+                 Do X Mixes Per Day
+               </button>
+             </div>
           </div>
         )}
 

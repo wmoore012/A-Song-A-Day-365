@@ -99,6 +99,26 @@ export default function PerdayLogo({
         ease: "power1.inOut",
         delay: 1
       });
+
+      // Random flick spinning animation
+      const flickLogo = () => {
+        const duration = 0.3 + Math.random() * 0.4; // 0.3-0.7s
+        const rotations = 2 + Math.random() * 4; // 2-6 rotations
+        const ease = "power2.out";
+        
+        gsap.to(iconRef.current, {
+          rotation: `+=${360 * rotations}`,
+          duration: duration,
+          ease: ease,
+          onComplete: () => {
+            // Schedule next flick
+            setTimeout(flickLogo, 3000 + Math.random() * 5000); // 3-8 seconds
+          }
+        });
+      };
+
+      // Start the flick cycle
+      setTimeout(flickLogo, 2000 + Math.random() * 3000); // Initial delay 2-5 seconds
     }
 
     // Enhanced text animation with stagger and character splitting
