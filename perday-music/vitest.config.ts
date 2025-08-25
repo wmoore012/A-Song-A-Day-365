@@ -17,5 +17,16 @@ export default defineConfig({
     setupFiles: ['./src/test/setup.ts'],
     // Only test the app code
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
+    // Explicitly exclude legacy and other unwanted directories
+    exclude: [
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/legacy/**',
+      '**/tests/**',
+      '**/*.dom.test.js',
+      '**/*.function.test.js',
+      '**/test-baby-site/**',
+      '**/perday-rebuild/**'
+    ],
   },
 })

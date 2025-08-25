@@ -4,10 +4,6 @@ on:
   push:
   pull_request:
 
-defaults:
-  run:
-    working-directory: perday-music   # <-- run inside the app folder
-
 jobs:
   ci:
     runs-on: ubuntu-latest
@@ -17,7 +13,7 @@ jobs:
         with:
           node-version: 20
           cache: 'npm'
-          cache-dependency-path: package-lock.json
-      - run: npm ci
-      - run: npm test -- --run --silent
-      - run: npm run build
+          cache-dependency-path: perday-music/package-lock.json
+      - run: cd perday-music && npm ci
+      - run: cd perday-music && npm test -- --run --silent
+      - run: cd perday-music && npm run build
