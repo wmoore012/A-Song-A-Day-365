@@ -11,7 +11,7 @@ export default function FocusRunning() {
   const [timeRemaining, setTimeRemaining] = useState((session.durationMin || 25) * 60);
   const [isPaused, setIsPaused] = useState(false);
   const [note, setNote] = useState('');
-  const intervalRef = useRef<number | undefined>(undefined);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
 
   useEffect(() => {
     // Reduce villain messages when focus starts
