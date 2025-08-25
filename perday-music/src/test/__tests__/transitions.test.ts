@@ -35,12 +35,13 @@ describe('flow transitions', () => {
     ).toThrow();
   });
 
-  it('BACK from FOCUS_SETUP returns to LOCK_IN; BACK from LOCK_IN (if unimplemented) throws', () => {
+  it('BACK from FOCUS_SETUP returns to LOCK_IN; BACK from LOCK_IN returns to PRE_START', () => {
     const fromSetup = transition({ ...fresh, state: FlowState.FOCUS_SETUP } as Session, { type: 'BACK' });
     expect(fromSetup.state).toBe(FlowState.LOCK_IN);
 
     const fromLock = { ...fresh, state: FlowState.LOCK_IN } as Session;
-    expect(() => transition(fromLock, { type: 'BACK' })).toThrow();
+    const backFromLock = transition(fromLock, { type: 'BACK' });
+    expect(backFromLock.state).toBe(FlowState.PRE_START);
   });
 });
 

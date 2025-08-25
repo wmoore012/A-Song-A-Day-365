@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { _fxSubscribe } from '../hooks/useVillainAnnounce';
 import { gsap } from 'gsap';
 import { typeInto } from '../utils/typewriter';
+import { CheckCircle, XCircle, MessageCircle } from 'lucide-react';
 
 interface VillainMessage {
   id: string;
@@ -147,8 +148,9 @@ export default function VillainDisplay() {
             <div className="flex items-center gap-2">
               <span className="text-lg">
                 {message.type === 'villain-nudge' ? '😈' : 
-                 message.type === 'success' ? '✅' : 
-                 message.type === 'error' ? '❌' : '💬'}
+                 message.type === 'success' ? <CheckCircle className="w-5 h-5 text-green-400" /> : 
+                 message.type === 'error' ? <XCircle className="w-5 h-5 text-red-400" /> : 
+                 <MessageCircle className="w-5 h-5 text-cyan-400" />}
               </span>
               <span className="font-medium text-sm message-text font-mono">
                 {!message.isTyping ? message.text : ''}

@@ -101,6 +101,7 @@ export function transition(s: Session, a: Action): Session {
 
     case "BACK":
       if (s.state === FlowState.FOCUS_SETUP) return { ...s, state: FlowState.LOCK_IN };
+      if (s.state === FlowState.LOCK_IN) return { ...s, state: FlowState.PRE_START };
       if (s.state === FlowState.CHECKPOINT) return { ...s, state: FlowState.FOCUS_RUNNING };
       throw new InvalidTransition(s.state, a.type);
 

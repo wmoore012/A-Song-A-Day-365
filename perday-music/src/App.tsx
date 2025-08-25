@@ -4,6 +4,7 @@ import { FlowState } from "./types";
 import { useRef, useState } from "react";
 import DashboardLayout from "./components/DashboardLayout";
 import ShaderBackground from "./components/ShaderBackground";
+import { Volume2 } from 'lucide-react';
 
 
 import UserQuestionnaire from "./components/UserQuestionnaire";
@@ -69,34 +70,32 @@ export default function App() {
           return (
           <ShaderBackground data-testid="app-main">
 
-                  {/* Villain Display */}
-            <VillainDisplay />
+                  {/* Global Components - Always Available */}
+                  <VillainDisplay />
+                  <AudioHud fadeOutRef={fadeOutRef} />
 
+                  {/* Welcome Screen - Show when vault is closed */}
+                  {session.state === FlowState.VAULT_CLOSED && (
+                    <div className="flex items-center justify-center min-h-screen p-8">
+                      <WelcomeScreen />
+                    </div>
+                  )}
 
+                  {/* Demo pages rendered for full-screen experience */}
+                  {session.state === FlowState.SCROLL_DEMO && (
+                    <ScrollDemoPage />
+                  )}
 
-            {/* Show beautiful WelcomeScreen directly - no vault transition */}
-            <div className="flex items-center justify-center min-h-screen p-8">
-              <WelcomeScreen />
-            </div>
+                  {/* Other flow states rendered when not in demo mode */}
+                  {session.state !== FlowState.VAULT_CLOSED &&
+                   session.state !== FlowState.SCROLL_DEMO && (
+                    <>
+                      {/* Main Dashboard */}
+                      <DashboardLayout>
+                        {/* Analytics HUD */}
+                        <AnalyticsHud grades={[]} latencies={[]} />
 
-      {/* Demo pages rendered for full-screen experience */}
-      {session.state === FlowState.SCROLL_DEMO && (
-        <ScrollDemoPage />
-      )}
-
-                   {/* Other flow states rendered when not in demo mode */}
-             {session.state !== FlowState.VAULT_CLOSED &&
-              session.state !== FlowState.SCROLL_DEMO && (
-                <>
-                  {/* Main Dashboard */}
-                  <DashboardLayout>
-                    {/* Analytics HUD */}
-                    <AnalyticsHud grades={[]} latencies={[]} />
-
-                    {/* Audio HUD */}
-                    <AudioHud fadeOutRef={fadeOutRef} />
-
-                    {/* Sequential Flow Content */}
+                        {/* Sequential Flow Content */}
                     {session.state === FlowState.DASHBOARD && (
                       <Dashboard />
                     )}
@@ -190,7 +189,8 @@ function WelcomeScreen() {
                 onClick={handleEnableSound}
                 className="px-8 py-4 bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-white font-bold text-lg rounded-xl shadow-2xl hover:shadow-cyan-500/25 transition-all duration-300 transform hover:scale-105"
               >
-                🎵 Enable Sound
+                <Volume2 className="w-5 h-5 mr-2" />
+                Enable Sound
               </button>
             </div>
           </div>

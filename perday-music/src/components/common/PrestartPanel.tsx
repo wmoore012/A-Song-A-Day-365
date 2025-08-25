@@ -10,6 +10,7 @@ import MultiplierBar from "../MultiplierBar";
 import confetti from 'canvas-confetti';
 import UserQuestionnaire from "../UserQuestionnaire";
 import LockInTips from "../LockInTips";
+import { Zap, Rocket, Music, Users, Target } from 'lucide-react';
 
 gsap.registerPlugin(useGSAP);
 
@@ -40,7 +41,7 @@ export default function PrestartPanel({
   useEffect(() => {
     if (readyAtMs == null) return;
     markReadyAt(readyAtMs);
-    villainNudge("⚡ Ready! Your multiplier is powered up!");
+    villainNudge("Ready! Your multiplier is powered up!");
     
     // Throw confetti for the micro-win!
     if (motionOk && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
@@ -56,7 +57,7 @@ export default function PrestartPanel({
   useEffect(() => {
     if (readyAtMs != null) return; // already ready
     if (msLeft <= 60000 && msLeft > 59000) { // around 1 minute left
-      villainNudge("⏰ 1 minute left! Ready to power up your multiplier?");
+      villainNudge("1 minute left! Ready to power up your multiplier?");
     }
   }, [msLeft, readyAtMs, villainNudge]);
 
@@ -65,7 +66,7 @@ export default function PrestartPanel({
     if (!sealed) return;
     // missed Ready? nudge a little shade
     if (readyAtMs == null) {
-      villainNudge("Missed the Ready button? No worries, we're starting anyway! 🚀");
+      villainNudge("Missed the Ready button? No worries, we're starting anyway!");
     }
     fadeOutMusic?.();
     setPhase("lockin");
@@ -74,7 +75,7 @@ export default function PrestartPanel({
 
   const handleStartTimer = () => {
     setTimerStarted(true);
-    villainNudge("🎯 Timer started! Now power up your multiplier!");
+    villainNudge("Timer started! Now power up your multiplier!");
     
     // Throw confetti for starting the challenge!
     if (motionOk && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
@@ -110,7 +111,8 @@ export default function PrestartPanel({
                 className="w-full px-6 py-4 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 font-extrabold shadow-lg hover:shadow-[0_10px_24px_rgba(34,197,94,0.4)] transition-all duration-300 text-lg transform hover:scale-[1.02]"
                 onClick={handleStartTimer}
               >
-                🎯 Start 7-Minute Timer
+                <Target className="w-5 h-5 mr-2" />
+                Start 7-Minute Timer
               </button>
               <div className="text-sm text-synth-icy/70">
                 Take the challenge! One step closer to making a beat a day and achieving your dreams!
@@ -137,11 +139,12 @@ export default function PrestartPanel({
                   className="px-4 py-3 rounded-xl bg-white/10 border border-white/15 text-white hover:bg-white/15 transition relative group"
                   onClick={() => {
                     // In real app, this would open studio vibes playlist
-                    villainNudge("📻 Studio vibes playlist loaded!");
+                    villainNudge("Studio vibes playlist loaded!");
                   }}
                   title="Visual inspiration videos - watch on mute on your second screen"
                 >
-                  📻 Studio Vibes
+                  <Music className="w-5 h-5 mr-2" />
+                  Studio Vibes
                   <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black/90 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
                     Visual inspiration videos - watch on mute on your second screen
                   </div>
@@ -153,7 +156,8 @@ export default function PrestartPanel({
                   }}
                   title="Get paired with an accountability partner for virtual coworking"
                 >
-                  👥 Focusmate
+                  <Users className="w-5 h-5 mr-2" />
+                  Focusmate
                   <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black/90 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
                     Get paired with an accountability partner for virtual coworking
                   </div>
@@ -166,24 +170,26 @@ export default function PrestartPanel({
                 <UserQuestionnaire 
                   onComplete={(data) => {
                     setSettings({ userName: data.name, collaborators: data.collaborators });
-                    villainNudge("✅ Session setup complete!");
+                    villainNudge("Session setup complete!");
                   }}
                 />
               </div>
 
               <div className="space-y-4">
                 <button
-                  className="w-full px-6 py-4 rounded-xl bg-gradient-to-r from-synth-amber to-synth-amberLight hover:from-synth-amberLight hover:to-synth-amber font-extrabold shadow-lg hover:shadow-[0_10px_24px_rgba(255,176,32,0.4)] transition-all duration-300 text-lg transform hover:scale-[1.02] animate-amberGlow"
+                  className="w-full px-6 py-4 rounded-xl bg-gradient-to-r from-synth-amber to-synth-amberLight hover:from-synth-amberLight hover:to-synth-amber font-extrabold shadow-lg hover:shadow-[0_10px_24px_rgba(255,176,32,0.4)] transition-all duration-300 text-lg transform hover:scale-[1.02] border-2 border-synth-amber/50 hover:border-synth-amber animate-amberPulse"
                   onClick={tapReady}
                   disabled={readyAtMs != null}
                 >
-                  ⚡ Ready (Power up your Multiplier)
+                  <Zap className="w-5 h-5 mr-2" />
+                  Ready (Power up your Multiplier)
                 </button>
                 <button
                   className="w-full px-6 py-4 rounded-xl bg-synth-violet/20 hover:bg-synth-violet/30 font-bold text-lg border border-synth-violet/40 hover:border-synth-violet/60 transition-all duration-300 hover:shadow-[0_8px_20px_rgba(108,26,237,0.3)]"
                   onClick={handleStartNow}
                 >
-                  🚀 Start Now (Skip Pre-Start)
+                  <Rocket className="w-5 h-5 mr-2" />
+                  Start Now (Skip Pre-Start)
                 </button>
               </div>
             </>

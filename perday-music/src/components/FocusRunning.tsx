@@ -3,7 +3,7 @@ import { useAppStore } from '../store/store';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import { Pause, Target, Clock, MessageSquare, Square } from 'lucide-react';
+import { Pause, Target, Clock, MessageSquare, Square, Music, Users } from 'lucide-react';
 import MultiplierBar from './MultiplierBar';
 
 export default function FocusRunning() {
@@ -124,7 +124,8 @@ export default function FocusRunning() {
             }}
             title="Visual inspiration videos - watch on mute on your second screen"
           >
-            📻 Studio Vibes
+                              <Music className="w-5 h-5 mr-2" />
+                  Studio Vibes
             <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black/90 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
               Visual inspiration videos - watch on mute on your second screen
             </div>
@@ -136,7 +137,8 @@ export default function FocusRunning() {
             }}
             title="Get paired with an accountability partner for virtual coworking"
           >
-            👥 Focusmate
+                              <Users className="w-5 h-5 mr-2" />
+                  Focusmate
             <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black/90 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
               Get paired with an accountability partner for virtual coworking
             </div>
