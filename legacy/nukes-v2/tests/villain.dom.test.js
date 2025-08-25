@@ -61,6 +61,9 @@ describe('Villain shade rain', () => {
   it('spawns devil-heads when shade sting occurs via ytConsidered going down', async () => {
     await import('../nukes-v2.js');
 
+    // Trigger DOMContentLoaded to initialize event listeners
+    document.dispatchEvent(new Event('DOMContentLoaded'));
+
     // Ensure ytConsidered is initially checked, then uncheck to trigger shade path
     const yt = document.getElementById('ytConsidered');
     yt.checked = true;

@@ -31,6 +31,9 @@ it('openHints sets the Open in YouTube link to the rotated hint id', async () =>
   // Load module (as ESM) which defines openHints on window
   await import('../nukes-v2.js');
 
+  // Trigger DOMContentLoaded to initialize event listeners
+  document.dispatchEvent(new Event('DOMContentLoaded'));
+
   // Wait a tick for hints to load
   await Promise.resolve();
 

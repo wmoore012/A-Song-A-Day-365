@@ -74,6 +74,9 @@ describe('Heat buttons', () => {
   it('increments LS.heatCounts and shows a pager toast + fire embers', async () => {
     await import('../nukes-v2.js');
 
+    // Trigger DOMContentLoaded to initialize event listeners
+    document.dispatchEvent(new Event('DOMContentLoaded'));
+
     // Start session to enable Done
     document.getElementById('startBtn').click();
     const doneBtn = document.getElementById('doneBtn');
