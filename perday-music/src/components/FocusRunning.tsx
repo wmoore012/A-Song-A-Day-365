@@ -5,6 +5,7 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Pause, Target, Clock, MessageSquare, Square } from 'lucide-react';
 import MultiplierBar from './MultiplierBar';
+import GlassPanel from './common/GlassPanel';
 
 export default function FocusRunning() {
   const { session, dispatch } = useAppStore();
@@ -63,7 +64,7 @@ export default function FocusRunning() {
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center p-8">
-      <div className="bg-gradient-to-br from-magenta-900/20 via-cyan-900/20 to-purple-900/20 backdrop-blur-xl ring-1 ring-cyan-400/30 rounded-2xl p-8 max-w-2xl w-full">
+      <GlassPanel className="bg-gradient-to-br from-magenta-900/20 via-cyan-900/20 to-purple-900/20 p-8 max-w-2xl w-full">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-synth-white mb-2">Focus Session</h1>
           <p className="text-synth-icy/70">Stay focused, stay productive</p>
@@ -185,7 +186,7 @@ export default function FocusRunning() {
             End Session
           </Button>
         </div>
-      </div>
+      </GlassPanel>
     </div>
   );
 }
