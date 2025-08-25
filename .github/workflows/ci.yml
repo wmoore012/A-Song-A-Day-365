@@ -7,6 +7,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: perday-music
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -21,15 +24,18 @@ jobs:
         run: npm ci
 
       - name: Run tests
-        run: npm test --silent
+        run: npm test -- --silent
 
       - name: Build site
-        run: npm run build --silent
+        run: npm run build
 
   deploy:
     if: github.ref == 'refs/heads/main'
     needs: build
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: perday-music
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -44,7 +50,7 @@ jobs:
         run: npm ci
 
       - name: Build site
-        run: npm run build --silent
+        run: npm run build
 
       - name: Install Netlify CLI
         run: npm i -g netlify-cli
@@ -59,4 +65,4 @@ jobs:
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-        run: netlify deploy --dir=dist --prod --site "$NETLIFY_SITE_ID" --auth "$NETLIFY_AUTH_TOKEN"
+        run: netlify deploy --dir=perday-music/dist --prod --site "$NETLIFY_SITE_ID" --auth "$NETLIFY_AUTH_TOKEN"
