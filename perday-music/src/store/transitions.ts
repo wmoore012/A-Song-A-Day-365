@@ -109,7 +109,7 @@ export function transition(s: Session, a: Action): Session {
       return { ...s, state: FlowState.SHADER_DEMO };
 
     case "RESET":
-      return { state: FlowState.VAULT_CLOSED, readyPressed: false, multiplierPenalty: false, preparationStartTime: null };
+      return { state: FlowState.VAULT_CLOSED, readyPressed: false, multiplierPenalty: false, preparationStartTime: undefined };
 
     default:
       return s;
