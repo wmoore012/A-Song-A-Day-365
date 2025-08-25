@@ -64,6 +64,16 @@ export default function App() {
       {/* Test component to verify store */}
       <TestStore />
 
+      {/* Reset button for debugging */}
+      <div className="fixed top-4 right-4 z-50">
+        <button
+          onClick={() => dispatch({ type: "RESET" })}
+          className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-semibold"
+        >
+          Reset App
+        </button>
+      </div>
+
       {/* Main Dashboard - No vault transition */}
       <DashboardLayout>
           {/* Analytics HUD */}

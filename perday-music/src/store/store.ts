@@ -43,12 +43,12 @@ type AppState = {
 export const useAppStore = create<AppState>()(
   persist(
     (set) => ({
-      session: { state: FlowState.VAULT_CLOSED, readyPressed: false, multiplierPenalty: false },
+      session: { state: FlowState.VAULT_CLOSED, readyPressed: false, multiplierPenalty: false, preparationStartTime: null },
       settings: { 
         defaultDuration: 25, 
         defaultMultiplier: 1.5, 
         autoStartTimer: true, 
-        soundEnabled: false, 
+        soundEnabled: true, 
         volume: 0.7, 
         notifications: true, 
         accountabilityEmail: '',

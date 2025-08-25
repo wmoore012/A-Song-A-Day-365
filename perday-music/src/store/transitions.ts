@@ -7,7 +7,8 @@ export function transition(s: Session, a: Action): Session {
       return { ...s, state: FlowState.QUESTIONNAIRE };
 
     case "START_QUESTIONNAIRE":
-      if (s.state !== FlowState.QUESTIONNAIRE) throw new InvalidTransition(s.state, a.type);
+      // Allow transition from VAULT_CLOSED to QUESTIONNAIRE
+      if (s.state !== FlowState.VAULT_CLOSED && s.state !== FlowState.QUESTIONNAIRE) throw new InvalidTransition(s.state, a.type);
       return { ...s, state: FlowState.QUESTIONNAIRE };
 
     case "COMPLETE_QUESTIONNAIRE":
@@ -108,7 +109,7 @@ export function transition(s: Session, a: Action): Session {
       return { ...s, state: FlowState.SHADER_DEMO };
 
     case "RESET":
-      return { state: FlowState.PRE_START, readyPressed: false, multiplierPenalty: false };
+      return { state: FlowState.VAULT_CLOSED, readyPressed: false, multiplierPenalty: false, preparationStartTime: null };
 
     default:
       return s;
