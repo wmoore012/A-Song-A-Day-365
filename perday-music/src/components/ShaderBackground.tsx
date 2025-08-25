@@ -5,9 +5,10 @@ import { useEffect, useRef, useState } from "react"
 
 interface ShaderBackgroundProps {
   children: React.ReactNode
+  [key: string]: any // Allow any additional props to be passed through
 }
 
-export default function ShaderBackground({ children }: ShaderBackgroundProps) {
+export default function ShaderBackground({ children, ...props }: ShaderBackgroundProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [isActive, setIsActive] = useState(false)
 
@@ -30,7 +31,7 @@ export default function ShaderBackground({ children }: ShaderBackgroundProps) {
   }, [])
 
   return (
-    <div ref={containerRef} className="min-h-screen bg-black relative overflow-hidden">
+    <div ref={containerRef} className="min-h-screen bg-black relative overflow-hidden" {...props}>
       {/* SVG Filters */}
       <svg className="absolute inset-0 w-0 h-0">
         <defs>

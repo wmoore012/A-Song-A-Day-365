@@ -3,6 +3,8 @@ import { useAppStore } from "./store/store";
 import { FlowState } from "./types";
 import { useRef } from "react";
 import DashboardLayout from "./components/DashboardLayout";
+import ShaderBackground from "./components/ShaderBackground";
+import VaultTransition from "./components/VaultTransition";
 
 import UserQuestionnaire from "./components/UserQuestionnaire";
 import StartHero from "./components/StartHero";
@@ -60,7 +62,7 @@ export default function App() {
   };
 
   return (
-    <main data-testid="app-main" className="relative min-h-screen bg-black isolate">
+    <ShaderBackground data-testid="app-main">
       {/* Test component to verify store */}
       <TestStore />
 
@@ -74,8 +76,18 @@ export default function App() {
         </button>
       </div>
 
-      {/* Main Dashboard - No vault transition */}
-      <DashboardLayout>
+      {/* Villain Display - Always active for monitoring */}
+      <VillainDisplay />
+
+      {/* Vault Transition for beautiful opening animation */}
+      <VaultTransition 
+        isOpen={session.state !== FlowState.VAULT_CLOSED}
+        onTransitionComplete={() => {
+          console.log('Vault transition complete');
+        }}
+      >
+        {/* Main Dashboard */}
+        <DashboardLayout>
           {/* Analytics HUD */}
           <AnalyticsHud grades={[]} latencies={[]} />
 
@@ -124,9 +136,7 @@ export default function App() {
                    </div>
                  )}
         </DashboardLayout>
-
-      {/* Villain Display - Always active for monitoring */}
-      <VillainDisplay />
+      </VaultTransition>
 
       {/* Initial Welcome Screen (Vault Closed) */}
       {session.state === FlowState.VAULT_CLOSED && (
@@ -137,7 +147,7 @@ export default function App() {
           }} />
         </div>
       )}
-    </main>
+    </ShaderBackground>
   );
 }
 
