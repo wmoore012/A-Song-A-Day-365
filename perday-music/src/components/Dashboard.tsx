@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { useAppStore } from '../store/store';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from './ui/sheet';
 import { 
   Play, 
   Target, 
@@ -17,6 +19,9 @@ import {
 
 export default function Dashboard() {
   const { dispatch } = useAppStore();
+  const [showCommunity, setShowCommunity] = useState(false);
+  const [showAnalytics, setShowAnalytics] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   // Mock data for demonstration
   const stats = {
@@ -37,9 +42,9 @@ export default function Dashboard() {
 
   const quickActions = [
     { title: "Start Focus Session", icon: Play, action: () => dispatch({ type: "PICK_TYPE", payload: "Production" }) },
-    { title: "View Analytics", icon: BarChart3, action: () => console.log("View Analytics") },
-    { title: "Community", icon: Users, action: () => console.log("Community") },
-    { title: "Settings", icon: Settings, action: () => console.log("Settings") }
+    { title: "View Analytics", icon: BarChart3, action: () => setShowAnalytics(true) },
+    { title: "Community", icon: Users, action: () => setShowCommunity(true) },
+    { title: "Settings", icon: Settings, action: () => setShowSettings(true) }
   ];
 
   return (
@@ -238,6 +243,88 @@ export default function Dashboard() {
           </Card>
         </div>
       </div>
+
+      {/* Community Sheet */}
+      <Sheet open={showCommunity} onOpenChange={setShowCommunity}>
+        <SheetContent className="bg-black/95 border-cyan-400/30 text-white w-[400px]">
+          <SheetHeader>
+            <SheetTitle className="text-cyan-300">Community</SheetTitle>
+            <SheetDescription className="text-white/60">
+              Connect with fellow producers
+            </SheetDescription>
+          </SheetHeader>
+          <div className="mt-6 space-y-4">
+            <div className="p-4 bg-white/5 rounded-lg border border-cyan-400/20">
+              <h3 className="font-semibold text-cyan-300 mb-2">Live Sessions</h3>
+              <p className="text-white/70 text-sm">Join global studio sessions</p>
+            </div>
+            <div className="p-4 bg-white/5 rounded-lg border border-purple-400/20">
+              <h3 className="font-semibold text-purple-300 mb-2">Genre Challenges</h3>
+              <p className="text-white/70 text-sm">Compete by genre</p>
+            </div>
+            <div className="p-4 bg-white/5 rounded-lg border border-green-400/20">
+              <h3 className="font-semibold text-green-300 mb-2">Squad Energy</h3>
+              <p className="text-white/70 text-sm">Find your crew</p>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Analytics Sheet */}
+      <Sheet open={showAnalytics} onOpenChange={setShowAnalytics}>
+        <SheetContent className="bg-black/95 border-cyan-400/30 text-white w-[500px]">
+          <SheetHeader>
+            <SheetTitle className="text-cyan-300">Analytics</SheetTitle>
+            <SheetDescription className="text-white/60">
+              Your performance insights
+            </SheetDescription>
+          </SheetHeader>
+          <div className="mt-6 space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="p-4 bg-white/5 rounded-lg border border-cyan-400/20">
+                <h3 className="font-semibold text-cyan-300">Focus Time</h3>
+                <p className="text-2xl font-bold text-white">{Math.floor(stats.totalMinutes / 60)}h</p>
+              </div>
+              <div className="p-4 bg-white/5 rounded-lg border border-purple-400/20">
+                <h3 className="font-semibold text-purple-300">Sessions</h3>
+                <p className="text-2xl font-bold text-white">{stats.totalSessions}</p>
+              </div>
+            </div>
+            <div className="p-4 bg-white/5 rounded-lg border border-green-400/20">
+              <h3 className="font-semibold text-green-300 mb-2">Trends</h3>
+              <p className="text-white/70 text-sm">Your productivity patterns</p>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Settings Sheet */}
+      <Sheet open={showSettings} onOpenChange={setShowSettings}>
+        <SheetContent className="bg-black/95 border-cyan-400/30 text-white w-[400px]">
+          <SheetHeader>
+            <SheetTitle className="text-cyan-300">Settings</SheetTitle>
+            <SheetDescription className="text-white/60">
+              Customize your experience
+            </SheetDescription>
+          </SheetHeader>
+          <div className="mt-6 space-y-4">
+            <div className="p-4 bg-white/5 rounded-lg border border-cyan-400/20">
+              <h3 className="font-semibold text-cyan-300 mb-2">Audio</h3>
+              <p className="text-white/70 text-sm">Volume and playlist settings</p>
+            </div>
+            <div className="p-4 bg-white/5 rounded-lg border border-purple-400/20">
+              <h3 className="font-semibold text-purple-300 mb-2">Notifications</h3>
+              <p className="text-white/70 text-sm">Villain and community alerts</p>
+            </div>
+            <Button 
+              onClick={() => dispatch({ type: "RESET" })}
+              className="w-full bg-red-600 hover:bg-red-700"
+            >
+              Reset App
+            </Button>
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }

@@ -101,7 +101,7 @@ export default function VillainDisplay() {
   const getMessageStyle = (type: string) => {
     switch (type) {
       case 'villain-nudge':
-        return 'bg-gradient-to-r from-synth-amber/90 to-synth-amberLight/90 text-synth-white border-synth-amber/50 shadow-lg shadow-synth-amber/20';
+        return 'bg-black/80 text-cyan-300 border-cyan-400/30';
       case 'success':
         return 'bg-gradient-to-r from-synth-aqua/90 to-synth-icy/90 text-synth-white border-synth-aqua/50 shadow-lg shadow-synth-aqua/20';
       case 'error':

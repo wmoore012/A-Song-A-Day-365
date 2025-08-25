@@ -4,7 +4,7 @@ import { FlowState } from "./types";
 import { useRef, useState } from "react";
 import DashboardLayout from "./components/DashboardLayout";
 import ShaderBackground from "./components/ShaderBackground";
-import VaultTransition from "./components/VaultTransition";
+
 
 import UserQuestionnaire from "./components/UserQuestionnaire";
 import StartHero from "./components/StartHero";
@@ -15,8 +15,10 @@ import ScrollDemoPage from "./components/ScrollDemoPage";
 import VillainDisplay from "./components/VillainDisplay";
 import FeaturesShowcase from "./components/FeaturesShowcase";
 import Dashboard from "./components/Dashboard";
+import ScribbleX from "./components/ScribbleX";
+import SpinningLogo from "./components/SpinningLogo";
 import { AnalyticsHud } from "./components/common/AnalyticsHud";
-import AudioHud from "./components/common/AudioHud";
+
 import { usePrestart } from "./hooks/usePrestart";
 import { useStartupScript } from "./hooks/useStartupScript";
 import { _fxEmit } from "./hooks/useVillainAnnounce";
@@ -73,7 +75,7 @@ export default function App() {
             {session.state !== FlowState.VAULT_CLOSED && (
               <div className="fixed bottom-4 left-4 z-50">
                 <button
-                  onClick={() => dispatch({ type: "RESET" })}
+                  onClick={() => dispatch({ type: "GO_TO_DASHBOARD" })}
                   className="p-3 text-cyan-400 hover:text-cyan-300 transition-colors bg-black/20 backdrop-blur-sm rounded-full border border-cyan-400/30"
                   aria-label="Settings"
                 >
@@ -101,88 +103,92 @@ export default function App() {
                    {/* Other flow states rendered when not in demo mode */}
              {session.state !== FlowState.VAULT_CLOSED &&
               session.state !== FlowState.SCROLL_DEMO && (
-        <VaultTransition 
-          isOpen={true}
-          onTransitionComplete={() => {
-            console.log('Vault transition complete');
-          }}
-        >
-          {/* Main Dashboard */}
-          <DashboardLayout>
-            {/* Analytics HUD */}
-            <AnalyticsHud grades={[]} latencies={[]} />
+                <>
+                  {/* Main Dashboard */}
+                  <DashboardLayout>
+                    {/* Analytics HUD */}
+                    <AnalyticsHud grades={[]} latencies={[]} />
 
-            {/* Audio HUD */}
-            <AudioHud fadeOutRef={fadeOutRef} />
 
-            {/* Sequential Flow Content */}
-            {session.state === FlowState.DASHBOARD && (
-              <Dashboard />
-            )}
 
-            {session.state === FlowState.QUESTIONNAIRE && (
-              <div className="flex items-center justify-center min-h-screen p-4">
-                <UserQuestionnaire onComplete={handleQuestionnaireComplete} />
-              </div>
-            )}
+                    {/* Sequential Flow Content */}
+                    {session.state === FlowState.DASHBOARD && (
+                      <Dashboard />
+                    )}
 
-            {session.state === FlowState.PREPARATION && (
-              <PreparationPhase onComplete={handlePreparationComplete} />
-            )}
+                    {session.state === FlowState.QUESTIONNAIRE && (
+                      <div className="flex items-center justify-center min-h-screen p-4">
+                        <UserQuestionnaire onComplete={handleQuestionnaireComplete} />
+                      </div>
+                    )}
 
-            {session.state === FlowState.PRE_START && (
-              <StartHero fadeOutRef={fadeOutRef} />
-            )}
+                    {session.state === FlowState.PREPARATION && (
+                      <PreparationPhase onComplete={handlePreparationComplete} />
+                    )}
 
-            {session.state === FlowState.LOCK_IN && (
-              <LockInMenu />
-            )}
+                    {session.state === FlowState.PRE_START && (
+                      <StartHero fadeOutRef={fadeOutRef} />
+                    )}
 
-            {session.state === FlowState.FOCUS_SETUP && (
-              <FocusSetup />
-            )}
+                    {session.state === FlowState.LOCK_IN && (
+                      <LockInMenu />
+                    )}
 
-            {session.state === FlowState.FOCUS_RUNNING && (
-              <FocusRunning />
-            )}
+                    {session.state === FlowState.FOCUS_SETUP && (
+                      <FocusSetup />
+                    )}
 
-            {/* Default fallback */}
-            {![FlowState.DASHBOARD, FlowState.QUESTIONNAIRE, FlowState.PREPARATION, FlowState.PRE_START, FlowState.LOCK_IN, FlowState.FOCUS_SETUP, FlowState.FOCUS_RUNNING].includes(session.state) && (
-              <div className="flex items-center justify-center min-h-screen">
-                <div className="text-white text-2xl">State: {session.state}</div>
-              </div>
-            )}
-          </DashboardLayout>
-        </VaultTransition>
-      )}
+                    {session.state === FlowState.FOCUS_RUNNING && (
+                      <FocusRunning />
+                    )}
+
+                    {/* Default fallback */}
+                    {![FlowState.DASHBOARD, FlowState.QUESTIONNAIRE, FlowState.PREPARATION, FlowState.PRE_START, FlowState.LOCK_IN, FlowState.FOCUS_SETUP, FlowState.FOCUS_RUNNING].includes(session.state) && (
+                      <div className="flex items-center justify-center min-h-screen">
+                        <div className="text-white text-2xl">State: {session.state}</div>
+                      </div>
+                    )}
+                  </DashboardLayout>
+                </>
+              )}
     </ShaderBackground>
   );
 }
 
 // Welcome Screen Component
 function WelcomeScreen({ onEnter }: { onEnter: () => void }) {
-  const { dispatch } = useAppStore();
+
   const [soundEnabled, setSoundEnabled] = useState(false);
   const [showFeatures, setShowFeatures] = useState(false);
 
+  const [showSoundNotification, setShowSoundNotification] = useState(false);
+
   const handleEnableSound = () => {
     setSoundEnabled(true);
+    setShowSoundNotification(true);
     // Trigger villain message about sound being enabled
     _fxEmit('villain-nudge', { msg: "Sound enabled! Now let's get you producing..." });
+    
+    // Auto-hide the notification after 1 second
+    setTimeout(() => {
+      setShowSoundNotification(false);
+    }, 1000);
   };
 
   return (
     <div className="text-center space-y-8 max-w-2xl relative">
-      <div className="space-y-4">
-        <h1 className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400">
-          Perday Music 365™
-        </h1>
-        <p className="text-xl text-cyan-300/80">
-          Built for producers, by producers
+      <div className="space-y-6">
+        <div className="space-y-4">
+          <h1 className="text-5xl md:text-7xl font-black leading-tight">
+            Get locked in. Make <span className="text-synth-amber"><ScribbleX /></span> beats a day.
+          </h1>
+          <SpinningLogo size="large" className="mt-4" />
+        </div>
+        <p className="text-xl text-cyan-300/80 max-w-3xl mx-auto">
+          Perday Music 365 turns your studio time into a game: timeboxed cookups, live multipliers, and a squad that only talks when you're on a break (or after you ship). Points for focus. Heat for effort. Streaks for consistency.
         </p>
-        <p className="text-lg text-white/60 max-w-lg mx-auto">
-          This isn't another corporate productivity app. It's a community-driven platform 
-          built by music producers who understand the creative struggle.
+        <p className="text-lg text-white/60 max-w-2xl mx-auto">
+          Cook up. Level up. Every day.
         </p>
       </div>
 
@@ -205,10 +211,12 @@ function WelcomeScreen({ onEnter }: { onEnter: () => void }) {
           </div>
         ) : (
           <div className="space-y-4">
-            <div className="p-4 bg-green-500/20 backdrop-blur-sm border border-green-400/30 rounded-xl">
-              <p className="text-green-300 font-medium">✅ Sound Enabled</p>
-              <p className="text-white/70 text-sm">Background music and audio feedback active</p>
-            </div>
+            {showSoundNotification && (
+              <div className="p-4 bg-green-500/20 backdrop-blur-sm border border-green-400/30 rounded-xl animate-fade-in">
+                <p className="text-green-300 font-medium">✅ Sound Enabled</p>
+                <p className="text-white/70 text-sm">Background music and audio feedback active</p>
+              </div>
+            )}
             
             <button
               onClick={onEnter}
@@ -219,15 +227,7 @@ function WelcomeScreen({ onEnter }: { onEnter: () => void }) {
           </div>
         )}
 
-        {/* Demo Button - Always visible */}
-        <div className="space-y-3">
-          <button
-            onClick={() => dispatch({ type: "SCROLL_DEMO" })}
-            className="px-6 py-3 border-2 border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-black font-semibold text-base rounded-lg transition-all duration-300 hover:shadow-cyan-400/25"
-          >
-            View Scroll Demo
-          </button>
-        </div>
+
 
         <p className="text-sm text-white/40">
           Takes ~2 minutes to set up, then you're ready to produce
@@ -273,7 +273,7 @@ function WelcomeScreen({ onEnter }: { onEnter: () => void }) {
       {/* Footer */}
       <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-center">
         <p className="text-xs text-white/40">
-          © 2024 Made by Will Moore
+          © 2025 Made by Will Moore
         </p>
       </div>
     </div>
