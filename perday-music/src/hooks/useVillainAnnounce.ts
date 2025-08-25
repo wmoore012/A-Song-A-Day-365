@@ -1,25 +1,28 @@
-// Lightweight event bus for various UI effects
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const _fxSubscribers = new Set<(type: string, data?: any) => void>();
+type FxPayload =
+  | { msg: string; type?: never }
+  | { msg?: never; type?: 'success' | 'error' | 'info' }
+  | Record<string, unknown>;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function _fxEmit(type: string, data?: any) {
-  _fxSubscribers.forEach(subscriber => subscriber(type, data));
+type FxType = 'announce' | 'confetti' | 'toast' | 'villain-nudge';
+
+// Lightweight event bus (module singleton)
+const subscribers = new Set<(type: FxType, data?: FxPayload) => void>();
+
+export function _fxEmit(type: FxType, data?: FxPayload) {
+  subscribers.forEach(fn => fn(type, data));
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function _fxSubscribe(fn: (type: string, data?: any) => void) {
-  _fxSubscribers.add(fn);
-  // Return unsubscribe function
-  return () => _fxSubscribers.delete(fn);
+export function _fxSubscribe(fn: (type: FxType, data?: FxPayload) => void) {
+  subscribers.add(fn);
+  return () => subscribers.delete(fn);
 }
 
-// Public hook to trigger effects
 export function useVillainAnnounce() {
   return {
     announce: (msg: string) => _fxEmit("announce", { msg }),
     confetti: () => _fxEmit("confetti"),
-    toast: (msg: string, type: "success" | "error" | "info" = "info") => _fxEmit("toast", { msg, type }),
+    toast: (msg: string, type: "success" | "error" | "info" = "info") =>
+      _fxEmit("toast", { msg, type }),
     villainNudge: (msg: string) => _fxEmit("villain-nudge", { msg }),
   };
 }

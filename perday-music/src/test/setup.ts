@@ -1,27 +1,21 @@
 /// <reference types="vitest/globals" />
 import '@testing-library/jest-dom';
-
 import { vi } from 'vitest';
 
-// --- matchMedia (reduced motion)
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
-  value: vi.fn().mockImplementation((query: string) => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addListener: vi.fn(), // legacy
-    removeListener: vi.fn(), // legacy
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
+  value: vi.fn().mockImplementation((q: string) => ({
+    matches: false, media: q, onchange: null,
+    addListener: vi.fn(), removeListener: vi.fn(),
+    addEventListener: vi.fn(), removeEventListener: vi.fn(),
     dispatchEvent: vi.fn(),
   })),
 });
 
-// --- stable perf.now for latency math
+// Stable perf.now for latency math
 vi.spyOn(performance, 'now').mockReturnValue(1000);
 
-// --- localStorage
+// localStorage mock
 const localStorageMock = {
   getItem: vi.fn(),
   setItem: vi.fn(),
@@ -30,74 +24,50 @@ const localStorageMock = {
 };
 Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
-// --- ResizeObserver
 (globalThis as any).ResizeObserver = vi.fn().mockImplementation(() => ({
-  observe: vi.fn(),
-  unobserve: vi.fn(),
-  disconnect: vi.fn(),
+  observe: vi.fn(), unobserve: vi.fn(), disconnect: vi.fn(),
 }));
 
-// --- echarts wrapper (render nothing in tests)
 vi.mock('echarts-for-react', () => ({ default: () => null }));
 
-// --- Complete GSAP mock (single source of truth)
+// Tiny GSAP mock that matches the improved components
 vi.mock('gsap', () => {
-  const makeTween = () => ({ kill: vi.fn(), play: vi.fn().mockReturnThis() });
-
-  const to = vi.fn((target: any, vars: any) => {
-    console.log('GSAP MOCK: to() called');
-
-    // Handle usePrestart case - immediately set target to final value
-    if (target && typeof target === 'object' && 'v' in vars) {
-      console.log('Setting target.v to', vars.v);
-      target.v = vars.v;
-    }
-
-    // Handle DOM element animations (like devil heads)
-    if (typeof target === 'string' && vars) {
-      console.log('Animating DOM element:', target, vars);
-      // For DOM element animations, immediately call onComplete since we can't actually animate in tests
-      if (vars?.onComplete) {
-        vars.onComplete();
-      }
-    }
-
-    // Call callbacks immediately to simulate instant animation
-    if (vars?.onUpdate) vars.onUpdate();
-    if (vars?.onComplete) vars.onComplete();
-
-    return makeTween();
+  const makeTween = () => ({ 
+    kill: vi.fn(), 
+    play: vi.fn().mockReturnThis(),
+    onUpdate: vi.fn(),
+    onComplete: vi.fn()
   });
+  
+  const to = vi.fn(() => makeTween());
   const from = vi.fn(() => makeTween());
   const fromTo = vi.fn(() => makeTween());
-
   const timeline = vi.fn(() => {
     const tl: any = makeTween();
     tl.to = vi.fn().mockReturnValue(tl);
     tl.from = vi.fn().mockReturnValue(tl);
-    tl.fromTo = vi.fn().mockReturnValue(tl); // <- PerdayLogo needs this
+    tl.fromTo = vi.fn().mockReturnValue(tl);
     tl.set = vi.fn().mockReturnValue(tl);
     tl.add = vi.fn().mockReturnValue(tl);
-    tl.killTweensOf = vi.fn();               // <- some code calls it on the tl
+    tl.killTweensOf = vi.fn();
     tl.kill = vi.fn();
     return tl;
   });
-
+  
   const registerPlugin = vi.fn();
-  const killTweensOf = vi.fn();              // <- AtomOrbit calls this
-
-  // Mock ScrollTrigger
-  const ScrollTrigger = {
-    create: vi.fn(),
-    getAll: vi.fn().mockReturnValue([]),
-    refresh: vi.fn(),
-    config: vi.fn(),
-    register: vi.fn(),
-    killAll: vi.fn()
+  const killTweensOf = vi.fn();
+  
+  return { 
+    gsap: { 
+      to, 
+      from, 
+      fromTo, 
+      set: vi.fn(), 
+      timeline, 
+      registerPlugin, 
+      killTweensOf 
+    } 
   };
-
-  const gsap = { to, from, fromTo, set: vi.fn(), timeline, registerPlugin, killTweensOf, ScrollTrigger };
-  return { gsap };
 });
 
 // --- @gsap/react: run the callback immediately; accept config form too

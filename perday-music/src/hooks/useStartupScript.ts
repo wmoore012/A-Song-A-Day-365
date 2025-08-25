@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { _fxEmit } from './useVillainAnnounce';
 
 interface StartupMessage {
@@ -13,10 +13,9 @@ const STARTUP_SCRIPT: StartupMessage[] = [
   { id: 'nervous', text: 'Still nervous? ...I remember my first time producing lol', delay: 10000 },
   { id: 'focus', text: 'Focus on the music. Everything else is noise.', delay: 15000 },
   { id: 'multiplier', text: 'Your multiplier is your friend. Keep it alive!', delay: 20000 },
-  { id: 'villain-watching', text: 'I\'ll be watching... don\'t disappoint me.', delay: 25000 },
+  { id: 'villain-watching', text: "I'll be watching... don't disappoint me.", delay: 25000 },
 ];
 
-// Continuous quippy messages for ongoing monitoring
 const CONTINUOUS_MESSAGES = [
   "Focus on your work, or DON'T! 😂 More placements for me ✅",
   "I see you scrolling... 👀",
@@ -26,84 +25,76 @@ const CONTINUOUS_MESSAGES = [
   "Make it count or make it again 🔄",
   "Your multiplier is getting lonely 😈",
   "Tick tock... ⏰",
-  "I believe in you... sort of 🤷‍♂️",
-  "This better be worth my time 😏",
-  "Channel that energy into music 🎵",
-  "Less talk, more action 💪",
-  "Your future self will thank me 😌",
   "Pressure makes diamonds 💎",
-  "Or pressure makes you quit 😅",
+  "Less talk, more action 💪",
 ];
 
-export function useStartupScript(userName: string = 'Producer') {
-  const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
-  const [isComplete, setIsComplete] = useState(false);
-  const [continuousInterval, setContinuousInterval] = useState<ReturnType<typeof setInterval> | null>(null);
+export function useStartupScript(userName = 'Producer') {
+  const [idx, setIdx] = useState(0);
+  const [done, setDone] = useState(false);
+  const timers = useRef<number[]>([]);
+  const continuousId = useRef<number | null>(null);
+
+  const clearAll = () => {
+    timers.current.forEach(clearTimeout);
+    timers.current = [];
+    if (continuousId.current) {
+      clearInterval(continuousId.current);
+      continuousId.current = null;
+    }
+  };
 
   useEffect(() => {
-    if (isComplete) return;
+    const isSSR = typeof window === 'undefined';
+    const isTest = (import.meta as any)?.env?.MODE === 'test';
+    if (isSSR || isTest) return; // no chatter in tests/SSR
 
-    const message = STARTUP_SCRIPT[currentMessageIndex];
-    if (!message) {
-      setIsComplete(true);
+    if (done) return;
+
+    const msg = STARTUP_SCRIPT[idx];
+    if (!msg) {
+      setDone(true);
       return;
     }
 
-    const timer = setTimeout(() => {
-      const formattedText = message.text.replace('{name}', userName);
-      _fxEmit('villain-nudge', { msg: formattedText });
-      
-      if (currentMessageIndex < STARTUP_SCRIPT.length - 1) {
-        setCurrentMessageIndex(prev => prev + 1);
-      } else {
-        setIsComplete(true);
-      }
-    }, message.delay);
+    const id = window.setTimeout(() => {
+      _fxEmit('villain-nudge', { msg: msg.text.replace('{name}', userName) });
+      setIdx((v) => v + 1);
+    }, msg.delay);
 
-    return () => clearTimeout(timer);
-  }, [currentMessageIndex, isComplete, userName]);
+    timers.current.push(id);
+    return clearAll;
+  }, [idx, done, userName]);
 
-  // Start continuous quippy messages after startup script
+  // Start continuous quips after startup
   useEffect(() => {
-    if (isComplete && !continuousInterval) {
-      const interval = setInterval(() => {
-        const randomMessage = CONTINUOUS_MESSAGES[Math.floor(Math.random() * CONTINUOUS_MESSAGES.length)];
-        _fxEmit('villain-nudge', { msg: randomMessage });
-      }, 90000); // 1min 30sec = 90 seconds
+    const isSSR = typeof window === 'undefined';
+    const isTest = (import.meta as any)?.env?.MODE === 'test';
+    if (isSSR || isTest) return;
 
-      setContinuousInterval(interval);
+    if (done && !continuousId.current) {
+      continuousId.current = window.setInterval(() => {
+        const m = CONTINUOUS_MESSAGES[Math.floor(Math.random() * CONTINUOUS_MESSAGES.length)];
+        _fxEmit('villain-nudge', { msg: m });
+      }, 90_000);
     }
-
-    return () => {
-      if (continuousInterval) {
-        clearInterval(continuousInterval);
-      }
-    };
-  }, [isComplete, continuousInterval]);
+    return clearAll;
+  }, [done]);
 
   const restartScript = () => {
-    setCurrentMessageIndex(0);
-    setIsComplete(false);
-    // Clear continuous interval when restarting
-    if (continuousInterval) {
-      clearInterval(continuousInterval);
-      setContinuousInterval(null);
-    }
+    clearAll();
+    setIdx(0);
+    setDone(false);
   };
 
-  // Function to reduce villain messages during active work
   const reduceVillainMessages = () => {
-    setIsComplete(true);
-    // Clear continuous messages during focus
-    if (continuousInterval) {
-      clearInterval(continuousInterval);
-      setContinuousInterval(null);
-    }
-    // Set a quiet period message
-    setTimeout(() => {
-      _fxEmit('villain-nudge', { msg: 'Focus on your work. I\'ll be quiet for a while...' });
-    }, 30000); // 30 seconds
+    clearAll();
+    setDone(true);
+    const id = window.setTimeout(() => {
+      _fxEmit('villain-nudge', { msg: "Focus on your work. I'll be quiet for a while..." });
+    }, 30_000);
+    timers.current.push(id);
   };
 
-  return { isComplete, restartScript, reduceVillainMessages };
+  return { isComplete: done, restartScript, reduceVillainMessages };
 }

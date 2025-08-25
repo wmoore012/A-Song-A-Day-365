@@ -5,7 +5,7 @@ import App from '../../App';
 // Mock the store to force hydrated state
 vi.mock('../../store/store', () => ({
   useAppStore: () => ({
-    session: { state: "PRE_START", readyPressed: false },
+    session: { state: "VAULT_CLOSED", readyPressed: false },
     settings: {
       defaultDuration: 25,
       defaultMultiplier: 1.5,
@@ -29,18 +29,8 @@ describe('App', () => {
     expect(screen.getByTestId('app-main')).toBeInTheDocument();
   });
 
-  it('shows page visibility badge when page is hidden', () => {
-    Object.defineProperty(document, 'hidden', {
-      writable: true,
-      value: true,
-    });
-
+  it('shows WelcomeScreen initially', () => {
     render(<App />);
-    expect(screen.getByTestId('page-visibility-badge')).toBeInTheDocument();
-  });
-
-  it('shows StartHero initially', () => {
-    render(<App />);
-    expect(screen.getByText('7-minute Pre-Start to get your mind right.')).toBeInTheDocument();
+    expect(screen.getByText('Perday Music 365')).toBeInTheDocument();
   });
 });

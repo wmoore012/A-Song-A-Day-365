@@ -16,7 +16,6 @@ import ShaderShowcase from "./components/ShaderShowcase";
 // import VillainDisplay from "./components/VillainDisplay"; // Temporarily disabled
 import { AnalyticsHud } from "./components/common/AnalyticsHud";
 import AudioHud from "./components/common/AudioHud";
-import TestStore from "./components/TestStore";
 import { usePrestart } from "./hooks/usePrestart";
 // import { useStartupScript } from "./hooks/useStartupScript"; // Temporarily disabled
 
@@ -63,9 +62,6 @@ export default function App() {
 
   return (
     <ShaderBackground data-testid="app-main">
-      {/* Test component to verify store */}
-      <TestStore />
-
       {/* Reset button for debugging */}
       <div className="fixed top-4 right-4 z-50">
         <button

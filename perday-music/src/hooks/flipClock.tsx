@@ -7,106 +7,122 @@ interface FlipClockProps {
   onComplete?: () => void;
 }
 
+/**
+ * FlipClock
+ * - Scramble-to-final effect per character (authentic "flip" feel without 60fps setState spam)
+ * - One render per animation frame (batched), not per character update
+ * - Skips animation in tests / reduced-motion / SSR
+ */
 export default function FlipClock({ text, className = "", onComplete }: FlipClockProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [displayText, setDisplayText] = useState('');
-  const [isAnimating, setIsAnimating] = useState(false);
+  const tlRef = useRef<gsap.core.Timeline | null>(null);
+  const rafRef = useRef<number | null>(null);
+  const workingCharsRef = useRef<string[]>([]);
+  const [displayText, setDisplayText] = useState<string>("");
 
   useEffect(() => {
-    if (!containerRef.current || !text) return;
+    const isSSR = typeof window === 'undefined';
+    const isTest = (import.meta as any)?.env?.MODE === 'test';
+    const reduceMotion = !isSSR && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
-    const shouldAnimate = import.meta?.env?.MODE !== 'test' && 
-      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true ? false : true;
-    if (!shouldAnimate) {
+    if (!containerRef.current || !text) {
+      setDisplayText(text || "");
+      return;
+    }
+
+    // No animation paths
+    if (isSSR || isTest || reduceMotion) {
       setDisplayText(text);
       return;
     }
 
-    setIsAnimating(true);
-    
-    // Create timeline for authentic flip animation
+    // Kill any previous animation
+    tlRef.current?.kill();
+    if (rafRef.current) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
+
+    const finalChars = text.split('');
+    const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()';
+    const n = finalChars.length;
+
+    // Initialize working buffer with random chars (same length as target)
+    workingCharsRef.current = Array.from({ length: n }).map(
+      () => charset[Math.floor(Math.random() * charset.length)]
+    );
+
+    // Commit loop (single RAF per frame)
+    const commit = () => {
+      setDisplayText(workingCharsRef.current.join(''));
+      rafRef.current = requestAnimationFrame(commit);
+    };
+    rafRef.current = requestAnimationFrame(commit);
+
+    // Build a single timeline that animates each character's reveal
     const tl = gsap.timeline({
       onComplete: () => {
-        setIsAnimating(false);
-        if (onComplete) onComplete();
+        // Final commit to ensure perfect text
+        workingCharsRef.current = finalChars.slice();
+        setDisplayText(text);
+        if (rafRef.current) {
+          cancelAnimationFrame(rafRef.current);
+          rafRef.current = null;
+        }
+        onComplete?.();
       }
     });
 
-    const chars = text.split('');
-    
-    // Start with random characters
-    setDisplayText(chars.map(() => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()'[Math.floor(Math.random() * 62)]).join(''));
-
-    // Animate each character with authentic flip effect
-    chars.forEach((char, index) => {
-      const randomDuration = 3 + Math.random() * 5; // 3-8 seconds
-      const randomDelay = Math.random() * 2; // 0-2 seconds delay
-      
-      tl.to({}, {
-        duration: randomDuration,
-        delay: randomDelay,
-        ease: "power2.out",
-        onUpdate: function() {
-          const progress = this.progress();
-          
-          // Random character flipping effect
-          if (progress < 0.8) {
-            const randomChar = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()'[Math.floor(Math.random() * 62)];
-            setDisplayText(prev => {
-              const chars = prev.split('');
-              chars[index] = randomChar;
-              return chars.join('');
-            });
+    // Stagger per character with a little randomness
+    finalChars.forEach((ch, i) => {
+      const dur = 0.6 + Math.random() * 0.6;   // 0.6–1.2s
+      const delay = Math.random() * 0.2;       // 0–0.2s
+      // Dummy tween whose onUpdate mutates the working array (no setState here)
+      const proxy = { p: 0 };
+      tl.to(proxy, {
+        p: 1,
+        duration: dur,
+        delay,
+        ease: 'power2.out',
+        onUpdate: () => {
+          // While <80% progressed, keep scrambling this index only
+          if (proxy.p < 0.8) {
+            workingCharsRef.current[i] = charset[Math.floor(Math.random() * charset.length)];
           } else {
-            // Final character reveal
-            setDisplayText(prev => {
-              const chars = prev.split('');
-              chars[index] = char;
-              return chars.join('');
-            });
+            workingCharsRef.current[i] = ch;
           }
         }
-      }, index * 0.1); // Stagger the start of each character
+      }, i * 0.06); // slight deterministic stagger
     });
+
+    tlRef.current = tl;
+
+    return () => {
+      tlRef.current?.kill();
+      tlRef.current = null;
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+    };
   }, [text, onComplete]);
 
   return (
-    <div 
-      ref={containerRef} 
-      className={`font-mono font-bold tracking-wider ${className}`}
+    <div
+      ref={containerRef}
+      className={`font-mono font-bold tracking-wider [perspective:800px] ${className}`}
+      aria-label={text}
     >
-      {displayText.split('').map((char, index) => (
-        <div key={index} className="inline-block mx-1">
-          {/* Top half of flip digit */}
-          <div className="relative w-8 h-10 overflow-hidden">
-            <div 
-              className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-gray-800 to-gray-900 border border-cyan-400/30 rounded-t-md flex items-center justify-center text-cyan-300 text-lg font-bold"
-              style={{
-                transformOrigin: 'bottom',
-                transform: isAnimating ? 'rotateX(0deg)' : 'rotateX(0deg)',
-                transition: 'transform 0.3s ease-in-out',
-                textShadow: isAnimating ? '0 0 8px rgba(34, 211, 238, 0.8)' : 'none'
-              }}
-            >
-              {char}
-            </div>
-          </div>
-          
-          {/* Bottom half of flip digit */}
-          <div className="relative w-8 h-10 overflow-hidden">
-            <div 
-              className="absolute bottom-0 left-0 w-full h-full bg-gradient-to-t from-gray-700 to-gray-800 border border-cyan-400/30 rounded-b-md flex items-center justify-center text-cyan-300 text-lg font-bold"
-              style={{
-                transformOrigin: 'top',
-                transform: isAnimating ? 'rotateX(0deg)' : 'rotateX(0deg)',
-                transition: 'transform 0.3s ease-in-out',
-                textShadow: isAnimating ? '0 0 8px rgba(34, 211, 238, 0.8)' : 'none'
-              }}
-            >
-              {char}
-            </div>
-          </div>
-        </div>
+      {displayText.split('').map((char, idx) => (
+        <span
+          key={idx}
+          className="inline-block mx-1 [transform-style:preserve-3d]"
+        >
+          {/* Keep the markup simple; the 'flip' sensation is conveyed by the scramble + subtle depth */}
+          <span className="inline-block rounded-md px-1 py-2 bg-gradient-to-b from-gray-800 to-gray-900 border border-cyan-400/30 text-cyan-300 text-lg font-bold will-change-transform">
+            {char}
+          </span>
+        </span>
       ))}
     </div>
   );
