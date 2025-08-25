@@ -8,7 +8,7 @@ interface PerdayLogoProps {
   size?: number;
   className?: string;
   showText?: boolean;
-  variant?: 'default' | 'hero' | 'transition' | 'vault'; // New variants!
+  variant?: 'default' | 'hero' | 'transition'; // Animation variants
   onAnimationComplete?: () => void;
 }
 
@@ -55,14 +55,7 @@ export default function PerdayLogo({
         );
         break;
         
-      case 'vault':
-        // CINEMATIC vault reveal
-        tl.fromTo(logoRef.current,
-          { scale: 0.1, opacity: 0, filter: "blur(20px)" },
-          { scale: 1, opacity: 1, filter: "blur(0px)", duration: 1.5, ease: "power3.out" }
-        );
-        break;
-        
+
       default:
         // Enhanced default animation
         tl.fromTo(logoRef.current, 

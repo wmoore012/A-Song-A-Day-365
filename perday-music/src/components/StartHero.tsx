@@ -11,13 +11,12 @@ import SettingsSheet from "./SettingsSheet";
 import { Button } from "./ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Tooltip, TooltipTrigger, TooltipContent } from "./ui/tooltip";
-import VaultTransition from "./VaultTransition";
 import UserQuestionnaire from "./UserQuestionnaire";
 import { Settings } from "lucide-react";
 import { toast } from "sonner";
 
 /** Overlay FSM so only ONE overlay can ever mount at a time */
-type Overlay = "none" | "vault" | "questionnaire" | "setup";
+type Overlay = "none" | "questionnaire" | "setup";
 
 interface StartHeroProps {
   fadeOutRef: React.MutableRefObject<() => void>;
@@ -71,8 +70,7 @@ export default function StartHero({ fadeOutRef }: StartHeroProps) {
     setSoundArmed(true);
     setSettings({ soundEnabled: true });
     toast.success("🎵 Studio audio enabled");
-    // celebrate with vault transition once sound is allowed
-    setTimeout(() => setOverlay("vault"), 600);
+    // No more vault transition - sound is ready to use
   };
 
   const userName = settings.userName || "Producer";
@@ -179,19 +177,7 @@ export default function StartHero({ fadeOutRef }: StartHeroProps) {
           </div>
 
           {/* Overlays (mutually exclusive) */}
-          {overlay === "vault" && (
-            <VaultTransition
-              isOpen
-              onTransitionComplete={() => setOverlay("questionnaire")}
-            >
-              <div className="min-h-screen bg-black flex items-center justify-center">
-                <div className="text-center">
-                  <h1 className="text-6xl font-bold text-amber-300 mb-8">VAULT ACCESSED</h1>
-                  <p className="text-2xl text-cyan-100">Welcome to your creative space</p>
-                </div>
-              </div>
-            </VaultTransition>
-          )}
+          {/* Vault overlay removed - no longer needed */}
 
           {overlay === "questionnaire" && (
             <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-xl flex items-center justify-center">
