@@ -15,5 +15,5 @@ jobs:
           cache: 'npm'
           cache-dependency-path: package-lock.json
       - run: cd perday-music && npm ci
-      - run: cd perday-music && npm test -- --run --silent
+      - run: cd perday-music && npm test -- --silent
       - run: cd perday-music && npm run build
