@@ -86,7 +86,17 @@ vi.mock('gsap', () => {
   const registerPlugin = vi.fn();
   const killTweensOf = vi.fn();              // <- AtomOrbit calls this
 
-  const gsap = { to, from, fromTo, set: vi.fn(), timeline, registerPlugin, killTweensOf };
+  // Mock ScrollTrigger
+  const ScrollTrigger = {
+    create: vi.fn(),
+    getAll: vi.fn().mockReturnValue([]),
+    refresh: vi.fn(),
+    config: vi.fn(),
+    register: vi.fn(),
+    killAll: vi.fn()
+  };
+
+  const gsap = { to, from, fromTo, set: vi.fn(), timeline, registerPlugin, killTweensOf, ScrollTrigger };
   return { gsap };
 });
 

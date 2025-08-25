@@ -3,11 +3,11 @@ import * as echarts from "echarts";
 import { useEffect, useState } from 'react';
 
 interface AnalyticsHudProps {
-  grades: number[];
-  latencies: number[];
+  grades?: number[];
+  latencies?: number[];
 }
 
-export function AnalyticsHud({ grades, latencies }: AnalyticsHudProps) {
+export function AnalyticsHud({ grades = [], latencies = [] }: AnalyticsHudProps) {
   const [isFirstData, setIsFirstData] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
 

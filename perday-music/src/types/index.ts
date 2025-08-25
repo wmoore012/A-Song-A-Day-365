@@ -1,13 +1,18 @@
 export enum FlowState {
-  PRE_START = "PRE_START",
-  LOCK_IN = "LOCK_IN",
-  FOCUS_SETUP = "FOCUS_SETUP",
-  FOCUS_RUNNING = "FOCUS_RUNNING",
-  CHECKPOINT = "CHECKPOINT",
-  SELF_RATE = "SELF_RATE",
-  RECAP = "RECAP",
-  REWARD_GATE = "REWARD_GATE",
-  POST_ACTIONS = "POST_ACTIONS", // Add missing state
+  VAULT_CLOSED = "VAULT_CLOSED",      // Vault is closed, show welcome screen
+  QUESTIONNAIRE = "QUESTIONNAIRE",    // User answering initial questions
+  PREPARATION = "PREPARATION",        // 7-minute preparation phase
+  PRE_START = "PRE_START",           // Ready to start session
+  LOCK_IN = "LOCK_IN",               // Choose work type
+  FOCUS_SETUP = "FOCUS_SETUP",       // Set up focus session
+  FOCUS_RUNNING = "FOCUS_RUNNING",   // Active work session
+  CHECKPOINT = "CHECKPOINT",         // Mid-session checkpoint
+  SELF_RATE = "SELF_RATE",           // Rate the session
+  RECAP = "RECAP",                   // Session summary
+  REWARD_GATE = "REWARD_GATE",       // Reward screen
+  POST_ACTIONS = "POST_ACTIONS",     // Post-session actions
+  SCROLL_DEMO = "SCROLL_DEMO",       // Scroll animation demo page
+  SHADER_DEMO = "SHADER_DEMO",       // Sophisticated shader demo
 }
 
 export type Rating = 1 | 2 | 3;
@@ -25,27 +30,40 @@ export interface Session {
   endTime?: number;
   notes?: string;
   proof?: string;
+  // User profile data
+  userName?: string;
+  collaborators?: string;
+  // Preparation phase
+  preparationComplete?: boolean;
+  preparationStartTime?: number;
 }
 
 export type Action =
-  | { type: "READY" }
-  | { type: "TIMER_ZERO" }
-  | { type: "PICK_TYPE"; payload: string }
-  | { type: "SET_TARGET"; payload: string }
-  | { type: "SET_DURATION"; payload: number }
-  | { type: "START_FOCUS" }
-  | { type: "PAUSE" }
-  | { type: "END_FOCUS" }
-  | { type: "ATTACH_PROOF"; payload?: string }
-  | { type: "SKIP_CHECKPOINT" }
-  | { type: "RATE_SESSION"; payload: Rating }
-  | { type: "CONTINUE" }
-  | { type: "SAVE_SUMMARY" }
-  | { type: "DISCARD" }
-  | { type: "CLAIM_AWARD" }
-  | { type: "BACK" }
-  | { type: "RESET" }
-  | { type: "ADD_NOTE"; payload: string }; // Add missing action
+  | { type: "OPEN_VAULT" }                          // Open vault to reveal content
+  | { type: "START_QUESTIONNAIRE" }                 // Begin questionnaire
+  | { type: "COMPLETE_QUESTIONNAIRE"; payload: { name: string; collaborators: string; sessionDate?: Date } }
+  | { type: "START_PREPARATION" }                   // Begin 7-minute preparation
+  | { type: "COMPLETE_PREPARATION" }                // Finish preparation phase
+  | { type: "READY" }                               // User is ready to start
+  | { type: "TIMER_ZERO" }                          // Timer reached zero
+  | { type: "PICK_TYPE"; payload: string }          // Choose work type
+  | { type: "SET_TARGET"; payload: string }         // Set work target
+  | { type: "SET_DURATION"; payload: number }       // Set session duration
+  | { type: "START_FOCUS" }                         // Start focus session
+  | { type: "PAUSE" }                               // Pause session
+  | { type: "END_FOCUS" }                           // End focus session
+  | { type: "ATTACH_PROOF"; payload?: string }      // Attach proof of work
+  | { type: "SKIP_CHECKPOINT" }                     // Skip checkpoint
+  | { type: "RATE_SESSION"; payload: Rating }       // Rate the session
+  | { type: "CONTINUE" }                            // Continue to next phase
+  | { type: "SAVE_SUMMARY" }                        // Save session summary
+  | { type: "DISCARD" }                             // Discard session
+  | { type: "CLAIM_AWARD" }                         // Claim reward
+  | { type: "BACK" }                                // Go back to previous state
+  | { type: "RESET" }                               // Reset entire flow
+  | { type: "ADD_NOTE"; payload: string }
+  | { type: "SCROLL_DEMO" }
+  | { type: "SHADER_DEMO" };
 
 export class InvalidTransition extends Error {
   constructor(from: FlowState, action: string) {

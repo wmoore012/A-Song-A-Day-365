@@ -2,6 +2,32 @@ import { Action, FlowState, InvalidTransition, Session } from "../types";
 
 export function transition(s: Session, a: Action): Session {
   switch (a.type) {
+    case "OPEN_VAULT":
+      if (s.state !== FlowState.VAULT_CLOSED) throw new InvalidTransition(s.state, a.type);
+      return { ...s, state: FlowState.QUESTIONNAIRE };
+
+    case "START_QUESTIONNAIRE":
+      if (s.state !== FlowState.QUESTIONNAIRE) throw new InvalidTransition(s.state, a.type);
+      return { ...s, state: FlowState.QUESTIONNAIRE };
+
+    case "COMPLETE_QUESTIONNAIRE":
+      if (s.state !== FlowState.QUESTIONNAIRE) throw new InvalidTransition(s.state, a.type);
+      return {
+        ...s,
+        state: FlowState.PREPARATION,
+        userName: a.payload.name,
+        collaborators: a.payload.collaborators,
+        preparationStartTime: Date.now()
+      };
+
+    case "START_PREPARATION":
+      if (s.state !== FlowState.PREPARATION) throw new InvalidTransition(s.state, a.type);
+      return { ...s, preparationStartTime: Date.now() };
+
+    case "COMPLETE_PREPARATION":
+      if (s.state !== FlowState.PREPARATION) throw new InvalidTransition(s.state, a.type);
+      return { ...s, state: FlowState.PRE_START, preparationComplete: true };
+
     case "READY":
       if (s.state !== FlowState.PRE_START) throw new InvalidTransition(s.state, a.type);
       return { ...s, readyPressed: true };
@@ -72,6 +98,14 @@ export function transition(s: Session, a: Action): Session {
       if (s.state === FlowState.FOCUS_SETUP) return { ...s, state: FlowState.LOCK_IN };
       if (s.state === FlowState.CHECKPOINT) return { ...s, state: FlowState.FOCUS_RUNNING };
       throw new InvalidTransition(s.state, a.type);
+
+    case "SCROLL_DEMO":
+      // Direct navigation to scroll demo (can be accessed from any state)
+      return { ...s, state: FlowState.SCROLL_DEMO };
+
+    case "SHADER_DEMO":
+      // Direct navigation to shader demo (can be accessed from any state)
+      return { ...s, state: FlowState.SHADER_DEMO };
 
     case "RESET":
       return { state: FlowState.PRE_START, readyPressed: false, multiplierPenalty: false };

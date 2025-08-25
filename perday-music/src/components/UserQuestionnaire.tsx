@@ -4,20 +4,26 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
+import { Calendar } from './ui/calendar';
 import { Settings } from 'lucide-react';
 
 interface UserQuestionnaireProps {
-  onComplete: (data: { name: string; collaborators: string }) => void;
+  onComplete: (data: { name: string; collaborators: string; sessionDate?: Date }) => void;
 }
 
 export default function UserQuestionnaire({ onComplete }: UserQuestionnaireProps) {
   const [name, setName] = useState('');
   const [collaborators, setCollaborators] = useState('');
+  const [date, setDate] = useState<Date | undefined>(new Date());
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (name.trim()) {
-      onComplete({ name: name.trim(), collaborators: collaborators.trim() });
+      onComplete({
+        name: name.trim(),
+        collaborators: collaborators.trim(),
+        sessionDate: date
+      });
     }
   };
 
@@ -59,6 +65,18 @@ export default function UserQuestionnaire({ onComplete }: UserQuestionnaireProps
                 <SelectItem value="remote">Remote collaboration</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-synth-white">Session Date (for allnighters/backdating)</Label>
+            <div className="bg-black/40 border border-cyan-400/40 rounded-lg p-3">
+              <Calendar
+                mode="single"
+                selected={date}
+                onSelect={setDate}
+                className="rounded-lg border-0 bg-transparent text-synth-white"
+              />
+            </div>
           </div>
           
           <Button 
