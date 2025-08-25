@@ -104,9 +104,7 @@ export function transition(s: Session, a: Action): Session {
       // Direct navigation to scroll demo (can be accessed from any state)
       return { ...s, state: FlowState.SCROLL_DEMO };
 
-    case "SHADER_DEMO":
-      // Direct navigation to shader demo (can be accessed from any state)
-      return { ...s, state: FlowState.SHADER_DEMO };
+
 
     case "RESET":
       return { state: FlowState.VAULT_CLOSED, readyPressed: false, multiplierPenalty: false, preparationStartTime: undefined };

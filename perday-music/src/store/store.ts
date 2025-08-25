@@ -37,7 +37,7 @@ export const useAppStore = create<AppState>()(
         defaultMultiplier: 1.5, 
         autoStartTimer: true, 
         soundEnabled: true, 
-        volume: 0.7, 
+        volume: 0.15, 
         notifications: true, 
         accountabilityEmail: '',
         userName: '',

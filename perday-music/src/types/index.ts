@@ -12,7 +12,6 @@ export enum FlowState {
   REWARD_GATE = "REWARD_GATE",       // Reward screen
   POST_ACTIONS = "POST_ACTIONS",     // Post-session actions
   SCROLL_DEMO = "SCROLL_DEMO",       // Scroll animation demo page
-  SHADER_DEMO = "SHADER_DEMO",       // Sophisticated shader demo
 }
 
 export type Rating = 1 | 2 | 3;
@@ -63,8 +62,7 @@ export type Action =
   | { type: "RESET" }                               // Reset entire flow
   | { type: "ADD_NOTE"; payload: string }
   | { type: "UPDATE_SETTINGS"; payload: Partial<Settings> }
-  | { type: "SCROLL_DEMO" }
-  | { type: "SHADER_DEMO" };
+  | { type: "SCROLL_DEMO" };
 
 export interface Settings {
   defaultDuration: number;

@@ -31,6 +31,6 @@ describe('App', () => {
 
   it('shows WelcomeScreen initially', () => {
     render(<App />);
-    expect(screen.getByText('Perday Music 365')).toBeInTheDocument();
+    expect(screen.getByText('Perday Music 365™')).toBeInTheDocument();
   });
 });
