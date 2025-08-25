@@ -7,11 +7,14 @@ on:
 jobs:
   ci:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: perday-music
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: cd perday-music && npm ci
-      - run: cd perday-music && npm test -- --silent
-      - run: cd perday-music && npm run build
+      - run: npm ci
+      - run: npm test -- --silent
+      - run: npm run build
