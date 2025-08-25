@@ -63,7 +63,7 @@ export default function LockInMenu() {
           <Button
             variant="outline"
             onClick={handleBack}
-            className="border-cyan-400/40 text-cyan-300 hover:bg-cyan-400/20 px-8"
+            className="border-cyan-400/40 text-cyan-300 hover:bg-cyan-400/20 hover:shadow-lg hover:shadow-cyan-400/30 transition-all duration-300 px-8"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Pre-Start

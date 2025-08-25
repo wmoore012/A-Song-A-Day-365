@@ -19,6 +19,17 @@ export type Rating = 1 | 2 | 3;
 
 export type Grade = 'A' | 'B' | 'C';
 
+export type Genre = 'Trap' | 'Hip-Hop' | 'R&B' | 'Pop' | 'Electronic' | 'Rock' | 'Jazz' | 'Country' | 'Other';
+
+export interface InventoryItem {
+  id: string;
+  title: string;
+  genre: Genre;
+  createdAt: Date;
+  rating?: Rating;
+  notes?: string;
+}
+
 export interface Session {
   state: FlowState;
   readyPressed: boolean;
@@ -64,7 +75,8 @@ export type Action =
   | { type: "RESET" }                               // Reset entire flow
   | { type: "ADD_NOTE"; payload: string }
   | { type: "UPDATE_SETTINGS"; payload: Partial<Settings> }
-  | { type: "SCROLL_DEMO" };
+  | { type: "SCROLL_DEMO" }
+  | { type: "STACK_SONG"; payload: { title: string; genre: Genre; rating?: Rating; notes?: string } };
 
 export interface Settings {
   defaultDuration: number;

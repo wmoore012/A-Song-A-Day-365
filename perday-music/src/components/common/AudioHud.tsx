@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Volume2, Music, AudioWaveform } from 'lucide-react';
 
 /** --- YouTube loader (single-flight, callback-safe) --- */
 let ytReadyPromise: Promise<void> | null = null;
@@ -129,74 +130,53 @@ export default function AudioHud({ fadeOutRef }: { fadeOutRef: React.MutableRefO
   }, [armed]);
 
   return (
-    <section className="rounded-2xl bg-gradient-to-br from-synth-violet/10 to-synth-aqua/10 ring-1 ring-synth-icy/30 p-8 shadow-2xl backdrop-blur-sm border border-synth-icy/20 z-20">
-      <div className="text-xl font-bold text-synth-white mb-6 flex items-center">
-        <span className="text-2xl mr-3">🎵</span>
-        Music & Room Tone
-      </div>
-
+    <div className="fixed bottom-6 left-6 z-50 flex gap-3">
       {!armed ? (
-        <div className="text-center">
-          <div className="text-sm text-synth-icy/80 mb-4">Enable sound to get the full experience</div>
-          <button
-            className="px-6 py-3 rounded-xl bg-gradient-to-r from-synth-violet to-synth-magenta hover:from-synth-magenta hover:to-synth-violet font-bold shadow-lg hover:shadow-[0_8px_20px_rgba(108,26,237,0.4)] transition-all duration-300"
-            onClick={() => setArmed(true)}
-          >
-            🔊 Enable Sound
-          </button>
-        </div>
+        <button
+          className="px-4 py-3 rounded-xl bg-white/10 border border-white/15 text-white hover:bg-white/15 transition"
+          onClick={() => setArmed(true)}
+          aria-label="Enable Sound"
+          title="Enable Sound"
+        >
+          <Volume2 className="w-5 h-5" />
+        </button>
       ) : (
-        <div className="space-y-6">
-          <div className="bg-gradient-to-r from-synth-violet/20 to-synth-magenta/10 rounded-xl p-4 border border-synth-violet/30">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-lg font-semibold text-synth-white flex items-center">
-                <span className="text-2xl mr-2">🎵</span>
-                Music
-              </span>
-              <div className="text-xs text-synth-icy">vol ~15%</div>
-            </div>
-            <button
-              className="w-full px-4 py-3 rounded-lg bg-gradient-to-r from-synth-violet to-synth-magenta hover:from-synth-magenta hover:to-synth-violet font-bold shadow-lg hover:shadow-[0_8px_20px_rgba(108,26,237,0.4)] transition-all duration-300 transform hover:scale-[1.02]"
-              onClick={() => {
-                try {
-                  const s = music.current?.getPlayerState?.();
-                  if (s === 1) music.current?.pauseVideo?.();
-                  else music.current?.playVideo?.();
-                } catch {}
-              }}
-            >
-              ⏯️ Toggle Music
-            </button>
-          </div>
-
-          <div className="bg-gradient-to-r from-synth-aqua/20 to-synth-icy/10 rounded-xl p-4 border border-synth-aqua/30">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-lg font-semibold text-synth-white flex items-center">
-                <span className="text-2xl mr-2">🌊</span>
-                White Noise
-              </span>
-              <div className="text-xs text-synth-icy">vol ~15%</div>
-            </div>
-            <button
-              className="w-full px-4 py-3 rounded-lg bg-gradient-to-r from-synth-aqua to-synth-icy hover:from-synth-icy hover:to-synth-aqua font-bold shadow-lg hover:shadow-[0_8px_20px_rgba(85,203,220,0.4)] transition-all duration-300 transform hover:scale-[1.02]"
-              onClick={() => {
-                try {
-                  const s = noise.current?.getPlayerState?.();
-                  if (s === 1) noise.current?.pauseVideo?.();
-                  else noise.current?.playVideo?.();
-                } catch {}
-              }}
-            >
-              ⏯️ Toggle White Noise
-            </button>
-          </div>
-        </div>
+        <>
+          <button
+            className="px-4 py-3 rounded-xl bg-white/10 border border-white/15 text-white hover:bg-white/15 transition"
+            onClick={() => {
+              try {
+                const s = music.current?.getPlayerState?.();
+                if (s === 1) music.current?.pauseVideo?.();
+                else music.current?.playVideo?.();
+              } catch {}
+            }}
+            aria-label="Toggle Music"
+            title="Toggle Music"
+          >
+            <Music className="w-5 h-5" />
+          </button>
+          
+          <button
+            className="px-4 py-3 rounded-xl bg-white/10 border border-white/15 text-white hover:bg-white/15 transition"
+            onClick={() => {
+              try {
+                const s = noise.current?.getPlayerState?.();
+                if (s === 1) noise.current?.pauseVideo?.();
+                else noise.current?.playVideo?.();
+              } catch {}
+            }}
+            aria-label="Toggle White Noise"
+            title="Toggle White Noise"
+          >
+            <AudioWaveform className="w-5 h-5" />
+          </button>
+        </>
       )}
 
       {/* Keep players in the tree (1×1 visible to API), but non-interactive */}
       <div className="absolute w-px h-px -m-px overflow-hidden p-0 border-0 pointer-events-none" ref={musicRef} aria-hidden />
       <div className="absolute w-px h-px -m-px overflow-hidden p-0 border-0 pointer-events-none" ref={noiseRef} aria-hidden />
-      <div className="text-xs opacity-60 mt-4">Autoplay requires a click (browser policy).</div>
-    </section>
+    </div>
   );
 }

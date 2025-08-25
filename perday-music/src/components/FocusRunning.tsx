@@ -114,6 +114,35 @@ export default function FocusRunning() {
           />
         </div>
 
+        {/* Studio Vibes and Focusmate */}
+        <div className="grid grid-cols-2 gap-4 mb-8">
+          <button
+            className="px-4 py-3 rounded-xl bg-white/10 border border-white/15 text-white hover:bg-white/15 transition relative group"
+            onClick={() => {
+              // In real app, this would open studio vibes playlist
+              console.log("Studio vibes playlist loaded!");
+            }}
+            title="Visual inspiration videos - watch on mute on your second screen"
+          >
+            📻 Studio Vibes
+            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black/90 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+              Visual inspiration videos - watch on mute on your second screen
+            </div>
+          </button>
+          <button
+            className="px-4 py-3 rounded-xl bg-white/10 border border-white/15 text-white hover:bg-white/15 transition relative group"
+            onClick={() => {
+              window.open('https://www.focusmate.com/', '_blank');
+            }}
+            title="Get paired with an accountability partner for virtual coworking"
+          >
+            👥 Focusmate
+            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black/90 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+              Get paired with an accountability partner for virtual coworking
+            </div>
+          </button>
+        </div>
+
         {/* Notes */}
         <div className="mb-8">
           <Label className="text-synth-white font-semibold flex items-center gap-2 mb-3">

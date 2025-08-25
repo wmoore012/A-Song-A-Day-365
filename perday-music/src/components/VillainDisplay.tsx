@@ -101,7 +101,7 @@ export default function VillainDisplay() {
   const getMessageStyle = (type: string) => {
     switch (type) {
       case 'villain-nudge':
-        return 'bg-black/80 text-cyan-300 border-cyan-400/30';
+        return 'bg-black/90 text-white border-cyan-400/50 shadow-lg shadow-cyan-400/30';
       case 'success':
         return 'bg-gradient-to-r from-synth-aqua/90 to-synth-icy/90 text-synth-white border-synth-aqua/50 shadow-lg shadow-synth-aqua/20';
       case 'error':
@@ -134,7 +134,7 @@ export default function VillainDisplay() {
       {/* Message Container */}
       <div 
         ref={messageContainerRef}
-        className="fixed top-4 right-4 z-40 space-y-2 max-w-sm"
+        className="fixed top-32 right-4 z-40 space-y-2 max-w-sm"
       >
         {messages.map(message => (
           <div
@@ -150,7 +150,7 @@ export default function VillainDisplay() {
                  message.type === 'success' ? '✅' : 
                  message.type === 'error' ? '❌' : '💬'}
               </span>
-              <span className="font-medium text-sm message-text">
+              <span className="font-medium text-sm message-text font-mono">
                 {!message.isTyping ? message.text : ''}
               </span>
             </div>

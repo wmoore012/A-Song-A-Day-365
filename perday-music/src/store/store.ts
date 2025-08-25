@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import localforage from "localforage";
-import { Action, FlowState, Session, Settings } from "../types";
+import { Action, FlowState, Session, Settings, InventoryItem } from "../types";
 import { transition } from "./transitions";
 
 type AppState = {
@@ -11,6 +11,7 @@ type AppState = {
   latencies: number[];
   streak: number;
   freezes: number;
+  inventory: InventoryItem[];
   _hydrated: boolean;
   
   // Prestart properties
@@ -22,6 +23,7 @@ type AppState = {
   dispatch: (a: Action) => void;
   setSettings: (p: Partial<Settings>) => void;
   markHydrated: () => void;
+  addToInventory: (item: Omit<InventoryItem, 'id' | 'createdAt'>) => void;
   
   // Prestart methods
   setPhase: (phase: string) => void;
@@ -48,6 +50,7 @@ export const useAppStore = create<AppState>()(
       latencies: [],
       streak: 0,
       freezes: 0,
+      inventory: [],
       _hydrated: false,
       
       // Prestart properties
@@ -60,10 +63,31 @@ export const useAppStore = create<AppState>()(
         if (a.type === "UPDATE_SETTINGS") {
           return { settings: { ...s.settings, ...a.payload } };
         }
+        if (a.type === "STACK_SONG") {
+          const newItem: InventoryItem = {
+            id: Date.now().toString(),
+            title: a.payload.title,
+            genre: a.payload.genre,
+            createdAt: new Date(),
+            rating: a.payload.rating,
+            notes: a.payload.notes,
+          };
+          return { 
+            session: transition(s.session, a),
+            inventory: [...s.inventory, newItem]
+          };
+        }
         return { session: transition(s.session, a) };
       }),
       setSettings: (p) => set((s) => ({ settings: { ...s.settings, ...p } })),
       markHydrated: () => set({ _hydrated: true }),
+      addToInventory: (item) => set((s) => ({
+        inventory: [...s.inventory, {
+          id: Date.now().toString(),
+          ...item,
+          createdAt: new Date(),
+        }]
+      })),
       
       // Prestart methods
       setPhase: (phase) => set({ phase }),
@@ -80,6 +104,7 @@ export const useAppStore = create<AppState>()(
         latencies: s.latencies,
         streak: s.streak,
         freezes: s.freezes,
+        inventory: s.inventory,
         prestartTotalMs: s.prestartTotalMs,
         phase: s.phase,
         readyAt: s.readyAt,

@@ -108,7 +108,9 @@ export function transition(s: Session, a: Action): Session {
       // Direct navigation to scroll demo (can be accessed from any state)
       return { ...s, state: FlowState.SCROLL_DEMO };
 
-
+    case "STACK_SONG":
+      // Stack a song to inventory (can be called from any state)
+      return { ...s, state: FlowState.RECAP };
 
     case "RESET":
       return { state: FlowState.VAULT_CLOSED, readyPressed: false, multiplierPenalty: false, preparationStartTime: undefined };

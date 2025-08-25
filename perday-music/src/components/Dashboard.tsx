@@ -41,7 +41,7 @@ export default function Dashboard() {
   ];
 
   const quickActions = [
-    { title: "Start Focus Session", icon: Play, action: () => dispatch({ type: "PICK_TYPE", payload: "Production" }) },
+    { title: "Start Focus Session", icon: Play, action: () => dispatch({ type: "START_QUESTIONNAIRE" }) },
     { title: "View Analytics", icon: BarChart3, action: () => setShowAnalytics(true) },
     { title: "Community", icon: Users, action: () => setShowCommunity(true) },
     { title: "Settings", icon: Settings, action: () => setShowSettings(true) }
@@ -64,8 +64,8 @@ export default function Dashboard() {
               {stats.currentStreak} day streak
             </div>
             <Button 
-              onClick={() => dispatch({ type: "PICK_TYPE", payload: "Production" })}
-              className="bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500"
+              onClick={() => dispatch({ type: "START_QUESTIONNAIRE" })}
+              className="bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 transition-all duration-300"
             >
               <Plus className="w-4 h-4 mr-2" />
               New Session
@@ -143,7 +143,7 @@ export default function Dashboard() {
             <CardContent>
               <div className="space-y-4">
                 {recentSessions.map((session) => (
-                  <div key={session.id} className="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-white/10">
+                  <div key={session.id} className="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-white/10 hover:shadow-lg hover:shadow-cyan-400/20 transition-all duration-300 cursor-pointer">
                     <div className="flex items-center space-x-4">
                       <div className="w-10 h-10 bg-gradient-to-br from-cyan-400 to-purple-500 rounded-lg flex items-center justify-center">
                         <Music className="w-5 h-5 text-white" />
@@ -181,7 +181,7 @@ export default function Dashboard() {
                   <Button
                     key={index}
                     variant="outline"
-                    className="w-full justify-start border-white/20 text-white hover:bg-white/10"
+                    className="w-full justify-start border-white/20 text-white hover:bg-white/10 hover:shadow-lg hover:shadow-cyan-400/30 transition-all duration-300"
                     onClick={action.action}
                   >
                     <action.icon className="w-4 h-4 mr-2" />

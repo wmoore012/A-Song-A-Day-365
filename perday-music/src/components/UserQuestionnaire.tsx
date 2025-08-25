@@ -5,7 +5,8 @@ import { Label } from './ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Calendar } from './ui/calendar';
-import { Settings } from 'lucide-react';
+import { Checkbox } from './ui/checkbox';
+import { Settings, Users, UserPlus } from 'lucide-react';
 
 interface UserQuestionnaireProps {
   onComplete: (data: { name: string; collaborators: string; sessionDate?: Date }) => void;
@@ -14,6 +15,7 @@ interface UserQuestionnaireProps {
 export default function UserQuestionnaire({ onComplete }: UserQuestionnaireProps) {
   const [name, setName] = useState('');
   const [collaborators, setCollaborators] = useState('');
+  const [isRemote, setIsRemote] = useState(false);
   const [date, setDate] = useState<Date | undefined>(new Date());
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -26,6 +28,13 @@ export default function UserQuestionnaire({ onComplete }: UserQuestionnaireProps
       });
     }
   };
+
+  // Mock frequent collaborators (in real app, this would come from database)
+  const frequentCollaborators = [
+    { id: 1, name: "Alex Chen", email: "alex@example.com", lastSession: "2 days ago" },
+    { id: 2, name: "Sam Rivera", email: "sam@example.com", lastSession: "1 week ago" },
+    { id: 3, name: "Jordan Kim", email: "jordan@example.com", lastSession: "3 days ago" }
+  ];
 
   return (
     <Card className="w-full max-w-md bg-gradient-to-br from-magenta-900/20 via-cyan-900/20 to-purple-900/20 backdrop-blur-xl ring-1 ring-cyan-400/30">
@@ -53,7 +62,10 @@ export default function UserQuestionnaire({ onComplete }: UserQuestionnaireProps
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="collaborators" className="text-synth-white">Any collaborators today?</Label>
+            <Label htmlFor="collaborators" className="text-synth-white flex items-center gap-2">
+              <Users className="w-4 h-4" />
+              Any collaborators today?
+            </Label>
             <Select value={collaborators} onValueChange={setCollaborators}>
               <SelectTrigger className="bg-black/40 border-cyan-400/40 text-synth-white">
                 <SelectValue placeholder="Select option" />
@@ -62,10 +74,69 @@ export default function UserQuestionnaire({ onComplete }: UserQuestionnaireProps
                 <SelectItem value="solo">Solo session</SelectItem>
                 <SelectItem value="duo">Duo collaboration</SelectItem>
                 <SelectItem value="group">Group session</SelectItem>
-                <SelectItem value="remote">Remote collaboration</SelectItem>
               </SelectContent>
             </Select>
           </div>
+
+          {/* Remote/In-person checkbox for duo collaboration */}
+          {collaborators === 'duo' && (
+            <div className="space-y-3 p-4 bg-white/5 rounded-lg border border-cyan-400/20">
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="remote" 
+                  checked={isRemote} 
+                  onCheckedChange={(checked) => setIsRemote(checked as boolean)}
+                  className="border-cyan-400/40 data-[state=checked]:bg-cyan-400 data-[state=checked]:border-cyan-400"
+                />
+                <Label htmlFor="remote" className="text-synth-white text-sm">
+                  Remote collaboration
+                </Label>
+              </div>
+              
+              {isRemote && (
+                <div className="space-y-3">
+                  <Label className="text-synth-white text-sm">Frequent collaborators:</Label>
+                  <div className="space-y-2">
+                    {frequentCollaborators.map((collab) => (
+                      <div key={collab.id} className="flex items-center justify-between p-2 bg-white/5 rounded border border-white/10">
+                        <div>
+                          <div className="text-synth-white text-sm font-medium">{collab.name}</div>
+                          <div className="text-synth-icy/60 text-xs">{collab.lastSession}</div>
+                        </div>
+                        <Button 
+                          size="sm" 
+                          className="bg-cyan-500 hover:bg-cyan-600 text-white"
+                          onClick={() => {
+                            // In real app, this would send invite email
+                            alert(`Invite sent to ${collab.name} (${collab.email})`);
+                          }}
+                        >
+                          <UserPlus className="w-3 h-3 mr-1" />
+                          Invite
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="pt-2 border-t border-white/10">
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="w-full border-cyan-400/40 text-cyan-300 hover:bg-cyan-400/10"
+                      onClick={() => {
+                        const email = prompt("Enter collaborator's email:");
+                        if (email) {
+                          alert(`Invite sent to ${email}`);
+                        }
+                      }}
+                    >
+                      <UserPlus className="w-3 h-3 mr-1" />
+                      Invite New Person
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
 
           <div className="space-y-2">
             <Label className="text-synth-white">Session Date (for allnighters/backdating)</Label>

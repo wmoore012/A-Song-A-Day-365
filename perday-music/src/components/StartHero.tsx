@@ -32,7 +32,7 @@ export default function StartHero({ fadeOutRef }: StartHeroProps) {
   // --- UI state
   const [overlay, setOverlay] = useState<Overlay>("none");
   const [multiplier, setMultiplier] = useState(settings.defaultMultiplier ?? 1.0);
-  const [soundArmed, setSoundArmed] = useState<boolean>(settings.soundEnabled ?? false);
+
 
   // --- One-shot autostart at T-0 while in PRE_START
   const firedT0Ref = useRef(false);
@@ -66,12 +66,7 @@ export default function StartHero({ fadeOutRef }: StartHeroProps) {
 
   const onSkipPrestart = () => dispatch({ type: "TIMER_ZERO" });
 
-  const onEnableSound = () => {
-    setSoundArmed(true);
-    setSettings({ soundEnabled: true });
-    toast.success("🎵 Studio audio enabled");
-    // No more vault transition - sound is ready to use
-  };
+
 
   const userName = settings.userName || "Producer";
   const avatarSeed = useMemo(() => encodeURIComponent(userName), [userName]);
@@ -133,17 +128,7 @@ export default function StartHero({ fadeOutRef }: StartHeroProps) {
               <MultiplierBar multiplier={multiplier} />
             </div>
 
-            {!soundArmed ? (
-              <Button
-                size="lg"
-                className="w-full h-12 text-base font-semibold bg-gradient-to-r from-synth-amber to-synth-amberLight text-black rounded-2xl"
-                onClick={onEnableSound}
-              >
-                🔊 Enable Sound
-              </Button>
-            ) : (
-              <div className="text-amber-300 text-sm mb-4">Sound armed. Welcome to the lab. 🧪</div>
-            )}
+
 
             <div className="space-y-3 mt-4">
               <Tooltip>

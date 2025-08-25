@@ -18,6 +18,7 @@ import Dashboard from "./components/Dashboard";
 import ScribbleX from "./components/ScribbleX";
 
 import { AnalyticsHud } from "./components/common/AnalyticsHud";
+import AudioHud from "./components/common/AudioHud";
 
 import { usePrestart } from "./hooks/usePrestart";
 import { useStartupScript } from "./hooks/useStartupScript";
@@ -92,7 +93,8 @@ export default function App() {
                     {/* Analytics HUD */}
                     <AnalyticsHud grades={[]} latencies={[]} />
 
-
+                    {/* Audio HUD */}
+                    <AudioHud fadeOutRef={fadeOutRef} />
 
                     {/* Sequential Flow Content */}
                     {session.state === FlowState.DASHBOARD && (
@@ -168,7 +170,7 @@ function WelcomeScreen() {
 
         </div>
         <p className="text-xl text-cyan-300/80 max-w-3xl mx-auto">
-          Perday Music 365 turns your studio time into a game: timeboxed cookups, live multipliers, and a squad that only talks when you're on a break (or after you ship). Points for focus. Heat for effort. Streaks for consistency.
+          Perday Music 365 turns your studio time into a game: timeboxed cookups, live multipliers, and a squad that only talks when you're on a break (or after you stack). Points for focus. Heat for effort. Streaks for consistency.
         </p>
         <p className="text-lg text-white/60 max-w-2xl mx-auto">
           Cook up. Level up. Every day.
@@ -203,25 +205,25 @@ function WelcomeScreen() {
             
                          <div className="grid grid-cols-2 gap-4">
                <button
-                 onClick={() => dispatch({ type: "PICK_TYPE", payload: "Production" })}
+                 onClick={() => dispatch({ type: "START_QUESTIONNAIRE" })}
                  className="px-6 py-4 bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-white font-bold rounded-xl shadow-2xl hover:shadow-cyan-500/25 transition-all duration-300 transform hover:scale-105"
                >
                  Write X Songs Per Day
                </button>
                <button
-                 onClick={() => dispatch({ type: "PICK_TYPE", payload: "Production" })}
+                 onClick={() => dispatch({ type: "START_QUESTIONNAIRE" })}
                  className="px-6 py-4 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-400 hover:to-pink-500 text-white font-bold rounded-xl shadow-2xl hover:shadow-purple-500/25 transition-all duration-300 transform hover:scale-105"
                >
                  Produce X Songs Per Day
                </button>
                <button
-                 onClick={() => dispatch({ type: "PICK_TYPE", payload: "Production" })}
+                 onClick={() => dispatch({ type: "START_QUESTIONNAIRE" })}
                  className="px-6 py-4 bg-gradient-to-r from-pink-500 to-red-600 hover:from-pink-400 hover:to-red-500 text-white font-bold rounded-xl shadow-2xl hover:shadow-pink-500/25 transition-all duration-300 transform hover:scale-105"
                >
                  Make X Riffs Per Day
                </button>
                <button
-                 onClick={() => dispatch({ type: "PICK_TYPE", payload: "Production" })}
+                 onClick={() => dispatch({ type: "START_QUESTIONNAIRE" })}
                  className="px-6 py-4 bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-400 hover:to-orange-500 text-white font-bold rounded-xl shadow-2xl hover:shadow-red-500/25 transition-all duration-300 transform hover:scale-105"
                >
                  Do X Mixes Per Day
@@ -246,13 +248,29 @@ function WelcomeScreen() {
           </div>
         </div>
 
-        {/* Features Button */}
-        <button
-          onClick={() => setShowFeatures(true)}
-          className="px-6 py-3 border-2 border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-black font-semibold text-base rounded-lg transition-all duration-300 hover:shadow-purple-400/25"
-        >
-          See What's Inside
-        </button>
+                     {/* Features Button */}
+             <button
+               onClick={() => setShowFeatures(true)}
+               className="px-6 py-3 border-2 border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-black font-semibold text-base rounded-lg transition-all duration-300 hover:shadow-purple-400/25"
+             >
+               See What's Inside
+             </button>
+
+             {/* Learn More Button */}
+             <button
+               onClick={() => dispatch({ type: "SCROLL_DEMO" })}
+               className="px-6 py-3 border-2 border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-black font-semibold text-base rounded-lg transition-all duration-300 hover:shadow-cyan-400/25"
+             >
+               Learn More
+             </button>
+
+             {/* Join Beta Waitlist Button */}
+             <button
+               onClick={() => window.open('https://discord.gg/your-server', '_blank')}
+               className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-white font-semibold text-base rounded-lg transition-all duration-300 hover:shadow-green-500/25"
+             >
+               Join Beta Waitlist
+             </button>
       </div>
 
       {/* Features Modal */}
