@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { _fxSubscribe } from '../hooks/useVillainAnnounce';
 import { gsap } from 'gsap';
-import { typeInto } from '../hooks/typewriter';
+import { typeInto } from '../utils/typewriter';
 import FlipClock from '../hooks/flipClock';
 
 interface VillainMessage {

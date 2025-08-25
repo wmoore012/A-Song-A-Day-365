@@ -13,19 +13,19 @@ import FocusSetup from "./components/FocusSetup";
 import FocusRunning from "./components/FocusRunning";
 import ScrollDemoPage from "./components/ScrollDemoPage";
 import ShaderShowcase from "./components/ShaderShowcase";
-// import VillainDisplay from "./components/VillainDisplay"; // Temporarily disabled
+import VillainDisplay from "./components/VillainDisplay";
 import { AnalyticsHud } from "./components/common/AnalyticsHud";
 import AudioHud from "./components/common/AudioHud";
 import { usePrestart } from "./hooks/usePrestart";
-// import { useStartupScript } from "./hooks/useStartupScript"; // Temporarily disabled
+import { useStartupScript } from "./hooks/useStartupScript";
 
 export default function App() {
-  const { session, _hydrated, dispatch } = useAppStore();
+  const { session, _hydrated, dispatch, settings } = useAppStore();
   const fadeOutRef = useRef<() => void>(() => {});
 
-  // Initialize villain monitoring system - TEMPORARILY DISABLED
-  // const userName = settings.userName || "Producer";
-  // useStartupScript(userName);
+  // Initialize villain monitoring system
+  const userName = settings.userName || "Producer";
+  useStartupScript(userName);
 
   // Gate on hydration to avoid flicker
   if (!_hydrated) {
@@ -72,8 +72,8 @@ export default function App() {
         </button>
       </div>
 
-      {/* Villain Display - TEMPORARILY DISABLED */}
-      {/* <VillainDisplay /> */}
+      {/* Villain Display */}
+      <VillainDisplay />
 
       {/* Show beautiful WelcomeScreen directly - no vault transition */}
       <div className="flex items-center justify-center min-h-screen p-8">
