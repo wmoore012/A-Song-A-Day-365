@@ -79,58 +79,15 @@ export default function App() {
       {/* Villain Display - TEMPORARILY DISABLED */}
       {/* <VillainDisplay /> */}
 
-      {/* Vault Transition for beautiful opening animation */}
-      <VaultTransition 
-        isOpen={session.state !== FlowState.VAULT_CLOSED}
-        onTransitionComplete={() => {
-          console.log('Vault transition complete');
-        }}
-      >
-        {/* Main Dashboard */}
-        <DashboardLayout>
-          {/* Analytics HUD */}
-          <AnalyticsHud grades={[]} latencies={[]} />
+      {/* Show beautiful WelcomeScreen directly - no vault transition */}
+      <div className="flex items-center justify-center min-h-screen p-8">
+        <WelcomeScreen onEnter={() => {
+          console.log('App: WelcomeScreen onEnter called, going directly to questionnaire');
+          dispatch({ type: "START_QUESTIONNAIRE" });
+        }} />
+      </div>
 
-          {/* Audio HUD */}
-          <AudioHud fadeOutRef={fadeOutRef} />
-
-          {/* Sequential Flow Content */}
-          {session.state === FlowState.QUESTIONNAIRE && (
-            <div className="flex items-center justify-center min-h-screen p-4">
-              <UserQuestionnaire onComplete={handleQuestionnaireComplete} />
-            </div>
-          )}
-
-          {session.state === FlowState.PREPARATION && (
-            <PreparationPhase onComplete={handlePreparationComplete} />
-          )}
-
-          {session.state === FlowState.PRE_START && (
-            <StartHero fadeOutRef={fadeOutRef} />
-          )}
-
-          {session.state === FlowState.LOCK_IN && (
-            <LockInMenu />
-          )}
-
-          {session.state === FlowState.FOCUS_SETUP && (
-            <FocusSetup />
-          )}
-
-          {session.state === FlowState.FOCUS_RUNNING && (
-            <FocusRunning />
-          )}
-
-          {/* Default fallback */}
-          {![FlowState.QUESTIONNAIRE, FlowState.PREPARATION, FlowState.PRE_START, FlowState.LOCK_IN, FlowState.FOCUS_SETUP, FlowState.FOCUS_RUNNING, FlowState.SCROLL_DEMO, FlowState.SHADER_DEMO].includes(session.state) && (
-            <div className="flex items-center justify-center min-h-screen">
-              <div className="text-white text-2xl">State: {session.state}</div>
-            </div>
-          )}
-        </DashboardLayout>
-      </VaultTransition>
-
-      {/* Demo pages rendered outside of VaultTransition for full-screen experience */}
+      {/* Demo pages rendered for full-screen experience */}
       {session.state === FlowState.SCROLL_DEMO && (
         <ScrollDemoPage />
       )}
@@ -139,14 +96,59 @@ export default function App() {
         <ShaderShowcase />
       )}
 
-      {/* Show beautiful WelcomeScreen by default instead of basic ScrollDemoPage */}
-      {session.state === FlowState.VAULT_CLOSED && (
-        <div className="flex items-center justify-center min-h-screen p-8">
-          <WelcomeScreen onEnter={() => {
-            console.log('App: WelcomeScreen onEnter called, going directly to questionnaire');
-            dispatch({ type: "START_QUESTIONNAIRE" });
-          }} />
-        </div>
+      {/* Other flow states rendered when not in demo mode */}
+      {session.state !== FlowState.VAULT_CLOSED && 
+       session.state !== FlowState.SCROLL_DEMO && 
+       session.state !== FlowState.SHADER_DEMO && (
+        <VaultTransition 
+          isOpen={true}
+          onTransitionComplete={() => {
+            console.log('Vault transition complete');
+          }}
+        >
+          {/* Main Dashboard */}
+          <DashboardLayout>
+            {/* Analytics HUD */}
+            <AnalyticsHud grades={[]} latencies={[]} />
+
+            {/* Audio HUD */}
+            <AudioHud fadeOutRef={fadeOutRef} />
+
+            {/* Sequential Flow Content */}
+            {session.state === FlowState.QUESTIONNAIRE && (
+              <div className="flex items-center justify-center min-h-screen p-4">
+                <UserQuestionnaire onComplete={handleQuestionnaireComplete} />
+              </div>
+            )}
+
+            {session.state === FlowState.PREPARATION && (
+              <PreparationPhase onComplete={handlePreparationComplete} />
+            )}
+
+            {session.state === FlowState.PRE_START && (
+              <StartHero fadeOutRef={fadeOutRef} />
+            )}
+
+            {session.state === FlowState.LOCK_IN && (
+              <LockInMenu />
+            )}
+
+            {session.state === FlowState.FOCUS_SETUP && (
+              <FocusSetup />
+            )}
+
+            {session.state === FlowState.FOCUS_RUNNING && (
+              <FocusRunning />
+            )}
+
+            {/* Default fallback */}
+            {![FlowState.QUESTIONNAIRE, FlowState.PREPARATION, FlowState.PRE_START, FlowState.LOCK_IN, FlowState.FOCUS_SETUP, FlowState.FOCUS_RUNNING].includes(session.state) && (
+              <div className="flex items-center justify-center min-h-screen">
+                <div className="text-white text-2xl">State: {session.state}</div>
+              </div>
+            )}
+          </DashboardLayout>
+        </VaultTransition>
       )}
     </ShaderBackground>
   );
