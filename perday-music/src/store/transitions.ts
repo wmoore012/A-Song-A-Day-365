@@ -6,6 +6,10 @@ export function transition(s: Session, a: Action): Session {
       if (s.state !== FlowState.VAULT_CLOSED) throw new InvalidTransition(s.state, a.type);
       return { ...s, state: FlowState.QUESTIONNAIRE };
 
+    case "GO_TO_DASHBOARD":
+      // Can go to dashboard from any state
+      return { ...s, state: FlowState.DASHBOARD };
+
     case "START_QUESTIONNAIRE":
       // Allow transition from VAULT_CLOSED to QUESTIONNAIRE
       if (s.state !== FlowState.VAULT_CLOSED && s.state !== FlowState.QUESTIONNAIRE) throw new InvalidTransition(s.state, a.type);

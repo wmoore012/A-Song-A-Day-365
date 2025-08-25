@@ -1,5 +1,6 @@
 export enum FlowState {
   VAULT_CLOSED = "VAULT_CLOSED",      // Vault is closed, show welcome screen
+  DASHBOARD = "DASHBOARD",           // Main dashboard view
   QUESTIONNAIRE = "QUESTIONNAIRE",    // User answering initial questions
   PREPARATION = "PREPARATION",        // 7-minute preparation phase
   PRE_START = "PRE_START",           // Ready to start session
@@ -39,6 +40,7 @@ export interface Session {
 
 export type Action =
   | { type: "OPEN_VAULT" }                          // Open vault to reveal content
+  | { type: "GO_TO_DASHBOARD" }                     // Go to main dashboard
   | { type: "START_QUESTIONNAIRE" }                 // Begin questionnaire
   | { type: "COMPLETE_QUESTIONNAIRE"; payload: { name: string; collaborators: string; sessionDate?: Date } }
   | { type: "START_PREPARATION" }                   // Begin 7-minute preparation

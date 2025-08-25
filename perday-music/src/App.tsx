@@ -14,6 +14,7 @@ import FocusRunning from "./components/FocusRunning";
 import ScrollDemoPage from "./components/ScrollDemoPage";
 import VillainDisplay from "./components/VillainDisplay";
 import FeaturesShowcase from "./components/FeaturesShowcase";
+import Dashboard from "./components/Dashboard";
 import { AnalyticsHud } from "./components/common/AnalyticsHud";
 import AudioHud from "./components/common/AudioHud";
 import { usePrestart } from "./hooks/usePrestart";
@@ -87,8 +88,8 @@ export default function App() {
             {/* Show beautiful WelcomeScreen directly - no vault transition */}
             <div className="flex items-center justify-center min-h-screen p-8">
               <WelcomeScreen onEnter={() => {
-                console.log('App: WelcomeScreen onEnter called, going directly to questionnaire');
-                dispatch({ type: "START_QUESTIONNAIRE" });
+                console.log('App: WelcomeScreen onEnter called, going directly to dashboard');
+                dispatch({ type: "GO_TO_DASHBOARD" });
               }} />
             </div>
 
@@ -115,6 +116,10 @@ export default function App() {
             <AudioHud fadeOutRef={fadeOutRef} />
 
             {/* Sequential Flow Content */}
+            {session.state === FlowState.DASHBOARD && (
+              <Dashboard />
+            )}
+
             {session.state === FlowState.QUESTIONNAIRE && (
               <div className="flex items-center justify-center min-h-screen p-4">
                 <UserQuestionnaire onComplete={handleQuestionnaireComplete} />
@@ -142,7 +147,7 @@ export default function App() {
             )}
 
             {/* Default fallback */}
-            {![FlowState.QUESTIONNAIRE, FlowState.PREPARATION, FlowState.PRE_START, FlowState.LOCK_IN, FlowState.FOCUS_SETUP, FlowState.FOCUS_RUNNING].includes(session.state) && (
+            {![FlowState.DASHBOARD, FlowState.QUESTIONNAIRE, FlowState.PREPARATION, FlowState.PRE_START, FlowState.LOCK_IN, FlowState.FOCUS_SETUP, FlowState.FOCUS_RUNNING].includes(session.state) && (
               <div className="flex items-center justify-center min-h-screen">
                 <div className="text-white text-2xl">State: {session.state}</div>
               </div>
