@@ -1,15 +1,20 @@
 import { useState } from 'react';
-import { useSessionStore } from '../state/store';
+import { useAppStore } from '../store/store';
+import { FlowState } from '../types';
 import { Button } from './ui/button';
+import { Target, Clock, ArrowLeft, ArrowRight, Play } from 'lucide-react';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import { Target, Clock, MessageSquare, ArrowLeft, ArrowRight, Play } from 'lucide-react';
-import MultiplierBar from './MultiplierBar';
 
 export default function FocusSetup() {
-  const { session, dispatch } = useSessionStore();
+  const { session, dispatch } = useAppStore();
   const [target, setTarget] = useState(session.target || '');
   const [duration, setDuration] = useState(session.durationMin || 25);
+
+  // Only render if we're in the correct state
+  if (session.state !== FlowState.FOCUS_SETUP) {
+    return null;
+  }
 
   const handleBack = () => {
     dispatch({ type: 'BACK' });

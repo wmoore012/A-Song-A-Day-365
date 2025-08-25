@@ -22,3 +22,76 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Proprietary and sensitive content
+.env
+.env.*
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# API keys, secrets, and proprietary algorithms
+**/secrets/**
+**/proprietary/**
+**/algorithms/**
+**/special-sauce/**
+**/private/**
+
+# AI/ML models and data
+*.pkl
+*.h5
+*.pb
+*.onnx
+*.tflite
+*.joblib
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Cache and temporary files
+.cache/
+.tmp/
+temp/
+*.tmp
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Package manager files
+.yarn/
+.pnpm-debug.log*
+
+# Testing artifacts
+coverage/
+.nyc_output/
+test-results/
+playwright-report/
+
+# IDE and editor files
+*.swp
+*.swo
+*~
+
+# Backup files
+*.bak
+*.backup
+
+# Compiled files
+*.min.js
+*.min.css
+
+# Archives
+*.zip
+*.tar.gz
+*.rar
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock

@@ -1,13 +1,15 @@
-import { useState } from 'react';
-import { useSessionStore } from '../state/store';
+import { useAppStore } from '../store/store';
+import { FlowState } from '../types';
 import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
-import { Target, Clock, MessageSquare, ArrowLeft, ArrowRight, Play, Music, Zap } from 'lucide-react';
-import MultiplierBar from './MultiplierBar';
+import { Target, Clock, ArrowLeft, Music, Zap } from 'lucide-react';
 
 export default function LockInMenu() {
-  const { session, dispatch } = useSessionStore();
+  const { session, dispatch } = useAppStore();
+
+  // Only render if we're in the correct state
+  if (session.state !== FlowState.LOCK_IN) {
+    return null;
+  }
 
   const handleBack = () => {
     dispatch({ type: 'BACK' });

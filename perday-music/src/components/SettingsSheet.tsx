@@ -5,11 +5,9 @@ import { Label } from './ui/label';
 import { Switch } from './ui/switch';
 import { Slider } from './ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from './ui/sheet';
-import { Settings, Volume2, Music, Zap, Target, Clock, RotateCcw, Bell } from 'lucide-react';
-import { useSessionStore } from '../state/store';
-import { toast } from 'sonner';
+import { Settings, Volume2, Target, Clock, Bell } from 'lucide-react';
+import { useAppStore } from '../store/store';
 
 interface SettingsData {
   defaultDuration: number;
@@ -19,6 +17,8 @@ interface SettingsData {
   volume: number;
   notifications: boolean;
   accountabilityEmail: string;
+  userName?: string;
+  collaborators?: string;
 }
 
 interface SettingsSheetProps {
@@ -28,19 +28,14 @@ interface SettingsSheetProps {
 }
 
 export default function SettingsSheet({ onSave, currentSettings, onResetAll }: SettingsSheetProps) {
-  const [settings, setSettings] = useState<SettingsData>(currentSettings);
+  const { setSettings } = useAppStore();
   const [isOpen, setIsOpen] = useState(false);
+  const [settings, setLocalSettings] = useState<SettingsData>(currentSettings);
   const gearRef = useRef<HTMLDivElement>(null);
-  
-  // Gear spinning animation
+
   const spinGears = () => {
-    if (!gearRef.current) return;
-    
-    const randomSpins = Math.floor(Math.random() * 4) + 4; // 4-7 spins
-    const totalRotation = randomSpins * 360;
-    
     // gsap.to(gearRef.current, {
-    //   rotation: totalRotation,
+    //   rotation: 1440, // 4 spins * 360 degrees
     //   duration: 2,
     //   ease: "power2.out",
     //   onComplete: () => {
@@ -51,6 +46,7 @@ export default function SettingsSheet({ onSave, currentSettings, onResetAll }: S
   };
 
   const handleSave = () => {
+    setSettings(settings); // Use the store's setSettings
     onSave(settings);
     setIsOpen(false);
   };
@@ -64,8 +60,10 @@ export default function SettingsSheet({ onSave, currentSettings, onResetAll }: S
       volume: 0.7,
       notifications: true,
       accountabilityEmail: '',
+      userName: '',
+      collaborators: ''
     };
-    setSettings(defaults);
+    setLocalSettings(defaults);
     
     // Spin the gears when resetting to defaults
     spinGears();
@@ -98,7 +96,7 @@ export default function SettingsSheet({ onSave, currentSettings, onResetAll }: S
               <Clock className="h-4 w-4" />
               Default Duration (minutes)
             </Label>
-            <Select value={settings.defaultDuration.toString()} onValueChange={(value) => setSettings(prev => ({ ...prev, defaultDuration: parseInt(value) }))}>
+            <Select value={settings.defaultDuration.toString()} onValueChange={(value) => setLocalSettings(prev => ({ ...prev, defaultDuration: parseInt(value) }))}>
               <SelectTrigger className="bg-black/40 border-cyan-400/40 text-synth-white">
                 <SelectValue />
               </SelectTrigger>
@@ -117,7 +115,7 @@ export default function SettingsSheet({ onSave, currentSettings, onResetAll }: S
               <Target className="h-4 w-4" />
               Default Multiplier
             </Label>
-            <Select value={settings.defaultMultiplier.toString()} onValueChange={(value) => setSettings(prev => ({ ...prev, defaultMultiplier: parseFloat(value) }))}>
+            <Select value={settings.defaultMultiplier.toString()} onValueChange={(value) => setLocalSettings(prev => ({ ...prev, defaultMultiplier: parseFloat(value) }))}>
               <SelectTrigger className="bg-black/40 border-cyan-400/40 text-synth-white">
                 <SelectValue />
               </SelectTrigger>
@@ -137,7 +135,7 @@ export default function SettingsSheet({ onSave, currentSettings, onResetAll }: S
             </Label>
             <Slider
               value={[settings.volume * 100]}
-              onValueChange={([value]) => setSettings(prev => ({ ...prev, volume: value / 100 }))}
+              onValueChange={([value]) => setLocalSettings(prev => ({ ...prev, volume: value / 100 }))}
               max={100}
               step={5}
               className="w-full"
@@ -155,7 +153,7 @@ export default function SettingsSheet({ onSave, currentSettings, onResetAll }: S
             </Label>
             <Input
               value={settings.accountabilityEmail}
-              onChange={(e) => setSettings(prev => ({ ...prev, accountabilityEmail: e.target.value }))}
+              onChange={(e) => setLocalSettings(prev => ({ ...prev, accountabilityEmail: e.target.value }))}
               placeholder="your@email.com"
               className="bg-black/40 border-cyan-400/40 text-synth-white placeholder:text-synth-icy/50"
             />
@@ -170,21 +168,21 @@ export default function SettingsSheet({ onSave, currentSettings, onResetAll }: S
               <Label className="text-synth-white">Auto-start timer</Label>
               <Switch
                 checked={settings.autoStartTimer}
-                onCheckedChange={(checked: boolean) => setSettings(prev => ({ ...prev, autoStartTimer: checked }))}
+                onCheckedChange={(checked: boolean) => setLocalSettings(prev => ({ ...prev, autoStartTimer: checked }))}
               />
             </div>
             <div className="flex items-center justify-between">
               <Label className="text-synth-white">Sound effects</Label>
               <Switch
                 checked={settings.soundEnabled}
-                onCheckedChange={(checked: boolean) => setSettings(prev => ({ ...prev, soundEnabled: checked }))}
+                onCheckedChange={(checked: boolean) => setLocalSettings(prev => ({ ...prev, soundEnabled: checked }))}
               />
             </div>
             <div className="flex items-center justify-between">
               <Label className="text-synth-white">Notifications</Label>
               <Switch
                 checked={settings.notifications}
-                onCheckedChange={(checked: boolean) => setSettings(prev => ({ ...prev, notifications: checked }))}
+                onCheckedChange={(checked: boolean) => setLocalSettings(prev => ({ ...prev, notifications: checked }))}
               />
             </div>
           </div>

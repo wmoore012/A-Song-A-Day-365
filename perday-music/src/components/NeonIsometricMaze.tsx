@@ -89,5 +89,5 @@ const NeonIsometricMaze: React.FC = () => {
 
   return <canvas ref={canvasRef} className="block" />
 }
-
 export default NeonIsometricMaze
+

@@ -11,7 +11,7 @@ interface AudioControlsProps {
   enableStudioVibes?: boolean;
 }
 
-export default function AudioControls({ onVolumeChange, currentVolume, enableStudioVibes = false }: AudioControlsProps) {
+export default function AudioControls({ onVolumeChange, currentVolume }: AudioControlsProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTrack, setCurrentTrack] = useState('Perday Music 365 - Your Playlist');
   const [isOpen, setIsOpen] = useState(false);
@@ -55,9 +55,8 @@ export default function AudioControls({ onVolumeChange, currentVolume, enableStu
   };
 
   const nextTrack = () => {
-    // For now, just cycle through playlist names
-    const playlistNames = Object.keys(playlists);
-    const currentIndex = playlistNames.indexOf(currentPlaylist);
+    const playlistNames = Object.keys(playlists) as Array<keyof typeof playlists>;
+    const currentIndex = playlistNames.indexOf(currentPlaylist as keyof typeof playlists);
     const nextIndex = (currentIndex + 1) % playlistNames.length;
     const nextPlaylist = playlistNames[nextIndex];
     setCurrentPlaylist(nextPlaylist);
@@ -65,8 +64,8 @@ export default function AudioControls({ onVolumeChange, currentVolume, enableStu
   };
 
   const previousTrack = () => {
-    const playlistNames = Object.keys(playlists);
-    const currentIndex = playlistNames.indexOf(currentPlaylist);
+    const playlistNames = Object.keys(playlists) as Array<keyof typeof playlists>;
+    const currentIndex = playlistNames.indexOf(currentPlaylist as keyof typeof playlists);
     const prevIndex = currentIndex === 0 ? playlistNames.length - 1 : currentIndex - 1;
     const prevPlaylist = playlistNames[prevIndex];
     setCurrentPlaylist(prevPlaylist);

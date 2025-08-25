@@ -25,11 +25,12 @@ export default function PerdayLogo({
 
   useGSAP(() => {
     if (!logoRef.current) return;
-    
-    // Fixed shouldAnimate logic like other components
-    const shouldAnimate = import.meta?.env?.MODE !== 'test' && 
-      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true ? false : true;
-    if (!shouldAnimate) return;
+
+    // Guard for tests and reduced motion preferences
+    if (import.meta.env.VITEST || (typeof window !== 'undefined' &&
+        window.matchMedia?.('(prefers-reduced-motion: reduce)').matches)) {
+      return; // skip animations in tests and reduced motion
+    }
 
     // Create timeline for coordinated animations
     const tl = gsap.timeline({

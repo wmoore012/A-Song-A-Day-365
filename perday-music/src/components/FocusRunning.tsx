@@ -1,17 +1,16 @@
 import { useState, useRef, useEffect } from 'react';
-import { useSessionStore } from '../state/store';
+import { useAppStore } from '../store/store';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import { Clock, Target, MessageSquare, Pause, Square } from 'lucide-react';
+import { Pause, Target, Clock, MessageSquare, Square } from 'lucide-react';
 import MultiplierBar from './MultiplierBar';
 
 export default function FocusRunning() {
-  const { session, dispatch } = useSessionStore();
+  const { session, dispatch } = useAppStore();
   const [timeRemaining, setTimeRemaining] = useState((session.durationMin || 25) * 60);
   const [isPaused, setIsPaused] = useState(false);
   const [note, setNote] = useState('');
-  const [notes, setNotes] = useState<string[]>([]);
   const intervalRef = useRef<number | undefined>(undefined);
 
   useEffect(() => {
