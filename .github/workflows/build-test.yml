@@ -1,0 +1,23 @@
+name: build-test
+
+on:
+  push:
+  pull_request:
+
+defaults:
+  run:
+    working-directory: perday-music   # <-- run inside the app folder
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: perday-music/package-lock.json
+      - run: npm ci
+      - run: npm test -- --run
+      - run: npm run build
