@@ -9,7 +9,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTr
 import { Settings, Volume2, Target, Clock, Bell, Sparkles, Trash2 } from 'lucide-react';
 import { useAppStore } from '../store/store';
 
-interface SettingsData {
+export interface SettingsData {
   defaultDuration: number;
   defaultMultiplier: number;
   autoStartTimer: boolean;

@@ -7,7 +7,7 @@ import { useVillainAnnounce } from "../hooks/useVillainAnnounce";
 import PerdayLogo from "./PerdayLogo";
 import AtomOrbit from "./AtomOrbit";
 import MultiplierBar from "./MultiplierBar";
-import SettingsSheet from "./SettingsSheet";
+import SettingsSheet, { type SettingsData } from "./SettingsSheet";
 import { Button } from "./ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Tooltip, TooltipTrigger, TooltipContent } from "./ui/tooltip";
@@ -89,8 +89,11 @@ export default function StartHero({ fadeOutRef }: StartHeroProps) {
           {/* Top-right controls */}
           <div className="absolute top-6 right-6 z-20 flex items-center gap-3">
             <SettingsSheet
-              currentSettings={settings}
-              onSave={(s: any) => setSettings(s)}
+              currentSettings={{
+                ...settings,
+                celebration: settings.celebration ?? "none",
+              } as SettingsData}
+              onSave={(s: SettingsData) => setSettings(s)}
               onResetAll={() => {
                 setSettings({}); // Assuming setSettings handles reset
                 toast.success("Reset complete. Clean slate. 🔁");
