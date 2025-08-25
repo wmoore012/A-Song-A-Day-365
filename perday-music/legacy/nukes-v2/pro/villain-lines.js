@@ -1,7 +1,7 @@
 // Placeholder for proprietary villain lines
 // This file provides basic functionality for open-core version
 
-export function getProVillainLines() {
+function getProVillainLines() {
   return [
     {
       id: 'pro_villain_1',
@@ -12,7 +12,7 @@ export function getProVillainLines() {
   ];
 }
 
-export function getVillainShadeMessages() {
+function getVillainShadeMessages() {
   return [
     'That\'s not quite right...',
     'Try again, producer.',
@@ -20,6 +20,12 @@ export function getVillainShadeMessages() {
   ];
 }
 
-export function shouldShowVillainShade() {
+function shouldShowVillainShade() {
   return Math.random() > 0.7; // 30% chance
 }
+
+// ES Module exports
+export { getProVillainLines, getVillainShadeMessages, shouldShowVillainShade };
+
+// CommonJS exports for compatibility
+module.exports = { getProVillainLines, getVillainShadeMessages, shouldShowVillainShade };

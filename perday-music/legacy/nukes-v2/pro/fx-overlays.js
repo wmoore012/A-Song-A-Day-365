@@ -1,7 +1,7 @@
 // Placeholder for proprietary FX overlays
 // This file provides basic functionality for open-core version
 
-export function shouldCrossfade(element, duration = 300) {
+function shouldCrossfade(element, duration = 300) {
   if (!element) return false;
 
   // Simple crossfade implementation
@@ -15,7 +15,7 @@ export function shouldCrossfade(element, duration = 300) {
   return true;
 }
 
-export function createEmberEffect(targetElement) {
+function createEmberEffect(targetElement) {
   if (!targetElement) return false;
 
   // Create simple ember effect
@@ -41,7 +41,7 @@ export function createEmberEffect(targetElement) {
   return true;
 }
 
-export function addGlowEffect(element, color = '#ff4500') {
+function addGlowEffect(element, color = '#ff4500') {
   if (!element) return false;
 
   element.style.boxShadow = `0 0 20px ${color}`;
@@ -53,3 +53,9 @@ export function addGlowEffect(element, color = '#ff4500') {
 
   return true;
 }
+
+// ES Module exports
+export { shouldCrossfade, createEmberEffect, addGlowEffect };
+
+// CommonJS exports for compatibility
+module.exports = { shouldCrossfade, createEmberEffect, addGlowEffect };
