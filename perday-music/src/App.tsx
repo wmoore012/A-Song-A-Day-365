@@ -13,20 +13,20 @@ import FocusSetup from "./components/FocusSetup";
 import FocusRunning from "./components/FocusRunning";
 import ScrollDemoPage from "./components/ScrollDemoPage";
 import ShaderShowcase from "./components/ShaderShowcase";
-import VillainDisplay from "./components/VillainDisplay";
+// import VillainDisplay from "./components/VillainDisplay"; // Temporarily disabled
 import { AnalyticsHud } from "./components/common/AnalyticsHud";
 import AudioHud from "./components/common/AudioHud";
 import TestStore from "./components/TestStore";
 import { usePrestart } from "./hooks/usePrestart";
-import { useStartupScript } from "./hooks/useStartupScript";
+// import { useStartupScript } from "./hooks/useStartupScript"; // Temporarily disabled
 
 export default function App() {
-  const { session, _hydrated, dispatch, settings } = useAppStore();
+  const { session, _hydrated, dispatch } = useAppStore();
   const fadeOutRef = useRef<() => void>(() => {});
 
-  // Initialize villain monitoring system
-  const userName = settings.userName || "Producer";
-  useStartupScript(userName);
+  // Initialize villain monitoring system - TEMPORARILY DISABLED
+  // const userName = settings.userName || "Producer";
+  // useStartupScript(userName);
 
   // Gate on hydration to avoid flicker
   if (!_hydrated) {
@@ -76,8 +76,8 @@ export default function App() {
         </button>
       </div>
 
-      {/* Villain Display - Always active for monitoring */}
-      <VillainDisplay />
+      {/* Villain Display - TEMPORARILY DISABLED */}
+      {/* <VillainDisplay /> */}
 
       {/* Vault Transition for beautiful opening animation */}
       <VaultTransition 
@@ -117,28 +117,29 @@ export default function App() {
             <FocusSetup />
           )}
 
-                           {session.state === FlowState.FOCUS_RUNNING && (
-                   <FocusRunning />
-                 )}
+          {session.state === FlowState.FOCUS_RUNNING && (
+            <FocusRunning />
+          )}
 
-                 {session.state === FlowState.SCROLL_DEMO && (
-                   <ScrollDemoPage />
-                 )}
-
-                 {session.state === FlowState.SHADER_DEMO && (
-                   <ShaderShowcase />
-                 )}
-
-                 {/* Default fallback */}
-                 {![FlowState.QUESTIONNAIRE, FlowState.PREPARATION, FlowState.PRE_START, FlowState.LOCK_IN, FlowState.FOCUS_SETUP, FlowState.FOCUS_RUNNING, FlowState.SCROLL_DEMO, FlowState.SHADER_DEMO].includes(session.state) && (
-                   <div className="flex items-center justify-center min-h-screen">
-                     <div className="text-white text-2xl">State: {session.state}</div>
-                   </div>
-                 )}
+          {/* Default fallback */}
+          {![FlowState.QUESTIONNAIRE, FlowState.PREPARATION, FlowState.PRE_START, FlowState.LOCK_IN, FlowState.FOCUS_SETUP, FlowState.FOCUS_RUNNING, FlowState.SCROLL_DEMO, FlowState.SHADER_DEMO].includes(session.state) && (
+            <div className="flex items-center justify-center min-h-screen">
+              <div className="text-white text-2xl">State: {session.state}</div>
+            </div>
+          )}
         </DashboardLayout>
       </VaultTransition>
 
-      {/* Initial Welcome Screen (Vault Closed) */}
+      {/* Demo pages rendered outside of VaultTransition for full-screen experience */}
+      {session.state === FlowState.SCROLL_DEMO && (
+        <ScrollDemoPage />
+      )}
+
+      {session.state === FlowState.SHADER_DEMO && (
+        <ShaderShowcase />
+      )}
+
+      {/* Show beautiful WelcomeScreen by default instead of basic ScrollDemoPage */}
       {session.state === FlowState.VAULT_CLOSED && (
         <div className="flex items-center justify-center min-h-screen p-8">
           <WelcomeScreen onEnter={() => {
