@@ -14,6 +14,7 @@ import { Tooltip, TooltipTrigger, TooltipContent } from "./ui/tooltip";
 import UserQuestionnaire from "./UserQuestionnaire";
 import { Settings } from "lucide-react";
 import { toast } from "sonner";
+import GlassPanel from "./common/GlassPanel";
 
 /** Overlay FSM so only ONE overlay can ever mount at a time */
 type Overlay = "none" | "questionnaire" | "setup";
@@ -108,7 +109,7 @@ export default function StartHero({ fadeOutRef }: StartHeroProps) {
           </div>
 
           {/* Main card */}
-          <div className="relative z-10 rounded-2xl bg-gradient-to-br from-magenta-900/20 via-cyan-900/20 to-purple-900/20 backdrop-blur-xl ring-1 ring-cyan-400/30 p-8 max-w-md w-full text-center shadow-2xl">
+          <GlassPanel className="relative z-10 bg-gradient-to-br from-magenta-900/20 via-cyan-900/20 to-purple-900/20 p-8 max-w-md w-full text-center shadow-2xl">
             <div className="text-xl font-bold text-white mb-2">
               {`Welcome back, ${userName}!`}
             </div>
@@ -156,7 +157,7 @@ export default function StartHero({ fadeOutRef }: StartHeroProps) {
                 ✅ Ready locked. Multiplier boosted.
               </div>
             )}
-          </div>
+          </GlassPanel>
 
           {/* Overlays (mutually exclusive) */}
           {/* Vault overlay removed - no longer needed */}
@@ -193,10 +194,10 @@ export default function StartHero({ fadeOutRef }: StartHeroProps) {
           <div className="absolute inset-0 -z-10 pointer-events-none opacity-20" aria-hidden="true">
             <AtomOrbit />
           </div>
-          <div className="mx-auto max-w-md rounded-2xl bg-black/40 backdrop-blur-xl ring-1 ring-cyan-300/30 p-8 text-center">
+          <GlassPanel className="mx-auto max-w-md bg-black/40 ring-cyan-300/30 p-8 text-center">
             <h2 className="text-2xl font-bold text-white mb-6">Lock-In your lane</h2>
             <p className="text-cyan-200/80">Cook. Wrap. Log. & Stack MORE wins!</p>
-          </div>
+          </GlassPanel>
         </div>
       );
 

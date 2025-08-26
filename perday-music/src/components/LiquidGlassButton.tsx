@@ -123,87 +123,12 @@ export default function LiquidGlassButton({
       {ripples.map((ripple) => (
         <div
           key={ripple.id}
-          className="absolute pointer-events-none"
-          style={{
-            left: ripple.x,
-            top: ripple.y,
-            width: '4px',
-            height: '4px',
-            borderRadius: '50%',
-            background: 'rgba(255, 255, 255, 0.4)',
-            transform: 'translate(-50%, -50%)',
-            animation: 'liquidRipple 0.6s ease-out forwards',
-          }}
+          className={cn("absolute pointer-events-none", "ripple")}
+          style={{ left: ripple.x, top: ripple.y }}
         />
       ))}
 
       {buttonContent}
-
-      <style>{`
-        .liquid-glass-button {
-          background: rgba(255, 255, 255, 0.1);
-          backdrop-filter: blur(20px);
-          border: 1px solid rgba(255, 255, 255, 0.2);
-          box-shadow: 
-            0 12px 40px rgba(0, 0, 0, 0.3),
-            inset 0 2px 4px rgba(0, 0, 0, 0.2), 
-            inset 0 1px 0 rgba(255, 255, 255, 0.4),
-            inset 0 -1px 0 rgba(0, 0, 0, 0.2), 
-            0 0 20px rgba(255, 255, 255, 0.1);
-          transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
-          position: relative;
-          transform-origin: center center;
-        }
-
-        .liquid-glass-button::before {
-          content: "";
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          border-radius: inherit;
-          background: linear-gradient(
-            145deg,
-            rgba(255, 255, 255, 0.2) 0%,
-            rgba(255, 255, 255, 0.05) 50%,
-            rgba(255, 255, 255, 0) 100%
-          );
-          pointer-events: none;
-          z-index: 1;
-        }
-
-        .liquid-glass-button:hover {
-          border-color: rgba(255, 255, 255, 0.4);
-          transform: translateY(-2px);
-          box-shadow: 
-            0 16px 50px rgba(0, 0, 0, 0.4),
-            inset 0 2px 4px rgba(0, 0, 0, 0.2), 
-            inset 0 1px 0 rgba(255, 255, 255, 0.4),
-            inset 0 -1px 0 rgba(0, 0, 0, 0.2), 
-            0 0 25px rgba(255, 255, 255, 0.15);
-        }
-
-        .liquid-glass-button:active {
-          transform: translateY(1px) scale(0.96);
-          border-color: rgba(255, 255, 255, 0.5);
-          transition: all 0.1s cubic-bezier(0.23, 1, 0.32, 1);
-        }
-
-        @keyframes liquidRipple {
-          0% {
-            transform: scale(0);
-            opacity: 1;
-          }
-          50% {
-            opacity: 0.6;
-          }
-          100% {
-            transform: scale(4);
-            opacity: 0;
-          }
-        }
-      `}</style>
     </button>
   );
 }
