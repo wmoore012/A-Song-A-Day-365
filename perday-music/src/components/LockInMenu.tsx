@@ -2,6 +2,7 @@ import { useAppStore } from '../store/store';
 import { FlowState } from '../types';
 import { Button } from './ui/button';
 import { Target, Clock, ArrowLeft, Music, Zap } from 'lucide-react';
+import GlassPanel from './common/GlassPanel';
 
 export default function LockInMenu() {
   const { session, dispatch } = useAppStore();
@@ -28,7 +29,7 @@ export default function LockInMenu() {
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center p-8">
-      <div className="bg-gradient-to-br from-magenta-900/20 via-cyan-900/20 to-purple-900/20 backdrop-blur-xl ring-1 ring-cyan-400/30 rounded-2xl p-8 max-w-2xl w-full">
+      <GlassPanel className="bg-gradient-to-br from-magenta-900/20 via-cyan-900/20 to-purple-900/20 p-8 max-w-2xl w-full">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-synth-white mb-2">Lock-In Your Lane</h1>
           <p className="text-synth-icy/70">
@@ -69,7 +70,7 @@ export default function LockInMenu() {
             Back to Pre-Start
           </Button>
         </div>
-      </div>
+      </GlassPanel>
     </div>
   );
 }
