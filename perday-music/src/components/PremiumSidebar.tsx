@@ -95,7 +95,7 @@ export default function PremiumSidebar() {
   return (
     <div 
       ref={sidebarRef}
-      className={`fixed left-0 top-0 h-full bg-black/20 backdrop-blur-xl border-r border-cyan-400/20 transition-[width] duration-300 shadow-2xl ${
+      className={`h-full bg-black/20 backdrop-blur-xl border-r border-cyan-400/20 transition-[width] duration-300 shadow-2xl ${
         collapsed ? 'w-16' : 'w-64'
       }`}
     >

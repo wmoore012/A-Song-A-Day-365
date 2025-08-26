@@ -176,14 +176,23 @@ export default function PrestartPanel({
               </div>
 
               <div className="space-y-4">
-                <button
-                  className="w-full px-6 py-4 rounded-xl bg-gradient-to-r from-synth-amber to-synth-amberLight hover:from-synth-amberLight hover:to-synth-amber font-extrabold shadow-lg hover:shadow-[0_10px_24px_rgba(255,176,32,0.4)] transition-all duration-300 text-lg transform hover:scale-[1.02] border-2 border-synth-amber/50 hover:border-synth-amber animate-amberPulse"
-                  onClick={tapReady}
-                  disabled={readyAtMs != null}
-                >
-                  <Zap className="w-5 h-5 mr-2" />
-                  Ready (Power up your Multiplier)
-                </button>
+                {readyAtMs == null ? (
+                  <button
+                    className="w-full px-6 py-4 rounded-xl bg-gradient-to-r from-synth-amber to-synth-amberLight hover:from-synth-amberLight hover:to-synth-amber font-extrabold shadow-lg hover:shadow-[0_10px_24px_rgba(255,176,32,0.4)] transition-all duration-300 text-lg transform hover:scale-[1.02] border-2 border-synth-amber/50 hover:border-synth-amber animate-amberPulse"
+                    onClick={tapReady}
+                  >
+                    <Zap className="w-5 h-5 mr-2" />
+                    Ready (Power up your Multiplier)
+                  </button>
+                ) : (
+                  <button
+                    className="w-full px-6 py-4 rounded-xl bg-gradient-to-r from-green-500 to-emerald-400 hover:from-green-600 hover:to-emerald-500 font-extrabold shadow-lg hover:shadow-[0_10px_24px_rgba(34,197,94,0.4)] transition-all duration-300 text-lg transform hover:scale-[1.02] border-2 border-green-400/50 hover:border-green-400"
+                    onClick={handleStartNow}
+                  >
+                    <Target className="w-5 h-5 mr-2" />
+                    Start Now & Protect Your Multiplier
+                  </button>
+                )}
                 <button
                   className="w-full px-6 py-4 rounded-xl bg-synth-violet/20 hover:bg-synth-violet/30 font-bold text-lg border border-synth-violet/40 hover:border-synth-violet/60 transition-all duration-300 hover:shadow-[0_8px_20px_rgba(108,26,237,0.3)]"
                   onClick={handleStartNow}
