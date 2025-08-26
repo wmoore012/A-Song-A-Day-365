@@ -109,6 +109,7 @@ export const useAppStore = create<AppState>()(
         phase: s.phase,
         readyAt: s.readyAt,
         motionOk: s.motionOk,
+        _hydrated: s._hydrated,
       }),
     }
   )
