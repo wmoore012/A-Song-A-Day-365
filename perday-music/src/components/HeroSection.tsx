@@ -125,11 +125,11 @@ export default function HeroSection() {
       </div>
 
       {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
+      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center">
         <div className="w-6 h-10 border-2 border-white rounded-full flex justify-center">
           <div className="w-1 h-3 bg-white rounded-full mt-2 animate-bounce"></div>
         </div>
-        <p className="text-white text-sm mt-2">Scroll to explore</p>
+        <p className="text-white text-sm mt-2 text-center">Scroll to explore</p>
       </div>
     </section>
   );
