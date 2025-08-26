@@ -4,7 +4,7 @@ import { useAppStore } from "../store/store";
 import { usePrestart } from "../hooks/usePrestart";
 import { useVillainAnnounce } from "../hooks/useVillainAnnounce";
 
-import PerdayLogo from "./PerdayLogo";
+
 import AtomOrbit from "./AtomOrbit";
 import MultiplierBar from "./MultiplierBar";
 import SettingsSheet from "./SettingsSheet";
@@ -81,10 +81,7 @@ export default function StartHero({ fadeOutRef }: StartHeroProps) {
             <AtomOrbit />
           </div>
 
-          {/* Top-left brand */}
-          <div className="absolute top-6 left-6 z-20">
-            <PerdayLogo size={56} />
-          </div>
+          {/* Top-left brand - removed to avoid duplication with sidebar */}
 
           {/* Top-right controls */}
           <div className="absolute top-6 right-6 z-20 flex items-center gap-3">

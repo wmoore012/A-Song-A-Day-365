@@ -119,12 +119,7 @@ export default function AtomOrbit() {
         </defs>
       </svg>
 
-      {/* Perday Music 365 overlay */}
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div className="text-xs text-synth-amber font-bold animate-pulse bg-black/20 backdrop-blur-sm px-2 py-1 rounded-full">
-          Perday Music 365
-        </div>
-      </div>
+      {/* Perday Music 365 overlay - removed to avoid duplication */}
     </div>
   );
 }
