@@ -1,4 +1,5 @@
-import { useRef, useState, useCallback } from "react";
+import { useRef, useState, useCallback } from 'react';
+import styles from './LiquidGlassButton.module.css';
 // gsap import removed as it's not used
 import styles from "./LiquidGlassButton.module.css";
 import { cn } from "../lib/utils";
@@ -111,21 +112,26 @@ export default function LiquidGlassButton({
       ref={buttonRef}
       onClick={handleClick}
       disabled={disabled}
-      className={cn(
-        styles.liquidGlassButton,
-        getVariantStyles(),
-        getSizeStyles(),
-        disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer",
-        isPressed && "scale-95",
-        "transition-all duration-150 ease-out font-medium select-none relative overflow-hidden",
-        className
-      )}
+
+      className={`
+        ${styles.liquidGlassButton}
+        ${getVariantStyles()}
+        ${getSizeStyles()}
+        ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+        ${isPressed ? 'scale-95' : ''}
+        transition-all duration-150 ease-out
+        font-medium
+        select-none
+        overflow-hidden
+        ${className}
+      `}
       style={style}
     >
       {ripples.map((ripple) => (
         <div
           key={ripple.id}
           className={cn("absolute pointer-events-none", styles.ripple)}
+
           style={{ left: ripple.x, top: ripple.y }}
         />
       ))}
