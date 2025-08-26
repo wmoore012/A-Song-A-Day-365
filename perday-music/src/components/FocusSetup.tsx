@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useAppStore } from '../store/store';
 import { FlowState } from '../types';
 import { Button } from './ui/button';
-import { Target, Clock, ArrowLeft, ArrowRight, Play } from 'lucide-react';
+import { Target, Clock, ArrowLeft, Play } from 'lucide-react';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 
@@ -20,15 +20,17 @@ export default function FocusSetup() {
     dispatch({ type: 'BACK' });
   };
 
-  const handleSetTarget = () => {
-    if (target.trim()) {
-      dispatch({ type: 'SET_TARGET', payload: target.trim() });
+  const handleTargetChange = (value: string) => {
+    setTarget(value);
+    if (value.trim()) {
+      dispatch({ type: 'SET_TARGET', payload: value.trim() });
     }
   };
 
-  const handleSetDuration = () => {
-    if (duration > 0) {
-      dispatch({ type: 'SET_DURATION', payload: duration });
+  const handleDurationChange = (value: number) => {
+    setDuration(value);
+    if (value > 0) {
+      dispatch({ type: 'SET_DURATION', payload: value });
     }
   };
 
@@ -60,18 +62,10 @@ export default function FocusSetup() {
             <div className="flex gap-3">
               <Input
                 value={target}
-                onChange={(e) => setTarget(e.target.value)}
+                onChange={(e) => handleTargetChange(e.target.value)}
                 placeholder="What are you working on today?"
                 className="flex-1 bg-black/40 border-cyan-400/40 text-synth-white placeholder:text-synth-icy/50"
               />
-              <Button
-                onClick={handleSetTarget}
-                disabled={!target.trim()}
-                className="bg-gradient-to-r from-magenta-500 to-cyan-400 hover:from-magenta-600 hover:to-cyan-500 text-synth-white px-6"
-              >
-                <ArrowRight className="h-4 w-4 mr-2" />
-                Set
-              </Button>
             </div>
             {session.target && (
               <div className="text-sm text-cyan-300 bg-cyan-400/10 p-3 rounded-lg">
@@ -90,20 +84,12 @@ export default function FocusSetup() {
               <Input
                 type="number"
                 value={duration}
-                onChange={(e) => setDuration(parseInt(e.target.value) || 0)}
+                onChange={(e) => handleDurationChange(parseInt(e.target.value) || 0)}
                 min="1"
                 max="120"
                 className="flex-1 bg-black/40 border-cyan-400/40 text-synth-white"
               />
               <span className="text-synth-white self-center">minutes</span>
-              <Button
-                onClick={handleSetDuration}
-                disabled={duration <= 0}
-                className="bg-gradient-to-r from-magenta-500 to-cyan-400 hover:from-magenta-600 hover:to-cyan-500 text-synth-white px-6"
-              >
-                <ArrowRight className="h-4 w-4 mr-2" />
-                Set
-              </Button>
             </div>
             {session.durationMin && (
               <div className="text-sm text-cyan-300 bg-cyan-400/10 p-3 rounded-lg">
