@@ -1,5 +1,5 @@
 import { useRef, useState, useCallback } from 'react';
-// gsap import removed as it's not used
+import { cn } from '@/lib/utils';
 
 interface LiquidGlassButtonProps {
   children: React.ReactNode;
@@ -109,20 +109,15 @@ export default function LiquidGlassButton({
       ref={buttonRef}
       onClick={handleClick}
       disabled={disabled}
-      className={`
-        liquid-glass-button
-        ${getVariantStyles()}
-        ${getSizeStyles()}
-        ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-        ${isPressed ? 'scale-95' : ''}
-        transition-all duration-150 ease-out
-        font-medium
-        select-none
-        backdrop-blur-3xl
-        relative
-        overflow-hidden
-        ${className}
-      `}
+      className={cn(
+        'liquid-glass-button',
+        getVariantStyles(),
+        getSizeStyles(),
+        disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
+        isPressed && 'scale-95',
+        'transition-all duration-150 ease-out font-medium select-none backdrop-blur-3xl relative overflow-hidden',
+        className
+      )}
       style={style}
     >
       {ripples.map((ripple) => (
