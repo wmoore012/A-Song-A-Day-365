@@ -1,13 +1,11 @@
 import { useState, useRef } from 'react';
 import { gsap } from 'gsap';
 import { useGSAP } from '@gsap/react';
-import { useAppStore } from '../store/store';
 import { shouldAnimate } from '../lib/motion';
 import { 
   BarChart2, 
   Zap, 
   Target, 
-  Settings, 
   Music, 
   ChevronLeft,
   ChevronRight
@@ -53,7 +51,6 @@ function NavItem({ icon: Icon, label, active, collapsed, onClick }: {
 }
 
 export default function PremiumSidebar() {
-  const { dispatch } = useAppStore();
   const [collapsed, setCollapsed] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const lightBarRef = useRef<HTMLDivElement>(null);
@@ -126,7 +123,6 @@ export default function PremiumSidebar() {
           </div>
         )}
         <NavItem icon={Target} label="Goals" active={false} collapsed={collapsed} />
-        <NavItem icon={Settings} label="Settings" active={false} collapsed={collapsed} onClick={() => dispatch({ type: "RESET" })} />
       </nav>
 
       {/* Quick Stats */}

@@ -5,6 +5,7 @@ import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from './ui/sheet';
 import LockInTips from './LockInTips';
+import HeatButtons from './HeatButtons';
 import { 
   Play, 
   Target, 
@@ -78,6 +79,11 @@ export default function Dashboard() {
             </Button>
           </div>
         </div>
+      </div>
+
+      {/* Heat Buttons */}
+      <div className="mb-8">
+        <HeatButtons />
       </div>
 
       {/* Stats Grid */}

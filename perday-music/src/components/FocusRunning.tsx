@@ -61,8 +61,6 @@ export default function FocusRunning() {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const progress = ((session.durationMin! * 60 - timeRemaining) / (session.durationMin! * 60)) * 100;
-
   return (
     <div className="min-h-screen bg-black flex items-center justify-center p-8">
       <GlassPanel className="bg-gradient-to-br from-magenta-900/20 via-cyan-900/20 to-purple-900/20 p-8 max-w-2xl w-full">
@@ -95,24 +93,14 @@ export default function FocusRunning() {
           <div className="text-8xl font-black tabular-nums font-mono text-synth-white mb-4">
             {formatTime(timeRemaining)}
           </div>
-          
-          {/* Progress Bar */}
-          <div className="w-full bg-black/30 rounded-full h-3 mb-4">
-            <div 
-              className="bg-gradient-to-r from-cyan-400 to-magenta-500 h-3 rounded-full transition-all duration-1000"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-          
-          <p className="text-synth-icy/70">
-            {Math.round(progress)}% complete
-          </p>
         </div>
 
-        {/* Multiplier Bar */}
+        {/* Time Remaining Bar */}
         <div className="mb-8">
           <MultiplierBar 
-            multiplier={1.5}
+            multiplier={timeRemaining / (session.durationMin! * 60)}
+            className="time-remaining-bar"
+            isTimeRemaining={true}
           />
         </div>
 

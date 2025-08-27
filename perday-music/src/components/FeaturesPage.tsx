@@ -6,6 +6,7 @@ import { useGSAP } from "@gsap/react";
 import GlassPanel from "./common/GlassPanel";
 import { Button } from "./ui/button";
 import { Music, Zap, Users, Target, Clock, Trophy } from "lucide-react";
+import { ARTIST_PLACEHOLDERS } from "../data/artistPlaceholders";
 
 // Register GSAP plugins
 gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
@@ -306,7 +307,7 @@ export default function FeaturesPage() {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
             {features.map((feature) => (
               <GlassPanel
                 key={feature.id}
@@ -321,6 +322,34 @@ export default function FeaturesPage() {
                   </div>
                   <h3 className="text-2xl font-bold text-white mb-4">{feature.title}</h3>
                   <p className="text-cyan-200 leading-relaxed">{feature.description}</p>
+                </div>
+              </GlassPanel>
+            ))}
+          </div>
+
+          {/* Artist Gallery */}
+          <div className="text-center mb-12">
+            <h3 className="text-3xl font-bold text-white mb-4">
+              Join the Community
+            </h3>
+            <p className="text-lg text-cyan-200 max-w-2xl mx-auto">
+              Connect with producers who are already transforming their workflow
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            {ARTIST_PLACEHOLDERS.map((artist) => (
+              <GlassPanel
+                key={artist.name}
+                className="aspect-[3/4] rounded-2xl overflow-hidden border border-white/10 bg-white/5 hover:scale-105 transition-transform duration-300"
+              >
+                <img 
+                  src={artist.imageUrl} 
+                  alt={artist.name} 
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3">
+                  <p className="text-white text-sm font-medium truncate">{artist.name}</p>
                 </div>
               </GlassPanel>
             ))}
