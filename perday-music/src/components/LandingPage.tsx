@@ -39,7 +39,7 @@ export default function LandingPage() {
           <div className="space-y-6">
             <div className="space-y-4">
               <h1 className="text-5xl md:text-7xl font-black leading-tight">
-                We Help You Make 1 Beat Per Day
+                We Help You Make <span className="underline">1</span> Beat Per Day
               </h1>
               <h2 className="text-2xl md:text-3xl font-bold text-white">
                 <span className="text-cyan-300">Stop procrastinating. Start finishing. Start selling.</span>
