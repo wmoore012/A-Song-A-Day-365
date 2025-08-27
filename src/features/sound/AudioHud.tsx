@@ -1,5 +1,5 @@
-import { useRef, useEffect } from "react";
-import { useAppStore } from "@/store/store";
+import React, { useRef, useEffect } from "react";
+import { useAppStore } from "../../store/store";
 
 // Fail loud: validate preconditions
 function must<T>(value: T | null | undefined, msg: string): T {
@@ -68,17 +68,7 @@ export default function AudioHud({
         {soundEnabled ? "🔊 Sound On" : "🔇 Sound Off"}
       </button>
 
-      {soundEnabled && (
-        <audio
-          ref={audioRef}
-          loop
-          preload="none"
-          className="hidden"
-        >
-          {/* Add your audio source here */}
-          <source src="/audio/focus.mp3" type="audio/mpeg" />
-        </audio>
-      )}
+      {/* Audio removed - no more buhling sound effect */}
     </div>
   );
 }
