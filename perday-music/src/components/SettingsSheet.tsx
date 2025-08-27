@@ -1,11 +1,11 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Switch } from './ui/switch';
 import { Slider } from './ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from './ui/sheet';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from './ui/sheet';
 import { Settings, Volume2, Target, Clock, Bell } from 'lucide-react';
 import { useAppStore } from '../store/store';
 
@@ -22,33 +22,25 @@ interface SettingsData {
 }
 
 interface SettingsSheetProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   onSave: (settings: SettingsData) => void;
   currentSettings: SettingsData;
   onResetAll?: () => void;
 }
 
-export default function SettingsSheet({ onSave, currentSettings, onResetAll }: SettingsSheetProps) {
+export default function SettingsSheet({ open, onOpenChange, onSave, currentSettings, onResetAll }: SettingsSheetProps) {
   const { setSettings } = useAppStore();
-  const [isOpen, setIsOpen] = useState(false);
   const [settings, setLocalSettings] = useState<SettingsData>(currentSettings);
-  const gearRef = useRef<HTMLDivElement>(null);
 
   const spinGears = () => {
-    // gsap.to(gearRef.current, {
-    //   rotation: 1440, // 4 spins * 360 degrees
-    //   duration: 2,
-    //   ease: "power2.out",
-    //   onComplete: () => {
-    //     // Reset to 0 for next animation
-    //     gsap.set(gearRef.current, { rotation: 0 });
-    //   }
-    // });
+    // Animation placeholder for future implementation
   };
 
   const handleSave = () => {
     setSettings(settings); // Use the store's setSettings
     onSave(settings);
-    setIsOpen(false);
+    onOpenChange(false);
   };
 
   const resetToDefaults = () => {
@@ -70,15 +62,8 @@ export default function SettingsSheet({ onSave, currentSettings, onResetAll }: S
   };
 
   return (
-    <Sheet open={isOpen} onOpenChange={setIsOpen}>
-      <SheetTrigger asChild>
-        <Button variant="outline" size="icon" className="bg-black/40 border-cyan-400/40 text-cyan-300 hover:bg-cyan-400/20">
-          <div ref={gearRef}>
-            <Settings className="h-4 w-4" />
-          </div>
-        </Button>
-      </SheetTrigger>
-      <SheetContent className="bg-black/95 border-cyan-400/30 text-synth-white w-[400px]">
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent className="bg-black/95 border-cyan-400/30 text-synth-white w-[400px] z-[100]">
         <SheetHeader>
           <SheetTitle className="text-synth-white flex items-center gap-2">
             <Settings className="h-5 w-5" />
@@ -158,7 +143,7 @@ export default function SettingsSheet({ onSave, currentSettings, onResetAll }: S
               className="bg-black/40 border-cyan-400/40 text-synth-white placeholder:text-synth-icy/50"
             />
             <p className="text-xs text-synth-icy/70">
-              Get notified about your progress and achievements
+              Send an email to this person everytime you finish a session!
             </p>
           </div>
 

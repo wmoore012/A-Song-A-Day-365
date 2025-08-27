@@ -45,14 +45,29 @@ export default function LockInTips() {
   useEffect(() => {
     if (!isVisible) return;
 
-    const interval = setInterval(() => {
-      // Random tip instead of sequential
-      const randomIndex = Math.floor(Math.random() * LOCK_IN_TIPS.length);
-      setCurrentTip(randomIndex);
-    }, 45000); // Change tip every 45 seconds
+    let tipInterval: number;
+    let visibilityInterval: number;
 
-    return () => clearInterval(interval);
+    // Show/hide every 13 seconds
+    visibilityInterval = setInterval(() => {
+      setIsVisible(prev => !prev);
+    }, 13000);
+
+    // Change tip every 45 seconds (only when visible)
+    tipInterval = setInterval(() => {
+      if (isVisible) {
+        const randomIndex = Math.floor(Math.random() * LOCK_IN_TIPS.length);
+        setCurrentTip(randomIndex);
+      }
+    }, 45000);
+
+    return () => {
+      clearInterval(tipInterval);
+      clearInterval(visibilityInterval);
+    };
   }, [isVisible]);
+
+  if (!isVisible) return null;
 
   return (
     <div className="lock-in-tips fixed top-0 left-0 right-0 z-50 p-4">

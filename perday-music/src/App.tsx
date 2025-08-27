@@ -1,13 +1,14 @@
 
 import { useAppStore } from "./store/store";
 import { FlowState } from "./types";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import DashboardLayout from "./components/DashboardLayout";
 import ShaderBackground from "./components/ShaderBackground";
 import { Volume2 } from 'lucide-react';
 import DemoModeToggle from "./components/DemoModeToggle";
 
-import FrostedGalleryLoop from "./components/FrostedGalleryLoop";
+
 
 
 import UserQuestionnaire from "./components/UserQuestionnaire";
@@ -16,11 +17,13 @@ import LockInMenu from "./components/LockInMenu";
 import FocusSetup from "./components/FocusSetup";
 import FocusRunning from "./components/FocusRunning";
 import ScrollDemoPage from "./components/ScrollDemoPage";
+import SessionCompletion from "./components/SessionCompletion";
 import VillainDisplay from "./components/VillainDisplay";
 
 import Dashboard from "./components/Dashboard";
 import ScribbleX from "./components/ScribbleX";
 import LandingPage from "./components/LandingPage";
+import FeaturesPage from "./components/FeaturesPage";
 
 import { AnalyticsHud } from "./components/common/AnalyticsHud";
 import AudioHud from "./components/common/AudioHud";
@@ -28,25 +31,30 @@ import AudioHud from "./components/common/AudioHud";
 import { usePrestart } from "./hooks/usePrestart";
 import { useStartupScript } from "./hooks/useStartupScript";
 import { _fxEmit } from "./hooks/useVillainAnnounce";
+import { enableDemoFromQuery } from "./utils/demoMode";
 
-
+// Main App Component with Routing
 export default function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
+    </BrowserRouter>
+  );
+}
+
+// App Content Component (existing logic)
+function AppContent() {
   const { session, dispatch, settings } = useAppStore();
   const fadeOutRef = useRef<() => void>(() => {});
+
+  // Initialize demo mode from URL parameters
+  useEffect(() => {
+    enableDemoFromQuery();
+  }, []);
 
   // Initialize villain monitoring system
   const userName = settings.userName || "Producer";
   useStartupScript(userName);
-
-  // Gate on hydration to avoid flicker
-  // Temporarily disabled to debug blank screen issue
-  // if (!_hydrated) {
-  //   return (
-  //     <main className="relative min-h-screen bg-black flex items-center justify-center">
-  //       <div className="text-white text-xl">Loading...</div>
-  //     </main>
-  //   );
-  // }
 
   // Handle questionnaire completion
   const handleQuestionnaireComplete = (data: { name: string; collaborators: string; sessionDate?: Date }) => {
@@ -72,80 +80,88 @@ export default function App() {
     dispatch({ type: "COMPLETE_PREPARATION" });
   };
 
-          return (
-          <ShaderBackground data-testid="app-main">
+  return (
+    <ShaderBackground data-testid="app-main">
+      {/* Global Components - Always Available */}
+      <DemoModeToggle />
+      <VillainDisplay />
+      <AudioHud fadeOutRef={fadeOutRef} />
 
-                  {/* Global Components - Always Available */}
-                  <DemoModeToggle />
-                  <VillainDisplay />
-                  <AudioHud fadeOutRef={fadeOutRef} />
+      <Routes>
+        {/* Landing Page for New Users */}
+        <Route path="/" element={
+          session.state === FlowState.VAULT_CLOSED && !settings.userName ? (
+            <LandingPage />
+          ) : (
+            <div className="flex items-center justify-center min-h-screen p-8">
+              <WelcomeScreen />
+            </div>
+          )
+        } />
 
-                  {/* Landing Page for New Users */}
-                  {session.state === FlowState.VAULT_CLOSED && !settings.userName && (
-                    <LandingPage />
-                  )}
+        {/* Features Page */}
+        <Route path="/features" element={<FeaturesPage />} />
 
-                  {/* Welcome Screen for Returning Users */}
-                  {session.state === FlowState.VAULT_CLOSED && settings.userName && (
-                    <div className="flex items-center justify-center min-h-screen p-8">
-                      <WelcomeScreen />
-                    </div>
-                  )}
+        {/* Dashboard Route */}
+        <Route path="/dashboard" element={
+          <DashboardLayout>
+            <Dashboard />
+          </DashboardLayout>
+        } />
 
-                  {/* Demo pages rendered for full-screen experience */}
-                  {session.state === FlowState.SCROLL_DEMO && (
-                    <ScrollDemoPage />
-                  )}
+        {/* Demo pages rendered for full-screen experience */}
+        {session.state === FlowState.SCROLL_DEMO && (
+          <ScrollDemoPage />
+        )}
 
-                  {/* Other flow states rendered when not in demo mode */}
-                  {session.state !== FlowState.VAULT_CLOSED &&
-                   session.state !== FlowState.SCROLL_DEMO && (
-                    <>
-                      {/* Main Dashboard */}
-                      <DashboardLayout>
-                        {/* Analytics HUD */}
-                        <AnalyticsHud grades={[]} latencies={[]} />
+        {/* Other flow states rendered when not in demo mode */}
+        {session.state !== FlowState.VAULT_CLOSED &&
+         session.state !== FlowState.SCROLL_DEMO && (
+          <>
+            {/* Main Dashboard */}
+            <DashboardLayout>
+              {/* Analytics HUD */}
+              <AnalyticsHud grades={[]} latencies={[]} />
 
-                        {/* Sequential Flow Content */}
-                    {session.state === FlowState.DASHBOARD && (
-                      <Dashboard />
-                    )}
+              {/* Sequential Flow Content */}
+          {session.state === FlowState.DASHBOARD && (
+            <Dashboard />
+          )}
 
-                    {session.state === FlowState.QUESTIONNAIRE && (
-                      <div className="flex items-center justify-center min-h-screen p-4">
-                        <UserQuestionnaire onComplete={handleQuestionnaireComplete} />
-                      </div>
-                    )}
+          {session.state === FlowState.QUESTIONNAIRE && (
+            <div className="flex items-center justify-center min-h-screen p-4">
+              <UserQuestionnaire onComplete={handleQuestionnaireComplete} />
+            </div>
+          )}
 
-                    {session.state === FlowState.PREPARATION && (
-                      <PreparationPhase onComplete={handlePreparationComplete} />
-                    )}
+          {session.state === FlowState.PREPARATION && (
+            <PreparationPhase onComplete={handlePreparationComplete} />
+          )}
 
-                    {session.state === FlowState.PRE_START && (
-                      <StartHero fadeOutRef={fadeOutRef} />
-                    )}
+          {session.state === FlowState.PRE_START && (
+            <StartHero fadeOutRef={fadeOutRef} />
+          )}
 
-                    {session.state === FlowState.LOCK_IN && (
-                      <LockInMenu />
-                    )}
+          {session.state === FlowState.LOCK_IN && (
+            <LockInMenu />
+          )}
 
-                    {session.state === FlowState.FOCUS_SETUP && (
-                      <FocusSetup />
-                    )}
+          {session.state === FlowState.FOCUS_SETUP && (
+            <FocusSetup />
+          )}
 
-                    {session.state === FlowState.FOCUS_RUNNING && (
-                      <FocusRunning />
-                    )}
+          {session.state === FlowState.FOCUS_RUNNING && (
+            <FocusRunning />
+          )}
 
-                    {/* Default fallback */}
-                    {![FlowState.DASHBOARD, FlowState.QUESTIONNAIRE, FlowState.PREPARATION, FlowState.PRE_START, FlowState.LOCK_IN, FlowState.FOCUS_SETUP, FlowState.FOCUS_RUNNING].includes(session.state) && (
-                      <div className="flex items-center justify-center min-h-screen">
-                        <div className="text-white text-2xl">State: {session.state}</div>
-                      </div>
-                    )}
-                  </DashboardLayout>
-                </>
-              )}
+          {/* Session Completion States */}
+          {[FlowState.CHECKPOINT, FlowState.SELF_RATE, FlowState.RECAP, FlowState.REWARD_GATE, FlowState.POST_ACTIONS].includes(session.state) && (
+            <SessionCompletion />
+          )}
+        </DashboardLayout>
+      </>
+    )}
+      </Routes>
     </ShaderBackground>
   );
 }
@@ -195,161 +211,126 @@ function WelcomeScreen() {
               <p className="text-white/70 mb-4">
                 Get the full experience with background music and audio feedback
               </p>
-              <button
-                onClick={handleEnableSound}
-                className="px-8 py-4 bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-white font-bold text-lg rounded-xl shadow-2xl hover:shadow-cyan-500/25 transition-all duration-300 transform hover:scale-105"
-              >
-                <Volume2 className="w-5 h-5 mr-2" />
-                Enable Sound
-              </button>
+              <div className="flex gap-3">
+                <button
+                  onClick={handleEnableSound}
+                  className="flex-1 px-4 py-2 bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-white font-semibold rounded-lg transition-all duration-200"
+                >
+                  <Volume2 className="w-4 h-4 mr-2 inline" />
+                  Enable Sound
+                </button>
+                <button
+                  onClick={() => setSoundEnabled(false)}
+                  className="px-4 py-2 border border-cyan-400/60 text-cyan-300 hover:bg-cyan-400/20 rounded-lg transition-all duration-200"
+                >
+                  Proceed with no sound
+                </button>
+              </div>
             </div>
           </div>
         ) : (
           <div className="space-y-4">
+            {/* Success notification */}
             {showSoundNotification && (
-              <div className="p-4 bg-green-500/20 backdrop-blur-sm border border-green-400/30 rounded-xl animate-fade-in">
-                <p className="text-green-300 font-medium">✅ Sound Enabled</p>
-                <p className="text-white/70 text-sm">Background music and audio feedback active</p>
+              <div className="p-4 bg-green-500/20 border border-green-400/50 rounded-xl animate-pulse">
+                <p className="text-green-300 font-semibold">Sound enabled! 🎵</p>
               </div>
             )}
-            
-                         <div className="grid grid-cols-2 gap-4">
-               <button
-                 onClick={() => dispatch({ type: "START_QUESTIONNAIRE" })}
-                 className="px-6 py-4 bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-white font-bold rounded-xl shadow-2xl hover:shadow-cyan-500/25 transition-all duration-300 transform hover:scale-105"
-               >
-                 Write X Songs Per Day
-               </button>
-               <button
-                 onClick={() => dispatch({ type: "START_QUESTIONNAIRE" })}
-                 className="px-6 py-4 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-400 hover:to-pink-500 text-white font-bold rounded-xl shadow-2xl hover:shadow-purple-500/25 transition-all duration-300 transform hover:scale-105"
-               >
-                 Produce X Songs Per Day
-               </button>
-               <button
-                 onClick={() => dispatch({ type: "START_QUESTIONNAIRE" })}
-                 className="px-6 py-4 bg-gradient-to-r from-pink-500 to-red-600 hover:from-pink-400 hover:to-red-500 text-white font-bold rounded-xl shadow-2xl hover:shadow-pink-500/25 transition-all duration-300 transform hover:scale-105"
-               >
-                 Make X Riffs Per Day
-               </button>
-               <button
-                 onClick={() => dispatch({ type: "START_QUESTIONNAIRE" })}
-                 className="px-6 py-4 bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-400 hover:to-orange-500 text-white font-bold rounded-xl shadow-2xl hover:shadow-red-500/25 transition-all duration-300 transform hover:scale-105"
-               >
-                 Do X Mixes Per Day
-               </button>
-             </div>
-          </div>
-        )}
 
+            {/* Main CTA */}
+            <button
+              onClick={() => dispatch({ type: "GO_TO_DASHBOARD" })}
+              className="px-8 py-4 bg-gradient-to-r from-magenta-500 via-cyan-400 to-purple-600 hover:from-magenta-600 hover:via-cyan-500 hover:to-purple-700 text-white font-bold text-xl rounded-xl transition-all duration-300 transform hover:scale-105 shadow-2xl"
+            >
+              Start Your Session
+            </button>
 
-
-        <p className="text-sm text-white/40">
-          Takes ~2 minutes to set up, then you're ready to produce
-        </p>
-
-        {/* Timer Display */}
-        <div className="relative">
-          <div className="text-4xl font-mono font-black text-gray-600/30 tabular-nums">
-            07:00
-          </div>
-          <div className="text-lg text-white/40 mt-2">
-            Ready to Cook Up?
-          </div>
-        </div>
-
-                     {/* Features Button */}
-             <button
-               onClick={() => setShowFeatures(true)}
-               className="px-6 py-3 border-2 border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-black font-semibold text-base rounded-lg transition-all duration-300 hover:shadow-purple-400/25"
-             >
-               See What's Inside
-             </button>
-
-             {/* Learn More Button */}
-             <button
-               onClick={() => dispatch({ type: "SCROLL_DEMO" })}
-               className="px-6 py-3 border-2 border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-black font-semibold text-base rounded-lg transition-all duration-300 hover:shadow-cyan-400/25"
-             >
-               Learn More
-             </button>
-
-             {/* Join Beta Waitlist Button */}
-             <button
-               onClick={() => window.open('https://discord.gg/your-server', '_blank')}
-               className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-white font-semibold text-base rounded-lg transition-all duration-300 hover:shadow-green-500/25"
-             >
-               Join Beta Waitlist
-             </button>
-      </div>
-
-      {/* Features Modal */}
-      {showFeatures && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-black/95 border border-cyan-400/30 rounded-2xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-white">What's Inside</h2>
+            {/* Secondary actions */}
+            <div className="flex gap-4 justify-center">
               <button
-                onClick={() => setShowFeatures(false)}
-                className="text-white/60 hover:text-white"
+                onClick={() => setShowFeatures(!showFeatures)}
+                className="px-6 py-3 border border-white/30 text-white/80 hover:bg-white/10 rounded-lg transition-all duration-200"
               >
-                ✕
+                {showFeatures ? 'Hide' : 'Show'} Features
+              </button>
+              <button
+                onClick={() => dispatch({ type: "SCROLL_DEMO" })}
+                className="px-6 py-3 border border-white/30 text-white/80 hover:bg-white/10 rounded-lg transition-all duration-200"
+              >
+                View Demo
               </button>
             </div>
-            <FrostedGalleryLoop />
+          </div>
+        )}
+      </div>
+
+      {/* Features Preview */}
+      {showFeatures && (
+        <div className="mt-8 p-6 bg-black/20 backdrop-blur-sm border border-cyan-400/30 rounded-xl">
+          <h3 className="text-lg font-semibold text-cyan-300 mb-4">What's Inside</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-white/80">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-cyan-400 rounded-full"></div>
+              <span>55-minute lock-ins</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
+              <span>Live multipliers</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-magenta-400 rounded-full"></div>
+              <span>Accountability squad</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-amber-400 rounded-full"></div>
+              <span>Progress tracking</span>
+            </div>
           </div>
         </div>
       )}
-
-      {/* Footer */}
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-center">
-        <p className="text-xs text-white/40">
-          © 2025 Made by Will Moore
-        </p>
-      </div>
     </div>
   );
 }
 
 // Preparation Phase Component
 function PreparationPhase({ onComplete }: { onComplete: () => void }) {
-  const { mmss, msLeft } = usePrestart(7 * 60 * 1000); // 7 minutes
+  const { prestartTotalMs, phase } = useAppStore();
+  const { msLeft } = usePrestart(prestartTotalMs);
 
-  // Auto-complete when timer reaches zero
-  if (msLeft <= 0) {
-    onComplete();
-  }
+  useEffect(() => {
+    if (msLeft <= 0) {
+      onComplete();
+    }
+  }, [msLeft, onComplete]);
+
+  const progress = ((prestartTotalMs - msLeft) / prestartTotalMs) * 100;
+  const minutes = Math.floor(msLeft / 60000);
+  const seconds = Math.floor((msLeft % 60000) / 1000);
 
   return (
     <div className="flex items-center justify-center min-h-screen p-8">
       <div className="text-center space-y-8 max-w-2xl">
+        <h2 className="text-4xl font-bold text-white mb-4">Preparation Phase</h2>
+        <p className="text-xl text-cyan-300/80 mb-8">
+          Get ready for your session. Clear your mind, set your intentions.
+        </p>
+        
         <div className="space-y-4">
-          <h2 className="text-4xl font-bold text-synth-white">Preparation Phase</h2>
-          <p className="text-xl text-cyan-300/80">
-            Get your mind right. Set up your workspace. Load your samples.
-          </p>
-        </div>
-
-        <div className="space-y-4">
-          <div className="text-8xl font-mono font-black text-synth-amber tabular-nums">
-            {mmss}
+          <div className="text-6xl font-mono text-white">
+            {minutes}:{seconds.toString().padStart(2, '0')}
           </div>
-          <p className="text-lg text-white/60">
-            Time remaining to prepare your creative environment
-          </p>
+          
+          <div className="w-full bg-white/10 rounded-full h-2">
+            <div 
+              className="bg-gradient-to-r from-cyan-400 to-purple-600 h-2 rounded-full transition-all duration-1000"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
         </div>
 
-        <div className="space-y-4">
-          <button
-            onClick={onComplete}
-            className="px-8 py-4 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-white font-bold text-lg rounded-xl shadow-2xl hover:shadow-green-500/25 transition-all duration-300"
-          >
-            I'm Ready Now
-          </button>
-          <p className="text-sm text-white/40">
-            We'll automatically advance when the timer hits zero
-          </p>
-        </div>
+        <p className="text-white/60">
+          Phase: {phase}
+        </p>
       </div>
     </div>
   );

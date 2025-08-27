@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/
 import { Calendar } from './ui/calendar';
 import { Checkbox } from './ui/checkbox';
 import { Settings, Users, UserPlus } from 'lucide-react';
+import { getDemoConfig } from '../utils/demoMode';
 
 interface UserQuestionnaireProps {
   onComplete: (data: { name: string; collaborators: string; sessionDate?: Date }) => void;
@@ -17,6 +18,15 @@ export default function UserQuestionnaire({ onComplete }: UserQuestionnaireProps
   const [collaborators, setCollaborators] = useState('');
   const [isRemote, setIsRemote] = useState(false);
   const [date, setDate] = useState<Date | undefined>(new Date());
+
+  // Read demo config for pre-filled values
+  useEffect(() => {
+    const demoConfig = getDemoConfig();
+    if (demoConfig.intent) {
+      // Pre-configure based on intent
+      console.log('Demo intent:', demoConfig.intent);
+    }
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

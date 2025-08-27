@@ -79,15 +79,20 @@ export default function FocusSetup() {
           <div className="space-y-3">
             <Label className="text-synth-white text-lg font-semibold flex items-center gap-2">
               <Clock className="h-5 w-5" />
-              Set Duration
+              Set Duration (max 5 hours)
             </Label>
             <div className="flex gap-3">
               <Input
                 type="number"
                 value={duration}
-                onChange={(e) => handleDurationChange(parseInt(e.target.value) || 0)}
+                onChange={(e) => {
+                  const value = parseInt(e.target.value) || 0;
+                  // Cap at 5 hours (300 minutes)
+                  const cappedValue = Math.min(value, 300);
+                  handleDurationChange(cappedValue);
+                }}
                 min="1"
-                max="120"
+                max="300"
                 className="flex-1 bg-black/40 border-cyan-400/40 text-synth-white"
               />
               <span className="text-synth-white self-center">minutes</span>

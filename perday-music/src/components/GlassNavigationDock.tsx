@@ -1,10 +1,25 @@
-import { useState } from 'react';
-import { Settings, BookOpen, Package, User, Volume2 } from 'lucide-react';
-import { useAppStore } from '../store/store';
-import SettingsSheet from './SettingsSheet';
-import { toast } from 'sonner';
+import { useState } from "react";
+import { Settings, BookOpen, Package, User, Volume2 } from "lucide-react";
+import { useAppStore } from "../store/store";
+import { toast } from "sonner";
 
-// Create a ref to control the notepad
+// shadcn/ui (Radix) primitives render in a portal -> no overlap issues
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import {
+  Tooltip,
+  TooltipProvider,
+  TooltipTrigger,
+  TooltipContent,
+} from "./ui/tooltip";
+
+import SettingsSheet from "./SettingsSheet";
+
+// Notepad control (unchanged)
 let notepadRef: { open: () => void } | null = null;
 export const setNotepadRef = (ref: { open: () => void } | null) => {
   notepadRef = ref;
@@ -12,185 +27,149 @@ export const setNotepadRef = (ref: { open: () => void } | null) => {
 
 export default function GlassNavigationDock() {
   const { settings, setSettings } = useAppStore();
-  const [showSettings, setShowSettings] = useState(false);
-  const [showMusicOptions, setShowMusicOptions] = useState(false);
+  const [musicOpen, setMusicOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const navItems = [
     {
       icon: User,
-      label: 'Profile',
-      action: () => toast.info('Profile management coming soon!'),
-      color: 'hover:bg-blue-500/20 hover:border-blue-400/50'
+      label: "Profile",
+      onClick: () => toast.info("Profile management coming soon!"),
+      hoverColor: "hover:bg-blue-500/20 hover:border-blue-400/50",
     },
     {
       icon: BookOpen,
-      label: 'Notepad',
-      action: () => {
-        if (notepadRef) {
-          notepadRef.open();
-        } else {
-          toast.info('Notepad opens automatically in sessions!');
-        }
-      },
-      color: 'hover:bg-green-500/20 hover:border-green-400/50'
+      label: "Notepad",
+      onClick: () => (notepadRef ? notepadRef.open() : toast.info("Notepad opens automatically in sessions!")),
+      hoverColor: "hover:bg-green-500/20 hover:border-green-400/50",
     },
     {
       icon: Package,
-      label: 'Inventory',
-      action: () => toast.info('Inventory system coming soon!'),
-      color: 'hover:bg-purple-500/20 hover:border-purple-400/50'
+      label: "Inventory",
+      onClick: () => toast.info("Inventory system coming soon!"),
+      hoverColor: "hover:bg-purple-500/20 hover:border-purple-400/50",
     },
     {
       icon: Settings,
-      label: 'Settings',
-      action: () => setShowSettings(true),
-      color: 'hover:bg-cyan-500/20 hover:border-cyan-400/50'
-    }
-  ];
+      label: "Settings",
+      onClick: () => setSettingsOpen(true),
+      hoverColor: "hover:bg-cyan-500/20 hover:border-cyan-400/50",
+    },
+  ] as const;
 
   return (
     <>
-      <div className="fixed bottom-6 left-6 z-50">
-        <div className="flex items-end gap-3">
-          {/* Glass Navigation Dock */}
-          <div className="flex flex-col gap-2">
-            {navItems.map((item, index) => (
+      {/* isolate => own stacking context; pointer-events auto only for the cluster */}
+      <div className="fixed bottom-6 left-6 z-[70] isolate pointer-events-none">
+        <div className="flex items-end gap-3 pointer-events-auto">
+          {/* Main vertical dock */}
+          <TooltipProvider>
+            <div className="flex flex-col gap-2">
+              {navItems.map((item) => (
+                <Tooltip key={item.label}>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={item.onClick}
+                      className={[
+                        "relative p-3 rounded-2xl",
+                        "bg-gradient-to-br from-white/15 via-white/8 to-white/5",
+                        "border border-white/20 backdrop-blur-xl",
+                        "shadow-2xl shadow-black/50 transition-all duration-200 ease-out",
+                        // Remove scale transform to avoid stacking-context fights; use subtle translate + ring instead
+                        "hover:-translate-y-0.5 hover:ring-1 hover:ring-white/20",
+                        item.hoverColor,
+                      ].join(" ")}
+                      aria-label={item.label}
+                    >
+                      <item.icon className="w-5 h-5 text-white drop-shadow-lg" />
+                      {/* purely visual overlays must not capture clicks */}
+                      <span className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-white/10 via-transparent to-transparent opacity-0 hover:opacity-100 transition-opacity blur-xl scale-110" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="right" className="bg-black/90 text-white border border-white/10">
+                    {item.label}
+                  </TooltipContent>
+                </Tooltip>
+              ))}
+            </div>
+          </TooltipProvider>
+
+          {/* Music button with a portal-based DropdownMenu (no overlap) */}
+          <DropdownMenu open={musicOpen} onOpenChange={setMusicOpen}>
+            <DropdownMenuTrigger asChild>
               <button
-                key={item.label}
-                onClick={item.action}
-                className={`
-                  group relative p-3 rounded-2xl
-                  bg-gradient-to-br from-white/15 via-white/8 to-white/5
-                  border border-white/20
-                  backdrop-blur-xl
-                  shadow-2xl shadow-black/50
-                  hover:shadow-3xl hover:shadow-black/60
-                  transition-all duration-300 ease-out
-                  hover:scale-105 hover:-translate-y-1
-                  ${item.color}
-                  before:absolute before:inset-0 before:rounded-2xl
-                  before:bg-gradient-to-br before:from-white/20 before:to-transparent
-                  before:opacity-0 before:transition-opacity before:duration-300
-                  hover:before:opacity-100
-                  after:absolute after:inset-0 after:rounded-2xl
-                  after:bg-gradient-to-t after:from-black/20 after:to-transparent
-                  after:pointer-events-none
-                `}
-                style={{
-                  animationDelay: `${index * 100}ms`
-                }}
-                title={item.label}
-                aria-label={item.label}
+                className={[
+                  "relative p-3 rounded-2xl",
+                  "bg-gradient-to-br from-white/15 via-white/8 to-white/5",
+                  "border border-white/20 backdrop-blur-xl",
+                  "shadow-2xl shadow-black/50 transition-all duration-200 ease-out",
+                  "hover:-translate-y-0.5 hover:ring-1 hover:ring-white/20",
+                  "hover:bg-purple-500/20 hover:border-purple-400/50",
+                ].join(" ")}
+                aria-label="Enable Music"
               >
-                <item.icon className="w-5 h-5 text-white relative z-10 drop-shadow-lg" />
-
-                {/* Tooltip */}
-                <div className="absolute left-full ml-3 px-3 py-2 bg-black/90 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none whitespace-nowrap z-20 shadow-xl border border-white/10">
-                  {item.label}
-                  <div className="absolute right-full top-1/2 -translate-y-1/2 w-2 h-2 bg-black/90 border-l border-t border-white/10 transform rotate-45"></div>
-                </div>
-
-                {/* Subtle glow effect */}
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl scale-110"></div>
+                <Volume2 className="w-5 h-5 text-white drop-shadow-lg" />
+                <span className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-white/10 via-transparent to-transparent opacity-0 hover:opacity-100 transition-opacity blur-xl scale-110" />
               </button>
-            ))}
-          </div>
+            </DropdownMenuTrigger>
 
-          {/* Enable Music Button */}
-          <div className="flex flex-col gap-2">
-            <button
-              onClick={() => setShowMusicOptions(!showMusicOptions)}
-              className={`
-                group relative p-3 rounded-2xl
-                bg-gradient-to-br from-white/15 via-white/8 to-white/5
-                border border-white/20
-                backdrop-blur-xl
-                shadow-2xl shadow-black/50
-                hover:shadow-3xl hover:shadow-black/60
-                transition-all duration-300 ease-out
-                hover:scale-105 hover:-translate-y-1
-                hover:bg-purple-500/20 hover:border-purple-400/50
-                before:absolute before:inset-0 before:rounded-2xl
-                before:bg-gradient-to-br before:from-white/20 before:to-transparent
-                before:opacity-0 before:transition-opacity before:duration-300
-                hover:before:opacity-100
-                after:absolute after:inset-0 after:rounded-2xl
-                after:bg-gradient-to-t after:from-black/20 after:to-transparent
-                after:pointer-events-none
-              `}
-              title="Enable Music"
-              aria-label="Enable Music"
+            <DropdownMenuContent
+              side="top"
+              align="start"
+              className="w-56 bg-black/90 backdrop-blur-xl border border-purple-400/50 rounded-xl shadow-2xl text-sm p-2"
             >
-              <Volume2 className="w-5 h-5 text-white relative z-10 drop-shadow-lg" />
-
-              {/* Tooltip */}
-              <div className="absolute left-full ml-3 px-3 py-2 bg-black/90 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none whitespace-nowrap z-20 shadow-xl border border-white/10">
-                Enable Music
-                <div className="absolute right-full top-1/2 -translate-y-1/2 w-2 h-2 bg-black/90 border-l border-t border-white/10 transform rotate-45"></div>
-              </div>
-
-              {/* Subtle glow effect */}
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl scale-110"></div>
-            </button>
-
-                    {/* Music Options Popup */}
-        {showMusicOptions && (
-          <div className="absolute bottom-full left-0 mb-2 p-3 bg-black/90 backdrop-blur-xl border border-purple-400/50 rounded-xl shadow-2xl z-30">
-                <div className="space-y-2">
-                  <button
-                    onClick={() => {
-                      setSettings({ ...settings, soundEnabled: true });
-                      setShowMusicOptions(false);
-                      toast.success('Music enabled!');
-                    }}
-                    className="w-full px-3 py-2 text-sm text-white bg-purple-600/80 hover:bg-purple-500/90 rounded-lg transition-colors"
-                  >
-                    Enable Sound
-                  </button>
-                  <button
-                    onClick={() => {
-                      setSettings({ ...settings, soundEnabled: false });
-                      setShowMusicOptions(false);
-                      toast.info('Proceeding with no sound');
-                    }}
-                    className="w-full px-3 py-2 text-sm text-white/70 bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
-                  >
-                    Proceed with no sound
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
+              <DropdownMenuItem
+                onClick={() => {
+                  setSettings({ ...settings, soundEnabled: true });
+                  setMusicOpen(false);
+                  toast.success("Music enabled!");
+                }}
+                className="w-full px-3 py-2 text-white bg-purple-600/80 hover:bg-purple-500/90 rounded-lg transition-colors cursor-pointer"
+              >
+                Enable Sound
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  setSettings({ ...settings, soundEnabled: false });
+                  setMusicOpen(false);
+                  toast.info("Proceeding with no sound");
+                }}
+                className="w-full px-3 py-2 text-white/80 bg-white/10 hover:bg-white/20 rounded-lg transition-colors cursor-pointer"
+              >
+                Proceed with no sound
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
-      {/* Settings Sheet */}
-      {showSettings && (
-        <SettingsSheet
-          currentSettings={settings}
-          onSave={(newSettings) => {
-            setSettings(newSettings);
-            setShowSettings(false);
-            toast.success('Settings saved successfully!');
-          }}
-          onResetAll={() => {
-            setSettings({
-              defaultDuration: 25,
-              defaultMultiplier: 1.5,
-              autoStartTimer: true,
-              soundEnabled: true,
-              volume: 0.15,
-              notifications: true,
-              accountabilityEmail: '',
-              userName: settings.userName || '',
-              collaborators: '',
-              defaultPlaylist: 'PLl-ShioB5kapLuMhLMqdyx_gKX_MBiXeb'
-            });
-            setShowSettings(false);
-            toast.success('Settings reset to defaults!');
-          }}
-        />
-      )}
+      {/* Settings: control it explicitly. If your SettingsSheet wraps Radix <Sheet>, pass these props through. */}
+      <SettingsSheet
+        open={settingsOpen}
+        onOpenChange={setSettingsOpen}
+        currentSettings={settings}
+        onSave={(newSettings) => {
+          setSettings(newSettings);
+          setSettingsOpen(false);
+          toast.success("Settings saved successfully!");
+        }}
+        onResetAll={() => {
+          setSettings({
+            defaultDuration: 25,
+            defaultMultiplier: 1.5,
+            autoStartTimer: true,
+            soundEnabled: true,
+            volume: 0.15,
+            notifications: true,
+            accountabilityEmail: "",
+            userName: settings.userName || "",
+            collaborators: "",
+            defaultPlaylist: "PLl-ShioB5kapLuMhLMqdyx_gKX_MBiXeb",
+          });
+          setSettingsOpen(false);
+          toast.success("Settings reset to defaults!");
+        }}
+      />
     </>
   );
 }

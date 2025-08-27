@@ -87,7 +87,7 @@ export default function MultiplierBar({ multiplier = 1.0, className = "", isTime
         isDying ? 'text-red-400 animate-pulse' : 'text-synth-amber'
       }`}>
         {isTimeRemaining 
-          ? `${Math.floor(multiplier * 60)}m` // Show minutes remaining
+          ? `${Math.floor(multiplier)}m` // Show minutes remaining (multiplier is already in minutes)
           : `${multiplier.toFixed(1)}x` // Show multiplier
         }
       </span>

@@ -115,7 +115,7 @@ export default function RotatingHeroPro({
           <span key={idx} className="align-baseline">
             {p}
             {idx < parts.length - 1 ? (
-              <ScribbleX width={42} stroke={7} className="text-red-500 inline-block" />
+              <ScribbleX size={42} strokeWidth={7} className="text-red-500 inline-block" />
             ) : null}
           </span>
         ))}

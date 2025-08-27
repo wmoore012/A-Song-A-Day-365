@@ -31,7 +31,7 @@ describe('App', () => {
 
   it('shows LandingPage for new users', () => {
     render(<App />);
-    expect(screen.getByText(/PERDAY/)).toBeInTheDocument();
+    expect(screen.getByText(/Perday: Music/)).toBeInTheDocument();
     expect(screen.getByText(/Stop procrastinating/)).toBeInTheDocument();
   });
 });

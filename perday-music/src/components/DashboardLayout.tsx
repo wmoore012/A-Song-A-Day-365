@@ -2,7 +2,7 @@ import { ReactNode, useRef, useEffect } from 'react';
 import PremiumSidebar from './PremiumSidebar';
 import SocialDock from './SocialDock';
 import InventoryCounter from './InventoryCounter';
-import Notepad from './Notepad';
+import Notepad, { NotepadHandle } from './Notepad';
 import GlassNavigationDock, { setNotepadRef } from './GlassNavigationDock';
 
 interface DashboardLayoutProps {
@@ -10,7 +10,7 @@ interface DashboardLayoutProps {
 }
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
-  const notepadRef = useRef<{ open: () => void }>(null);
+  const notepadRef = useRef<NotepadHandle>(null);
 
   useEffect(() => {
     setNotepadRef(notepadRef.current);

@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useAppStore } from '../store/store';
 import { useDemoMode } from '../hooks/useDemoMode';
+import { FlowState } from '../types';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from './ui/sheet';
 import LockInTips from './LockInTips';
 import HeatButtons from './HeatButtons';
-import GlassPanel from './common/GlassPanel';
 import { 
   Play, 
   Target, 
@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 
 export default function Dashboard() {
-  const { dispatch, settings, setSettings } = useAppStore();
+  const { dispatch, settings, setSettings, session } = useAppStore();
   const { getData } = useDemoMode();
   const [showCommunity, setShowCommunity] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
@@ -68,27 +68,27 @@ export default function Dashboard() {
     <div className="min-h-screen bg-black text-white p-6">
       <LockInTips />
       
-      {/* Sound Enable Prompt */}
+      {/* Sound Enable Prompt - Front and Center */}
       {showSoundPrompt && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xl flex items-center justify-center p-4">
-          <GlassPanel className="max-w-md w-full p-8 text-center">
-            <div className="mb-6">
-              <Volume2 className="w-16 h-16 text-cyan-300 mx-auto mb-4" />
-              <h2 className="text-2xl font-bold text-white mb-2">Enable Sound?</h2>
-              <p className="text-cyan-200/80">
+        <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-xl flex items-center justify-center p-4">
+          <div className="bg-black/60 backdrop-blur-xl border border-cyan-400/30 rounded-2xl p-8 max-w-md w-full text-center shadow-2xl shadow-cyan-400/20">
+            <div className="mb-8">
+              <Volume2 className="w-20 h-20 text-cyan-300 mx-auto mb-6" />
+              <h2 className="text-3xl font-bold text-white mb-4">Enable Sound?</h2>
+              <p className="text-cyan-200/80 text-lg">
                 Get the full experience with background music and audio feedback
               </p>
             </div>
-            <div className="space-y-3">
+            <div className="space-y-4">
               <Button
                 onClick={() => {
                   setSettings({ ...settings, soundEnabled: true });
                   localStorage.setItem('hasSeenSoundPrompt', 'true');
                   setShowSoundPrompt(false);
                 }}
-                className="w-full bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500"
+                className="w-full h-14 bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-lg font-semibold rounded-xl"
               >
-                <Volume2 className="w-4 h-4 mr-2" />
+                <Volume2 className="w-5 h-5 mr-2" />
                 Enable Sound
               </Button>
               <Button
@@ -98,12 +98,12 @@ export default function Dashboard() {
                   localStorage.setItem('hasSeenSoundPrompt', 'true');
                   setShowSoundPrompt(false);
                 }}
-                className="w-full border-cyan-400/50 text-cyan-300 hover:bg-cyan-400/20"
+                className="w-full h-12 border-cyan-400/60 text-cyan-300 hover:bg-cyan-400/20 rounded-xl"
               >
                 Proceed with no sound
               </Button>
             </div>
-          </GlassPanel>
+          </div>
         </div>
       )}
       {/* Header */}
@@ -131,10 +131,12 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Heat Buttons */}
-      <div className="mb-8">
-        <HeatButtons />
-      </div>
+      {/* Heat Buttons - Only show when session is active and questionnaire completed */}
+      {session.state === FlowState.FOCUS_RUNNING && session.target && (
+        <div className="mb-8">
+          <HeatButtons />
+        </div>
+      )}
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

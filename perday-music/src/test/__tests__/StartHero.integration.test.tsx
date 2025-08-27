@@ -1,6 +1,7 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { BrowserRouter } from 'react-router-dom';
 import { FlowState } from '../../types'; // Added FlowState import
 
 // ── IMPORTANT: StartHero must accept a prop `fadeOutRef: React.MutableRefObject<() => void>`
@@ -60,7 +61,11 @@ describe('StartHero → audio fade on Ready (integration smoke)', () => {
   it('clicking Ready calls fadeOutRef.current exactly once', async () => {
     const fadeOutRef = { current: fadeSpy };
 
-    render(<StartHero fadeOutRef={fadeOutRef as React.MutableRefObject<() => void>} />);
+    render(
+      <BrowserRouter>
+        <StartHero fadeOutRef={fadeOutRef as React.MutableRefObject<() => void>} />
+      </BrowserRouter>
+    );
 
     // First, click the Start Timer button
     const startTimerBtn = await screen.findByRole('button', { name: /start 7-minute timer/i });
