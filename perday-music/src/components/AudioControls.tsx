@@ -4,58 +4,7 @@ import { Slider } from './ui/slider';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from './ui/sheet';
 import { Volume2, Play, Pause, SkipBack, SkipForward, Music, Settings } from 'lucide-react';
 
-// YouTube Player API types
-interface YTPlayer {
-  playVideo(): void;
-  pauseVideo(): void;
-  nextVideo(): void;
-  previousVideo(): void;
-  setVolume(volume: number): void;
-  getVolume(): number;
-  getVideoData(): YTVideoData | undefined;
-  destroy(): void;
-}
-
-interface YTVideoData {
-  title?: string;
-  author?: string;
-  video_id?: string;
-}
-
-interface YTPlayerEvent {
-  target: YTPlayer;
-  data: number;
-}
-
-interface YTPlayerOptions {
-  width?: string | number;
-  height?: string | number;
-  playerVars?: Record<string, any>;
-  events?: {
-    onReady?: (event: YTPlayerEvent) => void;
-    onStateChange?: (event: YTPlayerEvent) => void;
-  };
-}
-
-interface YTPlayerConstructor {
-  new (element: HTMLElement | string, options: YTPlayerOptions): YTPlayer;
-}
-
-declare global {
-  interface Window {
-    YT?: {
-      Player: YTPlayerConstructor;
-      PlayerState: {
-        UNSTARTED: number;
-        ENDED: number;
-        PLAYING: number;
-        PAUSED: number;
-        BUFFERING: number;
-        CUED: number;
-      };
-    };
-  }
-}
+// YT types declared in AudioHud.tsx
 
 interface AudioControlsProps {
   currentVolume: number;
@@ -71,7 +20,7 @@ export default function AudioControls({
   const [isOpen, setIsOpen] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [trackTitle, setTrackTitle] = useState<string>('Perday Music 365');
-  const playerRef = useRef<YTPlayer | null>(null);
+  const playerRef = useRef<any | null>(null); // YTPlayer from AudioHud.tsx
   const hostRef = useRef<HTMLDivElement>(null);
 
   // Load IFrame API once and build the player on first open/interaction
@@ -98,12 +47,12 @@ export default function AudioControls({
         list: playlistId,
       },
       events: {
-        onReady: (e: YTPlayerEvent) => {
+        onReady: (e: any) => {
           e.target.setVolume(Math.round(currentVolume * 100));
           const vd = e.target.getVideoData?.();
           if (vd?.title) setTrackTitle(vd.title);
         },
-        onStateChange: (e: YTPlayerEvent) => {
+        onStateChange: (e: any) => {
           // 1=playing, 2=paused, 0=ended
           setIsPlaying(e.data === 1);
           const vd = e.target.getVideoData?.();
