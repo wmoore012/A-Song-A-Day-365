@@ -2,8 +2,32 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "../ui/sheet";
-
 import { ExternalLink } from "lucide-react";
+
+// Jitsi Meet API types
+interface JitsiMeetExternalAPI {
+  dispose(): void;
+  executeCommand(command: string, ...args: unknown[]): void;
+  addEventListener(event: string, handler: (data: unknown) => void): void;
+  removeEventListener(event: string, handler: (data: unknown) => void): void;
+}
+
+interface JitsiMeetExternalAPIConstructor {
+  new (domain: string, options: {
+    roomName: string;
+    parentNode?: HTMLElement;
+    configOverwrite?: Record<string, unknown>;
+    interfaceConfigOverwrite?: Record<string, unknown>;
+    width?: string | number;
+    height?: string | number;
+  }): JitsiMeetExternalAPI;
+}
+
+declare global {
+  interface Window {
+    JitsiMeetExternalAPI?: JitsiMeetExternalAPIConstructor;
+  }
+}
 
 type Props = { open: boolean; onOpenChange: (v: boolean) => void };
 
@@ -11,7 +35,7 @@ export default function VideoSheet({ open, onOpenChange }: Props) {
   const [provider, setProvider] = useState<"whereby" | "jitsi">("jitsi");
   const [roomName, setRoomName] = useState("perday-camp-room");
   const jitsiRef = useRef<HTMLDivElement>(null);
-  const apiRef = useRef<any>(null);
+  const apiRef = useRef<JitsiMeetExternalAPI | null>(null);
 
   // Lazy-load Jitsi API and mount when provider === 'jitsi'
   useEffect(() => {
@@ -19,7 +43,7 @@ export default function VideoSheet({ open, onOpenChange }: Props) {
 
     const ensureScript = () =>
       new Promise<void>((resolve) => {
-        if ((window as any).JitsiMeetExternalAPI) return resolve();
+        if (window.JitsiMeetExternalAPI) return resolve();
         const s = document.createElement("script");
         s.src = "https://meet.jit.si/external_api.js";
         s.onload = () => resolve();
@@ -29,7 +53,11 @@ export default function VideoSheet({ open, onOpenChange }: Props) {
     let disposed = false;
     ensureScript().then(() => {
       if (disposed || !jitsiRef.current) return;
-      const JitsiMeetExternalAPI = (window as any).JitsiMeetExternalAPI;
+      const JitsiMeetExternalAPI = window.JitsiMeetExternalAPI;
+      if (!JitsiMeetExternalAPI) {
+        console.error('Jitsi Meet API not loaded');
+        return;
+      }
       apiRef.current = new JitsiMeetExternalAPI("meet.jit.si", {
         roomName,
         parentNode: jitsiRef.current,

@@ -22,7 +22,7 @@ export default function FlipClock({ text, className = "", onComplete }: FlipCloc
 
   useEffect(() => {
     const isSSR = typeof window === 'undefined';
-    const isTest = (import.meta as any)?.env?.MODE === 'test';
+    const isTest = (import.meta as { env?: { MODE?: string } })?.env?.MODE === 'test';
     const reduceMotion = !isSSR && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
     if (!containerRef.current || !text) {

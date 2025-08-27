@@ -18,6 +18,13 @@ interface VillainEventData {
   type?: string;
 }
 
+type FxType = 'announce' | 'confetti' | 'toast' | 'villain-nudge';
+
+type FxPayload =
+  | { msg: string; type?: never }
+  | { msg?: never; type?: 'success' | 'error' | 'info' }
+  | Record<string, unknown>;
+
 export default function VillainDisplay() {
   const [messages, setMessages] = useState<VillainMessage[]>([]);
   const [devilHeads, setDevilHeads] = useState<Array<{ id: string; x: number; y: number }>>([]);
@@ -27,11 +34,11 @@ export default function VillainDisplay() {
 
   useEffect(() => {
     // Subscribe to villain events
-    const unsubscribe = _fxSubscribe((type: string, data: VillainEventData) => {
+    const unsubscribe = _fxSubscribe((type: FxType, data?: FxPayload) => {
       if (type === 'villain-nudge' || type === 'announce' || type === 'toast') {
         const newMessage: VillainMessage = {
           id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-          text: data.msg || data.text || 'Villain speaks!',
+          text: (data as any)?.msg || (data as any)?.text || 'Villain speaks!',
           type: type === 'villain-nudge' ? 'villain-nudge' : 
                 type === 'toast' ? (data.type || 'info') : 'info',
           timestamp: Date.now(),

@@ -60,8 +60,9 @@ function setupParallaxLayers() {
  */
 function setupContentScrollAnimations() {
   // Animate content sections on scroll
-  gsap.utils.toArray('.content-section').forEach((section: any) => {
-    gsap.fromTo(section,
+  gsap.utils.toArray('.content-section').forEach((section) => {
+    const element = section as HTMLElement;
+    gsap.fromTo(element,
       {
         opacity: 0,
         y: 50
@@ -72,7 +73,7 @@ function setupContentScrollAnimations() {
         duration: 1,
         ease: 'power2.out',
         scrollTrigger: {
-          trigger: section,
+          trigger: element,
           start: 'top 80%',
           end: 'bottom 20%',
           toggleActions: 'play none none reverse'
@@ -82,8 +83,9 @@ function setupContentScrollAnimations() {
   });
 
   // Stagger animations for cards/grids
-  gsap.utils.toArray('.card-grid .card').forEach((card: any, index: number) => {
-    gsap.fromTo(card,
+  gsap.utils.toArray('.card-grid .card').forEach((card, index) => {
+    const element = card as HTMLElement;
+    gsap.fromTo(element,
       {
         opacity: 0,
         y: 30
@@ -94,7 +96,7 @@ function setupContentScrollAnimations() {
         duration: 0.8,
         ease: 'power2.out',
         scrollTrigger: {
-          trigger: card,
+          trigger: element,
           start: 'top 85%',
           toggleActions: 'play none none reverse'
         },
@@ -143,9 +145,10 @@ function setupLaserEffects() {
   };
 
   // Trigger laser sweep when entering content sections
-  gsap.utils.toArray('.content-section').forEach((section: any) => {
+  gsap.utils.toArray('.content-section').forEach((section) => {
+    const element = section as HTMLElement;
     ScrollTrigger.create({
-      trigger: section,
+      trigger: element,
       start: 'top 80%',
       onEnter: sweepLasers,
       onEnterBack: sweepLasers

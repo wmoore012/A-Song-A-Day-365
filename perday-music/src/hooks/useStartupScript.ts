@@ -46,7 +46,7 @@ export function useStartupScript(userName = 'Producer') {
 
   useEffect(() => {
     const isSSR = typeof window === 'undefined';
-    const isTest = (import.meta as any)?.env?.MODE === 'test';
+    const isTest = (import.meta as { env?: { MODE?: string } })?.env?.MODE === 'test';
     if (isSSR || isTest) return; // no chatter in tests/SSR
 
     if (done) return;
@@ -69,7 +69,7 @@ export function useStartupScript(userName = 'Producer') {
   // Start continuous quips after startup
   useEffect(() => {
     const isSSR = typeof window === 'undefined';
-    const isTest = (import.meta as any)?.env?.MODE === 'test';
+    const isTest = (import.meta as { env?: { MODE?: string } })?.env?.MODE === 'test';
     if (isSSR || isTest) return;
 
     if (done && !continuousId.current) {

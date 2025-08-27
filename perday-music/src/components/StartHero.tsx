@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { FlowState } from "../types";
+import { FlowState, type Settings } from "../types";
 import { useAppStore } from "../store/store";
 import { usePrestart } from "../hooks/usePrestart";
 import { useVillainAnnounce } from "../hooks/useVillainAnnounce";
