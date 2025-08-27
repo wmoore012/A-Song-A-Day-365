@@ -13,7 +13,6 @@ jobs:
         with:
           node-version-file: .nvmrc
       - name: Install dependencies
-        working-directory: perday-music
         run: npm ci
       - name: Run tests
         working-directory: perday-music
