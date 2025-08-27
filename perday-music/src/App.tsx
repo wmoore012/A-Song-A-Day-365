@@ -21,7 +21,7 @@ import SessionCompletion from "./components/SessionCompletion";
 import VillainDisplay from "./components/VillainDisplay";
 
 import Dashboard from "./components/Dashboard";
-import ScribbleX from "./components/ScribbleX";
+
 import LandingPage from "./components/LandingPage";
 import FeaturesPage from "./components/FeaturesPage";
 
@@ -87,20 +87,7 @@ function AppContent() {
 
   return (
     <ShaderBackground data-testid="app-main">
-      {/* Debug info */}
-      <div className="fixed top-0 left-0 z-50 bg-black/80 text-white p-2 text-xs">
-        State: {session.state} | User: {settings.userName || 'none'}
-        <button 
-          onClick={() => {
-            localStorage.clear();
-            window.location.reload();
-          }}
-          className="ml-2 px-2 py-1 bg-red-500 text-white text-xs rounded"
-          title="Clear all stored data and reload"
-        >
-          Clear Data
-        </button>
-      </div>
+
       
       {/* Global Components - Always Available */}
       <DemoModeToggle />
@@ -225,7 +212,7 @@ function WelcomeScreen() {
               <div className="space-y-6">
           <div className="space-y-4">
             <h1 className="text-5xl md:text-7xl font-black leading-tight">
-              Get locked in. Make <span className="text-synth-amber"><ScribbleX /></span> beats a day.
+              We Help You Make 1 Beat Per Day
             </h1>
           </div>
         <p className="text-xl text-cyan-300/80 max-w-3xl mx-auto">

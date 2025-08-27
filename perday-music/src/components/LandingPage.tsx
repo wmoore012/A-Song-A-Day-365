@@ -1,6 +1,6 @@
 import { Button } from "./ui/button";
 import { toast } from "sonner";
-import ScribbleX from "./ScribbleX";
+
 import { useAppStore } from "../store/store";
 import { useDemoMode } from "../hooks/useDemoMode";
 import WaitlistForm from "./WaitlistForm";
@@ -39,7 +39,7 @@ export default function LandingPage() {
           <div className="space-y-6">
             <div className="space-y-4">
               <h1 className="text-5xl md:text-7xl font-black leading-tight">
-                Get locked in. Make <span className="text-synth-amber"><ScribbleX /></span> beats a day.
+                We Help You Make 1 Beat Per Day
               </h1>
               <h2 className="text-2xl md:text-3xl font-bold text-white">
                 <span className="text-cyan-300">Stop procrastinating. Start finishing. Start selling.</span>

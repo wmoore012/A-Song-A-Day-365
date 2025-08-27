@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { Observer } from "gsap/Observer";
 import { useGSAP } from "@gsap/react";
-import ScribbleX from "./ScribbleX";
+
 
 gsap.registerPlugin(Observer);
 
@@ -115,7 +115,7 @@ export default function RotatingHeroPro({
           <span key={idx} className="align-baseline">
             {p}
             {idx < parts.length - 1 ? (
-              <ScribbleX size={42} strokeWidth={7} className="text-red-500 inline-block" />
+              <span className="text-red-500 font-bold text-2xl">X</span>
             ) : null}
           </span>
         ))}
