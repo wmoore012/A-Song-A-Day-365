@@ -15,6 +15,8 @@ Object.defineProperty(window, 'matchMedia', {
 // Stable perf.now for latency math
 vi.spyOn(performance, 'now').mockReturnValue(1000);
 
+// Typewriter effect is disabled in tests via environment check
+
 // localStorage mock
 const localStorageMock = {
   getItem: vi.fn(),
