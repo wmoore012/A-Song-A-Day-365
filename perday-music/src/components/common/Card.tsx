@@ -211,5 +211,4 @@ export const CardFooter = React.forwardRef<
 CardFooter.displayName = 'CardFooter';
 
 // Export variants for external use
-// eslint-disable-next-line react-refresh/only-export-components
 export { cardVariants };

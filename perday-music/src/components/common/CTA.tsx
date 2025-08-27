@@ -156,5 +156,4 @@ export const CTA = React.forwardRef<HTMLButtonElement, CTAProps>(
 CTA.displayName = 'CTA';
 
 // Export variants for external use
-// eslint-disable-next-line react-refresh/only-export-components
 export { ctaVariants };

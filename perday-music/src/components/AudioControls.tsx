@@ -4,8 +4,6 @@ import { Slider } from './ui/slider';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from './ui/sheet';
 import { Volume2, Play, Pause, SkipBack, SkipForward, Music, Settings } from 'lucide-react';
 
-// YT types declared in AudioHud.tsx
-
 interface AudioControlsProps {
   currentVolume: number;
   onVolumeChange: (v: number) => void;
@@ -20,7 +18,7 @@ export default function AudioControls({
   const [isOpen, setIsOpen] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [trackTitle, setTrackTitle] = useState<string>('Perday Music 365');
-  const playerRef = useRef<any | null>(null); // YTPlayer from AudioHud.tsx
+  const playerRef = useRef<YT.Player | null>(null);
   const hostRef = useRef<HTMLDivElement>(null);
 
   // Load IFrame API once and build the player on first open/interaction
@@ -47,12 +45,12 @@ export default function AudioControls({
         list: playlistId,
       },
       events: {
-        onReady: (e: any) => {
+        onReady: (e: YT.PlayerEvent) => {
           e.target.setVolume(Math.round(currentVolume * 100));
           const vd = e.target.getVideoData?.();
           if (vd?.title) setTrackTitle(vd.title);
         },
-        onStateChange: (e: any) => {
+        onStateChange: (e: YT.OnStateChangeEvent) => {
           // 1=playing, 2=paused, 0=ended
           setIsPlaying(e.data === 1);
           const vd = e.target.getVideoData?.();

@@ -30,13 +30,8 @@ export async function typeInto(
     signal,
   } = opts;
 
-  // Skip typewriter effect in test environment
-  // Check for vitest global or test environment
-  const isTestEnvironment = typeof globalThis !== 'undefined' &&
-    (globalThis as any).vitest !== undefined ||
-    (typeof process !== 'undefined' && process.env.NODE_ENV === 'test');
-
-  if (isTestEnvironment) {
+  // Skip typewriter effect in test environment for faster tests
+  if (typeof process !== 'undefined' && process.env.NODE_ENV === 'test') {
     element.textContent = prefix + text;
     onComplete?.();
     return Promise.resolve();

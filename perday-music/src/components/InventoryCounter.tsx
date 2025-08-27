@@ -9,24 +9,24 @@ interface GenreCount {
   color: string;
 }
 
+// Genre colors constant - moved outside component to avoid useEffect dependency issues
+const genreColors: Record<Genre, string> = {
+  'Trap': 'from-purple-500 to-pink-500',
+  'Hip-Hop': 'from-orange-500 to-red-500',
+  'R&B': 'from-blue-500 to-purple-500',
+  'Pop': 'from-pink-500 to-rose-500',
+  'Electronic': 'from-cyan-500 to-blue-500',
+  'Rock': 'from-red-500 to-orange-500',
+    'Jazz': 'from-yellow-500 to-orange-500',
+    'Country': 'from-green-500 to-emerald-500',
+    'Other': 'from-gray-500 to-slate-500',
+  };
+
 export default function InventoryCounter() {
   const { inventory } = useAppStore();
   const [genreCounts, setGenreCounts] = useState<GenreCount[]>([]);
   const [showAnimation, setShowAnimation] = useState(false);
   const animationRef = useRef<HTMLDivElement>(null);
-
-  // Genre colors
-  const genreColors: Record<Genre, string> = {
-    'Trap': 'from-purple-500 to-pink-500',
-    'Hip-Hop': 'from-orange-500 to-red-500',
-    'R&B': 'from-blue-500 to-purple-500',
-    'Pop': 'from-pink-500 to-rose-500',
-    'Electronic': 'from-cyan-500 to-blue-500',
-    'Rock': 'from-red-500 to-orange-500',
-    'Jazz': 'from-yellow-500 to-orange-500',
-    'Country': 'from-green-500 to-emerald-500',
-    'Other': 'from-gray-500 to-slate-500',
-  };
 
   // Calculate genre counts
   useEffect(() => {

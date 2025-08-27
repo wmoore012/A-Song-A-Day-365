@@ -62,7 +62,11 @@ export default function StartHero({ fadeOutRef }: StartHeroProps) {
     setMultiplier(1.5);
     tapReady(); // records time-to-ready for scoring
     villainNudge("First baby step locked. 🔒✨");
-    try { fadeOutRef.current?.(); } catch {}
+    try {
+      fadeOutRef.current?.();
+    } catch (error) {
+      console.warn("Fade out failed:", error);
+    }
   };
 
   const onSkipPrestart = () => dispatch({ type: "TIMER_ZERO" });
@@ -88,7 +92,7 @@ export default function StartHero({ fadeOutRef }: StartHeroProps) {
           <div className="absolute top-6 right-6 z-20 flex items-center gap-3">
             <SettingsSheet
               currentSettings={settings}
-              onSave={(s: any) => setSettings(s)}
+              onSave={(s: Settings) => setSettings(s)}
               onResetAll={() => {
                 setSettings({}); // Assuming setSettings handles reset
                 toast.success("Reset complete. Clean slate. 🔁");

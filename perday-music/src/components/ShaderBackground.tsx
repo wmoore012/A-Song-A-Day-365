@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react"
 
 interface ShaderBackgroundProps {
   children: React.ReactNode
-  [key: string]: any // Allow any additional props to be passed through
+  className?: string;
 }
 
 export default function ShaderBackground({ children, ...props }: ShaderBackgroundProps) {

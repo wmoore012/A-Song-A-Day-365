@@ -223,5 +223,4 @@ export const PanelFooter = React.forwardRef<
 PanelFooter.displayName = 'PanelFooter';
 
 // Export variants for external use
-// eslint-disable-next-line react-refresh/only-export-components
 export { panelVariants };

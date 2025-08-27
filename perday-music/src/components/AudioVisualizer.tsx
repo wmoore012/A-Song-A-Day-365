@@ -29,7 +29,7 @@ export default function AudioVisualizer({ isActive=false, className="", size='me
         .from(bars, { y: '400%', opacity: 0, duration: 1.2, stagger: 0.03, ease: 'elastic(1,0.6)' }, 0.1);
 
       // looping bar movement
-      bars.forEach((bar: any, i: number) => {
+      bars.forEach((bar: HTMLElement, i: number) => {
         const loop = gsap.timeline({ repeat: -1, delay: i * 0.05 });
         for (let k = 0; k < 120; k++) {
           const h = 5 + Math.floor(Math.random()*95);

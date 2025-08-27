@@ -15,10 +15,10 @@ import PerdayLogo from './PerdayLogo';
 
 gsap.registerPlugin(useGSAP);
 
-function NavItem({ icon: Icon, label, active, collapsed, onClick }: { 
-  icon: any; 
-  label: string; 
-  active: boolean; 
+function NavItem({ icon: Icon, label, active, collapsed, onClick }: {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  active: boolean;
   collapsed: boolean;
   onClick?: () => void;
 }) {
