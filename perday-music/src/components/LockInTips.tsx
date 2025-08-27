@@ -46,8 +46,10 @@ export default function LockInTips() {
     if (!isVisible) return;
 
     const interval = setInterval(() => {
-      setCurrentTip((prev) => (prev + 1) % LOCK_IN_TIPS.length);
-    }, 4000); // Change tip every 4 seconds
+      // Random tip instead of sequential
+      const randomIndex = Math.floor(Math.random() * LOCK_IN_TIPS.length);
+      setCurrentTip(randomIndex);
+    }, 45000); // Change tip every 45 seconds
 
     return () => clearInterval(interval);
   }, [isVisible]);
@@ -63,20 +65,6 @@ export default function LockInTips() {
           <p className="text-white font-mono text-base leading-relaxed">
             {LOCK_IN_TIPS[currentTip]}
           </p>
-          <div className="flex justify-center mt-4">
-            <div className="flex gap-1">
-              {LOCK_IN_TIPS.map((_, index) => (
-                <div
-                  key={index}
-                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                    index === currentTip 
-                      ? 'bg-cyan-400' 
-                      : 'bg-white/20'
-                  }`}
-                />
-              ))}
-            </div>
-          </div>
         </div>
       </div>
     </div>

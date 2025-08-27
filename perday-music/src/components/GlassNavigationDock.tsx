@@ -5,6 +5,12 @@ import { useAppStore } from '../store/store';
 import SettingsSheet from './SettingsSheet';
 import { toast } from 'sonner';
 
+// Create a ref to control the notepad
+let notepadRef: { open: () => void } | null = null;
+export const setNotepadRef = (ref: { open: () => void } | null) => {
+  notepadRef = ref;
+};
+
 export default function GlassNavigationDock() {
   const { settings, setSettings } = useAppStore();
   const [showSettings, setShowSettings] = useState(false);
@@ -19,7 +25,13 @@ export default function GlassNavigationDock() {
     {
       icon: BookOpen,
       label: 'Notepad',
-      action: () => toast.info('Notepad opens automatically in sessions!'),
+      action: () => {
+        if (notepadRef) {
+          notepadRef.open();
+        } else {
+          toast.info('Notepad opens automatically in sessions!');
+        }
+      },
       color: 'hover:bg-green-500/20 hover:border-green-400/50'
     },
     {

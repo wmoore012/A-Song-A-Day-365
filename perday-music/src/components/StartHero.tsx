@@ -119,7 +119,7 @@ export default function StartHero({ fadeOutRef }: StartHeroProps) {
             </div>
             <div className="text-lg font-semibold text-synth-white mb-2">7-minute Pre-Start to get your mind right.</div>
             <div className="text-sm text-amber-300/90 mb-6">
-              Lock-In is your lane. Hit <b>Ready</b> to power up. At T-0 we go either way.
+              Ready the sooner you start the higher your multiplier
             </div>
 
             <div className={`text-8xl font-black tabular-nums mb-8 font-mono ${sealed ? "text-amber-300" : "text-white"}`}>
