@@ -1,7 +1,7 @@
 [build]
   base = "perday-music"
   command = "npm run build"
-  publish = "perday-music/dist"
+  publish = "dist"
 
 [build.environment]
   NODE_VERSION = "20"
