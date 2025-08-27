@@ -17,6 +17,7 @@ import VillainDisplay from "./components/VillainDisplay";
 import FeaturesShowcase from "./components/FeaturesShowcase";
 import Dashboard from "./components/Dashboard";
 import ScribbleX from "./components/ScribbleX";
+import LandingPage from "./components/LandingPage";
 
 import { AnalyticsHud } from "./components/common/AnalyticsHud";
 import AudioHud from "./components/common/AudioHud";
@@ -75,8 +76,13 @@ export default function App() {
                   <VillainDisplay />
                   <AudioHud fadeOutRef={fadeOutRef} />
 
-                  {/* Welcome Screen - Show when vault is closed */}
-                  {session.state === FlowState.VAULT_CLOSED && (
+                  {/* Landing Page for New Users */}
+                  {session.state === FlowState.VAULT_CLOSED && !settings.userName && (
+                    <LandingPage />
+                  )}
+
+                  {/* Welcome Screen for Returning Users */}
+                  {session.state === FlowState.VAULT_CLOSED && settings.userName && (
                     <div className="flex items-center justify-center min-h-screen p-8">
                       <WelcomeScreen />
                     </div>
