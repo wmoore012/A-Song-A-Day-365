@@ -16,14 +16,10 @@ export default function AudioHud({ fadeOutRef }: { fadeOutRef: React.MutableRefO
     };
   }, [fadeOutRef]);
 
-  // Auto-start music when clicking "Enable Sound"
+  // Don't auto-start music - let user control it manually
   useEffect(() => {
-    if (armed) {
-      // Small delay to ensure user gesture
-      const timer = setTimeout(() => {
-        setIsPlaying(true);
-      }, 100);
-      return () => clearTimeout(timer);
+    if (!armed) {
+      setIsPlaying(false);
     }
   }, [armed]);
 

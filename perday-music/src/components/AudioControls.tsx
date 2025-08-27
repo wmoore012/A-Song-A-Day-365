@@ -37,6 +37,7 @@ export default function AudioControls({
         origin: window.location.origin,
         listType: 'playlist',
         list: playlistId,
+        autoplay: 0, // Don't auto-play
       },
       events: {
         onReady: (e: YT.PlayerEvent) => {

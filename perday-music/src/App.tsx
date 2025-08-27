@@ -90,6 +90,16 @@ function AppContent() {
       {/* Debug info */}
       <div className="fixed top-0 left-0 z-50 bg-black/80 text-white p-2 text-xs">
         State: {session.state} | User: {settings.userName || 'none'}
+        <button 
+          onClick={() => {
+            localStorage.clear();
+            window.location.reload();
+          }}
+          className="ml-2 px-2 py-1 bg-red-500 text-white text-xs rounded"
+          title="Clear all stored data and reload"
+        >
+          Clear Data
+        </button>
       </div>
       
       {/* Global Components - Always Available */}
