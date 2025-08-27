@@ -38,10 +38,12 @@ export default function AudioControls({
         listType: 'playlist',
         list: playlistId,
         autoplay: 0, // Don't auto-play
+        mute: 1, // Start muted to prevent any sound
       },
       events: {
         onReady: (e: YT.PlayerEvent) => {
           e.target.setVolume(Math.round(currentVolume * 100));
+          e.target.mute(); // Ensure player starts muted
           const vd = e.target.getVideoData?.();
           if (vd?.title) setTrackTitle(vd.title);
         },

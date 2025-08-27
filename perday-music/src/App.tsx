@@ -190,22 +190,7 @@ function AppContent() {
 // Welcome Screen Component
 function WelcomeScreen() {
   const { dispatch } = useAppStore();
-  const [soundEnabled, setSoundEnabled] = useState(false);
   const [showFeatures, setShowFeatures] = useState(false);
-
-  const [showSoundNotification, setShowSoundNotification] = useState(false);
-
-  const handleEnableSound = () => {
-    setSoundEnabled(true);
-    setShowSoundNotification(true);
-    // Trigger villain message about sound being enabled
-    _fxEmit('villain-nudge', { msg: "Sound enabled! Now let's get you producing..." });
-    
-    // Auto-hide the notification after 1 second
-    setTimeout(() => {
-      setShowSoundNotification(false);
-    }, 1000);
-  };
 
   return (
     <div className="text-center space-y-8 max-w-2xl relative">
@@ -224,65 +209,29 @@ function WelcomeScreen() {
       </div>
 
       <div className="space-y-6">
-        {/* Sound Enable Section */}
-        {!soundEnabled ? (
-          <div className="space-y-4">
-            <div className="p-6 bg-black/20 backdrop-blur-sm border border-cyan-400/30 rounded-xl">
-              <h3 className="text-lg font-semibold text-cyan-300 mb-2">Enable Sound</h3>
-              <p className="text-white/70 mb-4">
-                Get the full experience with background music and audio feedback
-              </p>
-              <div className="flex gap-3">
-                <button
-                  onClick={handleEnableSound}
-                  className="flex-1 px-4 py-2 bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-white font-semibold rounded-lg transition-all duration-200"
-                >
-                  <Volume2 className="w-4 h-4 mr-2 inline" />
-                  Enable Sound
-                </button>
-                <button
-                  onClick={() => setSoundEnabled(false)}
-                  className="px-4 py-2 border border-cyan-400/60 text-cyan-300 hover:bg-cyan-400/20 rounded-lg transition-all duration-200"
-                >
-                  Proceed with no sound
-                </button>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {/* Success notification */}
-            {showSoundNotification && (
-              <div className="p-4 bg-green-500/20 border border-green-400/50 rounded-xl animate-pulse">
-                <p className="text-green-300 font-semibold">Sound enabled! 🎵</p>
-              </div>
-            )}
+        {/* Main CTA */}
+        <button
+          onClick={() => dispatch({ type: "GO_TO_DASHBOARD" })}
+          className="px-8 py-4 bg-gradient-to-r from-magenta-500 via-cyan-400 to-purple-600 hover:from-magenta-600 hover:via-cyan-500 hover:to-purple-700 text-white font-bold text-xl rounded-xl transition-all duration-300 transform hover:scale-105 shadow-2xl"
+        >
+          Start Your Session
+        </button>
 
-            {/* Main CTA */}
-            <button
-              onClick={() => dispatch({ type: "GO_TO_DASHBOARD" })}
-              className="px-8 py-4 bg-gradient-to-r from-magenta-500 via-cyan-400 to-purple-600 hover:from-magenta-600 hover:via-cyan-500 hover:to-purple-700 text-white font-bold text-xl rounded-xl transition-all duration-300 transform hover:scale-105 shadow-2xl"
-            >
-              Start Your Session
-            </button>
-
-            {/* Secondary actions */}
-            <div className="flex gap-4 justify-center">
-              <button
-                onClick={() => setShowFeatures(!showFeatures)}
-                className="px-6 py-3 border border-white/30 text-white/80 hover:bg-white/10 rounded-lg transition-all duration-200"
-              >
-                {showFeatures ? 'Hide' : 'Show'} Features
-              </button>
-              <button
-                onClick={() => dispatch({ type: "SCROLL_DEMO" })}
-                className="px-6 py-3 border border-white/30 text-white/80 hover:bg-white/10 rounded-lg transition-all duration-200"
-              >
-                View Demo
-              </button>
-            </div>
-          </div>
-        )}
+        {/* Secondary actions */}
+        <div className="flex gap-4 justify-center">
+          <button
+            onClick={() => setShowFeatures(!showFeatures)}
+            className="px-6 py-3 border border-white/30 text-white/80 hover:bg-white/10 rounded-lg transition-all duration-200"
+          >
+            {showFeatures ? 'Hide' : 'Show'} Features
+          </button>
+          <button
+            onClick={() => dispatch({ type: "SCROLL_DEMO" })}
+            className="px-6 py-3 border border-white/30 text-white/80 hover:bg-white/10 rounded-lg transition-all duration-200"
+          >
+            View Demo
+          </button>
+        </div>
       </div>
 
       {/* Features Preview */}
