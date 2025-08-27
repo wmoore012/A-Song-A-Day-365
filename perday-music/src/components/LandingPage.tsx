@@ -1,97 +1,31 @@
-import { useRef, useState } from "react";
-import { gsap } from "gsap";
-import { useGSAP } from "@gsap/react";
+import { useState } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { toast } from "sonner";
 import GlassPanel from "./common/GlassPanel";
+import { Volume2 } from 'lucide-react';
+import ScribbleX from "./ScribbleX";
+import { useAppStore } from "../store/store";
+import { useDemoMode } from "../hooks/useDemoMode";
 
 export default function LandingPage() {
+  const { dispatch } = useAppStore();
+  const { isDemoMode } = useDemoMode();
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showEmailForm, setShowEmailForm] = useState(false);
-  
-  // Refs for animation elements
-  const containerRef = useRef<HTMLDivElement>(null);
-  const producerRef = useRef<HTMLDivElement>(null);
-  const remoteRef = useRef<HTMLDivElement>(null);
-  const couchRef = useRef<HTMLDivElement>(null);
-  const deskRef = useRef<HTMLDivElement>(null);
-  const titleRef = useRef<HTMLHeadingElement>(null);
-  const taglineRef = useRef<HTMLParagraphElement>(null);
-  const emailFormRef = useRef<HTMLDivElement>(null);
+  const [soundEnabled, setSoundEnabled] = useState(false);
+  const [showSoundNotification, setShowSoundNotification] = useState(false);
 
-  useGSAP(() => {
-    if (!containerRef.current) return;
 
-    // Initial setup - producer at desk
-    gsap.set(producerRef.current, { 
-      y: 0, 
-      rotation: 0,
-      scale: 1 
-    });
-    gsap.set(remoteRef.current, { 
-      y: 0, 
-      x: 0,
-      rotation: 0 
-    });
-
-    // Timeline for the procrastination story
-    const tl = gsap.timeline({ 
-      delay: 1,
-      onComplete: () => setShowEmailForm(true)
-    });
-
-    // Producer starts at desk, then slides down
-    tl.to(producerRef.current, {
-      y: 200,
-      duration: 2,
-      ease: "power2.inOut"
-    })
-    // Remote falls and lands in lap
-    .to(remoteRef.current, {
-      y: 180,
-      x: 50,
-      rotation: 15,
-      duration: 1.5,
-      ease: "bounce.out"
-    }, "-=1.5")
-    // Producer floats like feather to couch
-    .to(producerRef.current, {
-      y: 300,
-      x: 100,
-      rotation: -5,
-      scale: 0.9,
-      duration: 3,
-      ease: "power1.out"
-    }, "-=1")
-    // Transform screen to theme
-    .to(containerRef.current, {
-      backgroundColor: "rgba(0, 0, 0, 0.95)",
-      duration: 1,
-      ease: "power2.inOut"
-    }, "-=2")
-    // Fade in title and tagline
-    .fromTo(titleRef.current, {
-      opacity: 0,
-      y: 50
-    }, {
-      opacity: 1,
-      y: 0,
-      duration: 1,
-      ease: "power2.out"
-    }, "-=1")
-    .fromTo(taglineRef.current, {
-      opacity: 0,
-      y: 30
-    }, {
-      opacity: 1,
-      y: 0,
-      duration: 1,
-      ease: "power2.out"
-    }, "-=0.5");
-
-  }, { scope: containerRef });
+  const handleEnableSound = () => {
+    setSoundEnabled(true);
+    setShowSoundNotification(true);
+    
+    // Auto-hide the notification after 1 second
+    setTimeout(() => {
+      setShowSoundNotification(false);
+    }, 1000);
+  };
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -113,112 +47,127 @@ export default function LandingPage() {
   };
 
   return (
-    <div 
-      ref={containerRef}
-      className="relative min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-black overflow-hidden"
-    >
-      {/* Animated Elements */}
-      <div className="absolute inset-0 pointer-events-none">
-        {/* Producer (paper cutout style) */}
-        <div 
-          ref={producerRef}
-          className="absolute top-1/4 left-1/3 w-16 h-24 bg-gradient-to-b from-cyan-400 to-blue-600 rounded-lg opacity-80"
-          style={{
-            clipPath: "polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%)"
-          }}
-        />
-        
-        {/* Remote control */}
-        <div 
-          ref={remoteRef}
-          className="absolute top-1/3 left-1/2 w-8 h-4 bg-gray-800 rounded opacity-90"
-        />
-        
-        {/* Couch */}
-        <div 
-          ref={couchRef}
-          className="absolute bottom-1/4 right-1/4 w-32 h-16 bg-gradient-to-r from-brown-400 to-brown-600 rounded-lg opacity-60"
-        />
-        
-        {/* Studio desk */}
-        <div 
-          ref={deskRef}
-          className="absolute top-1/3 left-1/4 w-24 h-4 bg-gradient-to-r from-amber-600 to-amber-800 rounded opacity-70"
-        />
+    <div className="text-center space-y-8 max-w-2xl relative">
+      <div className="space-y-6">
+        <div className="space-y-4">
+          <h1 className="text-5xl md:text-7xl font-black leading-tight">
+            Get locked in. Make <span className="text-synth-amber"><ScribbleX /></span> beats a day.
+          </h1>
+          <h2 className="text-2xl md:text-3xl font-bold text-white">
+            PERDAY<br />MUSIC<br />
+            <span className="text-cyan-300">Stop procrastinating. Start finishing. Start selling.</span>
+          </h2>
+        </div>
+        <p className="text-xl text-cyan-300/80 max-w-3xl mx-auto">
+          Perday Music 365 turns your studio time into a game: timeboxed cookups, live multipliers, and a squad that only talks when you're on a break (or after you stack). Points for focus. Heat for effort. Streaks for consistency.
+        </p>
+        <p className="text-lg text-white/60 max-w-2xl mx-auto">
+          Cook up. Level up. Every day.
+        </p>
       </div>
 
-      {/* Content */}
-      <div className="relative z-10 flex items-center justify-center min-h-screen p-8">
-        <div className="text-center max-w-2xl">
-          {/* Title */}
-          <h1 
-            ref={titleRef}
-            className="text-6xl md:text-8xl font-black text-white mb-6 opacity-0"
-          >
-            <span className="bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-              PERDAY
-            </span>
-            <br />
-            <span className="text-white">MUSIC</span>
-          </h1>
-
-          {/* Tagline */}
-          <p 
-            ref={taglineRef}
-            className="text-xl md:text-2xl text-cyan-200 mb-8 opacity-0"
-          >
-            Stop procrastinating. Start finishing. Start selling.
-          </p>
-
-          {/* Email Capture Form */}
-          {showEmailForm && (
-            <div 
-              ref={emailFormRef}
-              className="opacity-0 animate-in fade-in duration-1000"
-            >
-              <GlassPanel className="p-8 max-w-md mx-auto">
-                <h2 className="text-2xl font-bold text-white mb-4">
-                  Join the Community
-                </h2>
-                <p className="text-cyan-200 mb-6">
-                  Get early access to the producer's consistency engine. 
-                  Coming soon.
-                </p>
-                
-                <form onSubmit={handleEmailSubmit} className="space-y-4">
-                  <Input
-                    type="email"
-                    placeholder="your@email.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full h-12 text-center text-lg bg-white/10 border-cyan-400/50 text-white placeholder:text-cyan-200/50"
-                    required
-                  />
-                  <Button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full h-12 bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-semibold text-lg"
-                  >
-                    {isSubmitting ? "Joining..." : "Get Early Access"}
-                  </Button>
-                </form>
-                
-                <div className="mt-6">
-                  <Button
-                    variant="outline"
-                    className="w-full h-10 border-cyan-400/50 text-cyan-300"
-                    onClick={() => {
-                      // Navigate to learn more or demo
-                      toast.info("Demo coming soon!");
-                    }}
-                  >
-                    Learn More
-                  </Button>
-                </div>
-              </GlassPanel>
+      <div className="space-y-6">
+        {/* Sound Enable Section */}
+        {!soundEnabled ? (
+          <div className="space-y-4">
+            <div className="p-6 bg-black/20 backdrop-blur-sm border border-cyan-400/30 rounded-xl">
+              <h3 className="text-lg font-semibold text-cyan-300 mb-2">Enable Sound</h3>
+              <p className="text-white/70 mb-4">
+                Get the full experience with background music and audio feedback
+              </p>
+              <button
+                onClick={handleEnableSound}
+                className="px-8 py-4 bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-white font-bold text-lg rounded-xl shadow-2xl hover:shadow-cyan-500/25 transition-all duration-300 transform hover:scale-105"
+              >
+                <Volume2 className="w-5 h-5 mr-2" />
+                Enable Sound
+              </button>
             </div>
-          )}
-        </div>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {showSoundNotification && (
+              <div className="p-4 bg-green-500/20 backdrop-blur-sm border border-green-400/30 rounded-xl animate-fade-in">
+                <p className="text-green-300 font-medium">✅ Sound Enabled</p>
+                <p className="text-white/70 text-sm">Background music and audio feedback active</p>
+              </div>
+            )}
+            
+            {/* Email Collection Form */}
+            <GlassPanel className="p-6 max-w-md mx-auto">
+              <h2 className="text-xl font-bold text-white mb-4">
+                Join the Community
+              </h2>
+              <p className="text-cyan-200 mb-4 text-sm">
+                Get early access to the producer's consistency engine.
+              </p>
+              
+              <form onSubmit={handleEmailSubmit} className="space-y-3">
+                <Input
+                  type="email"
+                  placeholder="your@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full h-10 text-center bg-white/10 border-cyan-400/50 text-white placeholder:text-cyan-200/50"
+                  required
+                />
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full h-10 bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-semibold"
+                >
+                  {isSubmitting ? "Joining..." : "Get Early Access"}
+                </Button>
+              </form>
+            </GlassPanel>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <button
+                onClick={() => dispatch({ type: "START_QUESTIONNAIRE" })}
+                className="px-6 py-4 bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-white font-bold rounded-xl shadow-2xl hover:shadow-cyan-500/25 transition-all duration-300 transform hover:scale-105"
+              >
+                Write X Songs Per Day
+              </button>
+              <button
+                onClick={() => dispatch({ type: "START_QUESTIONNAIRE" })}
+                className="px-6 py-4 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-400 hover:to-pink-500 text-white font-bold rounded-xl shadow-2xl hover:shadow-purple-500/25 transition-all duration-300 transform hover:scale-105"
+              >
+                Produce X Songs Per Day
+              </button>
+              <button
+                onClick={() => dispatch({ type: "START_QUESTIONNAIRE" })}
+                className="px-6 py-4 bg-gradient-to-r from-pink-500 to-red-600 hover:from-pink-400 hover:to-red-500 text-white font-bold rounded-xl shadow-2xl hover:shadow-pink-500/25 transition-all duration-300 transform hover:scale-105"
+              >
+                Make X Riffs Per Day
+              </button>
+              <button
+                onClick={() => dispatch({ type: "START_QUESTIONNAIRE" })}
+                className="px-6 py-4 bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-400 hover:to-orange-500 text-white font-bold rounded-xl shadow-2xl hover:shadow-red-500/25 transition-all duration-300 transform hover:scale-105"
+              >
+                Do X Mixes Per Day
+              </button>
+            </div>
+            
+            {/* Demo Mode Access */}
+            {isDemoMode && (
+              <div className="mt-6">
+                <button
+                  onClick={() => dispatch({ type: "GO_TO_DASHBOARD" })}
+                  className="px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white font-bold rounded-xl shadow-2xl hover:shadow-amber-500/25 transition-all duration-300 transform hover:scale-105"
+                >
+                  🎯 Try Demo Dashboard
+                </button>
+                <p className="text-xs text-white/60 mt-2">
+                  Demo mode is active - see the full app experience
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        <p className="text-sm text-white/40">
+          Takes ~2 minutes to set up, then you're ready to produce
+        </p>
       </div>
     </div>
   );
