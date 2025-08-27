@@ -96,7 +96,11 @@ export const useAppStore = create<AppState>()(
     {
       name: "perday-app",
       storage: createJSONStorage(() => localforage),
-      onRehydrateStorage: () => (state) => state?.markHydrated(),
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          state.markHydrated();
+        }
+      },
       partialize: (s) => ({
         session: s.session,
         settings: s.settings,

@@ -20,6 +20,23 @@ export function usePrestart(totalMs = 7 * 60_000) {
     }
   }, []);
 
+  // Check if this is first visit today to prevent timer auto-start
+  useEffect(() => {
+    const isSSR = typeof window === 'undefined';
+    if (isSSR) return;
+
+    const today = new Date().toDateString();
+    const lastVisit = localStorage.getItem('perday-last-visit');
+
+    if (lastVisit !== today) {
+      // First visit today - don't auto-start timer
+      localStorage.setItem('perday-last-visit', today);
+      setMsLeft(totalMs);
+      setSealed(false);
+      return;
+    }
+  }, [totalMs]);
+
   // start ticking immediately (psyche-up)
   useEffect(() => {
     const isSSR = typeof window === 'undefined';

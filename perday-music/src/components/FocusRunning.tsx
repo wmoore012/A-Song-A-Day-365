@@ -4,6 +4,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Pause, Target, Clock, MessageSquare, Square, Music, Users } from 'lucide-react';
+import { toast } from 'sonner';
 import MultiplierBar from './MultiplierBar';
 import GlassPanel from './common/GlassPanel';
 
@@ -120,8 +121,8 @@ export default function FocusRunning() {
           <button
             className="px-4 py-3 rounded-xl bg-white/10 border border-white/15 text-white hover:bg-white/15 transition relative group"
             onClick={() => {
-              // In real app, this would open studio vibes playlist
-              console.log("Studio vibes playlist loaded!");
+              window.open('https://www.youtube.com/playlist?list=PLrAXtmRdnEQy4qtr5qFJUYgI6wvWXqLh', '_blank');
+              toast.success('Studio vibes playlist opened!');
             }}
             title="Visual inspiration videos - watch on mute on your second screen"
           >
@@ -132,9 +133,10 @@ export default function FocusRunning() {
             </div>
           </button>
           <button
-            className="px-4 py-3 rounded-xl bg-white/10 border border-white/15 text-white hover:bg-white/15 transition relative group"
+            className="px-4 py-3 rounded-xl bg-blue-500/80 border border-blue-400/50 text-white hover:bg-blue-400/90 transition relative group"
             onClick={() => {
               window.open('https://www.focusmate.com/', '_blank');
+              toast.success('Focusmate opened!');
             }}
             title="Get paired with an accountability partner for virtual coworking"
           >

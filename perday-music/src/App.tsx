@@ -35,13 +35,14 @@ export default function App() {
   useStartupScript(userName);
 
   // Gate on hydration to avoid flicker
-  if (!_hydrated) {
-    return (
-      <main className="relative min-h-screen bg-black flex items-center justify-center">
-        <div className="text-white text-xl">Loading...</div>
-      </main>
-    );
-  }
+  // Temporarily disabled to debug blank screen issue
+  // if (!_hydrated) {
+  //   return (
+  //     <main className="relative min-h-screen bg-black flex items-center justify-center">
+  //       <div className="text-white text-xl">Loading...</div>
+  //     </main>
+  //   );
+  // }
 
   // Handle questionnaire completion
   const handleQuestionnaireComplete = (data: { name: string; collaborators: string; sessionDate?: Date }) => {
