@@ -3,7 +3,6 @@ import PremiumSidebar from './PremiumSidebar';
 import SocialDock from './SocialDock';
 import InventoryCounter from './InventoryCounter';
 import Notepad from './Notepad';
-import ProfileAvatar from './ProfileAvatar';
 import GlassNavigationDock from './GlassNavigationDock';
 
 interface DashboardLayoutProps {

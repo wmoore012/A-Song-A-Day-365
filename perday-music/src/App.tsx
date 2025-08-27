@@ -27,7 +27,7 @@ import { _fxEmit } from "./hooks/useVillainAnnounce";
 
 
 export default function App() {
-  const { session, _hydrated, dispatch, settings } = useAppStore();
+  const { session, dispatch, settings } = useAppStore();
   const fadeOutRef = useRef<() => void>(() => {});
 
   // Initialize villain monitoring system

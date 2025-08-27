@@ -7,14 +7,16 @@ on:
 jobs:
   ci:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: perday-music
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'npm'
       - run: npm ci
-      - run: npm test -- --silent
-      - run: npm run build
+      - name: Run tests
+        working-directory: perday-music
+        run: npm test -- --silent
+      - name: Build site
+        working-directory: perday-music
+        run: npm run build

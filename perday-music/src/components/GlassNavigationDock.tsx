@@ -3,28 +3,29 @@ import { Settings, BookOpen, Package, User } from 'lucide-react';
 import ProfileAvatar from './ProfileAvatar';
 import { useAppStore } from '../store/store';
 import SettingsSheet from './SettingsSheet';
+import { toast } from 'sonner';
 
 export default function GlassNavigationDock() {
-  const { dispatch } = useAppStore();
+  const { settings, setSettings } = useAppStore();
   const [showSettings, setShowSettings] = useState(false);
 
   const navItems = [
     {
       icon: User,
       label: 'Profile',
-      action: () => console.log('Profile clicked'),
+      action: () => toast.info('Profile management coming soon!'),
       color: 'hover:bg-blue-500/20 hover:border-blue-400/50'
     },
     {
       icon: BookOpen,
       label: 'Notepad',
-      action: () => dispatch({ type: 'TOGGLE_NOTEPAD' }),
+      action: () => toast.info('Notepad opens automatically in sessions!'),
       color: 'hover:bg-green-500/20 hover:border-green-400/50'
     },
     {
       icon: Package,
       label: 'Inventory',
-      action: () => console.log('Inventory clicked'),
+      action: () => toast.info('Inventory system coming soon!'),
       color: 'hover:bg-purple-500/20 hover:border-purple-400/50'
     },
     {
@@ -91,7 +92,32 @@ export default function GlassNavigationDock() {
       </div>
 
       {/* Settings Sheet */}
-      <SettingsSheet open={showSettings} onOpenChange={setShowSettings} />
+      {showSettings && (
+        <SettingsSheet
+          currentSettings={settings}
+          onSave={(newSettings) => {
+            setSettings(newSettings);
+            setShowSettings(false);
+            toast.success('Settings saved successfully!');
+          }}
+          onResetAll={() => {
+            setSettings({
+              defaultDuration: 25,
+              defaultMultiplier: 1.5,
+              autoStartTimer: true,
+              soundEnabled: true,
+              volume: 0.15,
+              notifications: true,
+              accountabilityEmail: '',
+              userName: settings.userName || '',
+              collaborators: '',
+              defaultPlaylist: 'PLl-ShioB5kapLuMhLMqdyx_gKX_MBiXeb'
+            });
+            setShowSettings(false);
+            toast.success('Settings reset to defaults!');
+          }}
+        />
+      )}
     </>
   );
 }
