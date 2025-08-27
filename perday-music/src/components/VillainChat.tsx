@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Send, MessageCircle } from 'lucide-react';
+import { useMessageQueue, VillainLine } from "../hooks/useMessageQueue";
 
 interface Message {
   id: string;
@@ -8,7 +9,11 @@ interface Message {
   timestamp: Date;
 }
 
-export default function VillainChat() {
+interface VillainChatProps {
+  pending?: VillainLine[]; // optionally pass pre-queued lines for system messages
+}
+
+export default function VillainChat({ pending = [] }: VillainChatProps) {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -21,6 +26,13 @@ export default function VillainChat() {
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Message queue for system messages
+  const { displayed: queuedMessages, enqueue } = useMessageQueue();
+
+  useEffect(() => {
+    if (pending.length) pending.forEach(enqueue);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pending.join?.("|")]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -28,7 +40,7 @@ export default function VillainChat() {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, queuedMessages]);
 
   const sendMessage = async () => {
     if (!inputText.trim()) return;
@@ -91,6 +103,16 @@ export default function VillainChat() {
       </div>
 
       <div className="h-64 overflow-y-auto p-4 space-y-3">
+        {/* System messages from queue */}
+        {queuedMessages.map((m) => (
+          <div key={m.id} className="flex justify-start">
+            <div className="max-w-xs px-3 py-2 rounded-lg text-sm bg-white/10 text-white border border-cyan-400/30">
+              {m.text}
+            </div>
+          </div>
+        ))}
+        
+        {/* Chat messages */}
         {messages.map((message) => (
           <div
             key={message.id}

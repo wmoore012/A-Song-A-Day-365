@@ -303,3 +303,25 @@ body {
   }
 }
 
+/* Frosted Gallery Styles */
+.pg-card { 
+  transition: transform .25s ease, box-shadow .25s ease; 
+}
+
+.pg-card.pg-open { 
+  outline: 2px solid rgba(34, 211, 238, .5); 
+}
+
+/* Sky gradient driver (night → dusk via CSS vars) */
+:root { 
+  --skyA: 12%; 
+  --skyB: 6%; 
+}
+
+body {
+  background:
+    radial-gradient(1200px 800px at 20% 80%, rgba(108,26,237,var(--skyB)) 0%, transparent 60%),
+    radial-gradient(1200px 800px at 80% 20%, rgba(34,211,238,var(--skyA)) 0%, transparent 60%),
+    #0b0b0d;
+}
+

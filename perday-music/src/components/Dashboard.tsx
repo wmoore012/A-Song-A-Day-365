@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { useAppStore } from '../store/store';
+import { useDemoMode } from '../hooks/useDemoMode';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from './ui/sheet';
+import LockInTips from './LockInTips';
 import { 
   Play, 
   Target, 
@@ -19,26 +21,32 @@ import {
 
 export default function Dashboard() {
   const { dispatch } = useAppStore();
+  const { getData } = useDemoMode();
   const [showCommunity, setShowCommunity] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
 
-  // Mock data for demonstration
+  // Get data based on demo mode
+  const data = getData();
   const stats = {
-    totalSessions: 47,
-    currentStreak: 12,
-    totalMinutes: 2840,
-    averageRating: 4.2,
-    thisWeek: 5,
-    thisMonth: 23
+    totalSessions: data.inventory.length,
+    currentStreak: data.streak,
+    totalMinutes: data.inventory.length * 25, // Assume 25 min per session
+    averageRating: data.inventory.length > 0 
+      ? data.inventory.reduce((sum, item) => sum + (item.rating || 0), 0) / data.inventory.length 
+      : 0,
+    thisWeek: Math.floor(data.inventory.length * 0.3), // Rough estimate
+    thisMonth: Math.floor(data.inventory.length * 0.7) // Rough estimate
   };
 
-  const recentSessions = [
-    { id: 1, title: "Trap Beat - Verse 2", duration: 25, rating: 4, date: "2 hours ago", type: "Production" },
-    { id: 2, title: "Mixing Session", duration: 45, rating: 5, date: "Yesterday", type: "Mixing" },
-    { id: 3, title: "Sound Design", duration: 30, rating: 3, date: "2 days ago", type: "Sound Design" },
-    { id: 4, title: "Arrangement", duration: 35, rating: 4, date: "3 days ago", type: "Arrangement" }
-  ];
+  const recentSessions = data.inventory.slice(0, 4).map((item, index) => ({
+    id: index + 1,
+    title: item.title,
+    duration: 25,
+    rating: item.rating || 3,
+    date: index === 0 ? "2 hours ago" : index === 1 ? "Yesterday" : `${index + 1} days ago`,
+    type: item.genre
+  }));
 
   const quickActions = [
     { title: "Start Focus Session", icon: Play, action: () => dispatch({ type: "START_QUESTIONNAIRE" }) },
@@ -49,6 +57,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-black text-white p-6">
+      <LockInTips />
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center justify-between">

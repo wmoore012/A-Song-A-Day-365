@@ -5,6 +5,9 @@ import { useRef, useState } from "react";
 import DashboardLayout from "./components/DashboardLayout";
 import ShaderBackground from "./components/ShaderBackground";
 import { Volume2 } from 'lucide-react';
+import DemoModeToggle from "./components/DemoModeToggle";
+
+import FrostedGalleryLoop from "./components/FrostedGalleryLoop";
 
 
 import UserQuestionnaire from "./components/UserQuestionnaire";
@@ -14,7 +17,7 @@ import FocusSetup from "./components/FocusSetup";
 import FocusRunning from "./components/FocusRunning";
 import ScrollDemoPage from "./components/ScrollDemoPage";
 import VillainDisplay from "./components/VillainDisplay";
-import FeaturesShowcase from "./components/FeaturesShowcase";
+
 import Dashboard from "./components/Dashboard";
 import ScribbleX from "./components/ScribbleX";
 import LandingPage from "./components/LandingPage";
@@ -73,6 +76,7 @@ export default function App() {
           <ShaderBackground data-testid="app-main">
 
                   {/* Global Components - Always Available */}
+                  <DemoModeToggle />
                   <VillainDisplay />
                   <AudioHud fadeOutRef={fadeOutRef} />
 
@@ -168,13 +172,12 @@ function WelcomeScreen() {
 
   return (
     <div className="text-center space-y-8 max-w-2xl relative">
-      <div className="space-y-6">
-        <div className="space-y-4">
-          <h1 className="text-5xl md:text-7xl font-black leading-tight">
-            Get locked in. Make <span className="text-synth-amber"><ScribbleX /></span> beats a day.
-          </h1>
-
-        </div>
+              <div className="space-y-6">
+          <div className="space-y-4">
+            <h1 className="text-5xl md:text-7xl font-black leading-tight">
+              Get locked in. Make <span className="text-synth-amber"><ScribbleX /></span> beats a day.
+            </h1>
+          </div>
         <p className="text-xl text-cyan-300/80 max-w-3xl mx-auto">
           Perday Music 365 turns your studio time into a game: timeboxed cookups, live multipliers, and a squad that only talks when you're on a break (or after you stack). Points for focus. Heat for effort. Streaks for consistency.
         </p>
@@ -293,7 +296,7 @@ function WelcomeScreen() {
                 ✕
               </button>
             </div>
-            <FeaturesShowcase />
+            <FrostedGalleryLoop />
           </div>
         </div>
       )}

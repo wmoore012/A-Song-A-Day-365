@@ -14,6 +14,9 @@ type AppState = {
   inventory: InventoryItem[];
   _hydrated: boolean;
   
+  // Demo mode
+  isDemoMode: boolean;
+  
   // Prestart properties
   prestartTotalMs: number;
   phase: string;
@@ -24,6 +27,10 @@ type AppState = {
   setSettings: (p: Partial<Settings>) => void;
   markHydrated: () => void;
   addToInventory: (item: Omit<InventoryItem, 'id' | 'createdAt'>) => void;
+  
+  // Demo methods
+  enableDemoMode: () => void;
+  disableDemoMode: () => void;
   
   // Prestart methods
   setPhase: (phase: string) => void;
@@ -52,6 +59,9 @@ export const useAppStore = create<AppState>()(
       freezes: 0,
       inventory: [],
       _hydrated: false,
+      
+      // Demo mode
+      isDemoMode: false,
       
       // Prestart properties
       prestartTotalMs: 7 * 60 * 1000, // 7 minutes default
@@ -89,6 +99,10 @@ export const useAppStore = create<AppState>()(
         }]
       })),
       
+      // Demo methods
+      enableDemoMode: () => set({ isDemoMode: true }),
+      disableDemoMode: () => set({ isDemoMode: false }),
+      
       // Prestart methods
       setPhase: (phase) => set({ phase }),
       markReadyAt: (timestamp) => set({ readyAt: timestamp }),
@@ -109,6 +123,7 @@ export const useAppStore = create<AppState>()(
         streak: s.streak,
         freezes: s.freezes,
         inventory: s.inventory,
+        isDemoMode: s.isDemoMode,
         prestartTotalMs: s.prestartTotalMs,
         phase: s.phase,
         readyAt: s.readyAt,

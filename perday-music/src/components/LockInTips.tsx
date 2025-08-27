@@ -18,6 +18,15 @@ const LOCK_IN_TIPS = [
   "Reference last win. Repeat the steps.",
   "One hook. One bounce. Next.",
   "You ain't stuck. You bored. Move.",
+  // Added new tips from the user's suggestion
+  "Put phone in another room (timer on desktop).",
+  "Decide your 'stopping point' before you start.",
+  "Label your DAW markers (Verse, Pre, Hook) now.",
+  "When stuck, bounce a 30s loop and move on.",
+  "Mute FX buses during writing; add later.",
+  "Commit to one sound per section—choice beats options.",
+  "Use a ref track at -12 LUFS for perspective.",
+  "Name your session YYYY-MM-DD(at least) before you hit Rec.",
 ];
 
 export default function LockInTips() {
