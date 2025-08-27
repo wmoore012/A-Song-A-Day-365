@@ -1,5 +1,6 @@
     import { useRef, useEffect, useState } from 'react';
     import { gsap } from 'gsap';
+    import { shouldAnimate } from '../lib/motion';
 
     interface VaultTransitionProps {
       isOpen: boolean;
@@ -15,16 +16,9 @@
       useEffect(() => {
         if (!vaultRef.current || !contentRef.current) return;
 
-        // Force animations in dev/tests, only respect reduced motion in production
-        const shouldAnimate =
-          import.meta?.env?.MODE !== 'test' &&
-          window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true
-            ? false
-            : true;
-
         console.log('VaultTransition: isOpen =', isOpen, 'isTransitioning =', isTransitioning);
 
-        if (!shouldAnimate) {
+        if (!shouldAnimate()) {
           console.log('VaultTransition: Skipping animation due to reduced motion preference');
           onTransitionComplete();
           return;

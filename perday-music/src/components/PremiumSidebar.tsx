@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import { gsap } from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { useAppStore } from '../store/store';
+import { shouldAnimate } from '../lib/motion';
 import { 
   BarChart2, 
   Zap, 
@@ -27,14 +28,7 @@ function NavItem({ icon: Icon, label, active, collapsed, onClick }: {
   useGSAP(() => {
     if (!itemRef.current) return;
     
-    // Force animations in dev/tests, only respect reduced motion in production
-    const shouldAnimate = 
-      import.meta?.env?.MODE !== 'test' &&
-      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true
-        ? false
-        : true;
-    
-    if (!shouldAnimate) return;
+    if (!shouldAnimate()) return;
     
     gsap.fromTo(itemRef.current, 
       { opacity: 0, x: -10 }, 
@@ -67,14 +61,7 @@ export default function PremiumSidebar() {
   useGSAP(() => {
     if (!sidebarRef.current || !lightBarRef.current) return;
     
-    // Force animations in dev/tests, only respect reduced motion in production
-    const shouldAnimate = 
-      import.meta?.env?.MODE !== 'test' &&
-      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true
-        ? false
-        : true;
-    
-    if (!shouldAnimate) return;
+    if (!shouldAnimate()) return;
 
     // Entrance animation
     gsap.fromTo(sidebarRef.current, 

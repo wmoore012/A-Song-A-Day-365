@@ -30,11 +30,19 @@ export async function typeInto(
     signal,
   } = opts;
 
-  // Skip typewriter effect in test environment for faster tests
-  if (typeof process !== 'undefined' && process.env.NODE_ENV === 'test') {
-    element.textContent = prefix + text;
+  // Vite/Vitest test guard
+  if (import.meta?.env?.VITEST || import.meta?.env?.MODE === 'test') {
+    element.textContent = prefix + (text ?? '');
     onComplete?.();
-    return Promise.resolve();
+    return;
+  }
+
+  // Respect reduced motion
+  const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true;
+  if (reduceMotion) {
+    element.textContent = prefix + (text ?? '');
+    onComplete?.();
+    return;
   }
 
   // Neon style

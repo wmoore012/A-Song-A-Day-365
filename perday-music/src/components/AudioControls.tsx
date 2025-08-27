@@ -3,6 +3,7 @@ import { Button } from './ui/button';
 import { Slider } from './ui/slider';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from './ui/sheet';
 import { Volume2, Play, Pause, SkipBack, SkipForward, Music, Settings } from 'lucide-react';
+import { loadYouTubeAPI } from '../lib/youtube';
 
 interface AudioControlsProps {
   currentVolume: number;
@@ -21,19 +22,11 @@ export default function AudioControls({
   const playerRef = useRef<YT.Player | null>(null);
   const hostRef = useRef<HTMLDivElement>(null);
 
-  // Load IFrame API once and build the player on first open/interaction
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    if (window.YT?.Player) return; // already loaded
-
-    const s = document.createElement('script');
-    s.src = 'https://www.youtube.com/iframe_api';
-    document.head.appendChild(s);
-  }, []);
-
   // Create player on first open or first play click (user gesture => autoplay allowed)
-  const ensurePlayer = () => {
-    if (playerRef.current || !window.YT?.Player || !hostRef.current) return;
+  const ensurePlayer = async () => {
+    if (playerRef.current || !hostRef.current) return;
+
+    await loadYouTubeAPI();
     playerRef.current = new window.YT.Player(hostRef.current, {
       width: 320,
       height: 180,
@@ -41,6 +34,7 @@ export default function AudioControls({
         modestbranding: 1,
         rel: 0,
         playsinline: 1,
+        origin: window.location.origin,
         listType: 'playlist',
         list: playlistId,
       },
@@ -68,7 +62,7 @@ export default function AudioControls({
   }, [currentVolume]);
 
   const playPause = async () => {
-    ensurePlayer();
+    await ensurePlayer();
     const p = playerRef.current;
     if (!p) return;
     if (isPlaying) p.pauseVideo?.();
@@ -99,7 +93,7 @@ export default function AudioControls({
           {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
         </Button>
 
-        <Sheet open={isOpen} onOpenChange={(o) => { setIsOpen(o); if (o) ensurePlayer(); }}>
+        <Sheet open={isOpen} onOpenChange={(o) => { setIsOpen(o); if (o) ensurePlayer().catch(console.error); }}>
           <SheetTrigger asChild>
             <Button variant="outline" size="icon" className="bg-black/80 border-cyan-400/40 text-cyan-300 hover:bg-cyan-400/20">
               <Settings className="h-4 w-4" />

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
+import { shouldAnimate } from '../lib/motion';
 
 interface MultiplierBarProps {
   multiplier?: number;
@@ -13,9 +14,7 @@ export default function MultiplierBar({ multiplier = 1.0, className = "" }: Mult
   useEffect(() => {
     if (!barRef.current) return;
 
-    const shouldAnimate = import.meta?.env?.MODE !== 'test' && 
-      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true ? false : true;
-    if (!shouldAnimate) return;
+    if (!shouldAnimate()) return;
 
     // Check if multiplier is dying (below 1.5x)
     const dying = multiplier < 1.5;

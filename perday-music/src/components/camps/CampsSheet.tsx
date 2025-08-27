@@ -80,6 +80,9 @@ function CalComEmbed({ url }: { url: string }) {
       <iframe
         src={url}
         title="Cal.com"
+        loading="lazy"
+        referrerPolicy="strict-origin-when-cross-origin"
+        allow="payment *; fullscreen"
         className="w-full h-[680px] rounded-lg border border-white/10"
       />
       <p className="text-xs text-white/40">
@@ -101,7 +104,7 @@ function FocusmateBlurb() {
           className="px-4 py-2 rounded bg-white/10 hover:bg-white/15 inline-flex items-center gap-2"
           href="https://www.focusmate.com/"
           target="_blank"
-          rel="noreferrer"
+          rel="noopener noreferrer"
         >
           Open Focusmate <ExternalLink className="w-4 h-4" />
         </a>

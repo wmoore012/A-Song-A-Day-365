@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
+import { shouldAnimate } from '../lib/motion';
 
 interface BarChartData {
   label: string;
@@ -30,9 +31,7 @@ export default function EnhancedBarChart({
   useEffect(() => {
     if (!containerRef.current || !isActive) return;
 
-    const shouldAnimate = import.meta?.env?.MODE !== 'test' && 
-      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true ? false : true;
-    if (!shouldAnimate) return;
+    if (!shouldAnimate()) return;
 
     // Entrance animation
     const tl = gsap.timeline({

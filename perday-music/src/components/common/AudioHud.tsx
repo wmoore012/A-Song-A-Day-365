@@ -1,41 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { Volume2, Music, AudioWaveform } from 'lucide-react';
+import { loadYouTubeAPI } from '../../lib/youtube';
 
-/** --- YouTube loader (single-flight, callback-safe) --- */
-let ytReadyPromise: Promise<void> | null = null;
-const ytReadyResolvers: Array<() => void> = [];
-
-function loadYouTubeAPI(): Promise<void> {
-  if (typeof window === "undefined") return Promise.resolve();
-  if (window.YT?.Player) return Promise.resolve();
-
-  if (!ytReadyPromise) {
-    ytReadyPromise = new Promise<void>((resolve) => {
-      ytReadyResolvers.push(resolve);
-
-      // Inject once
-      if (!document.querySelector<HTMLScriptElement>('script[src="https://www.youtube.com/iframe_api"]')) {
-        const s = document.createElement("script");
-        s.src = "https://www.youtube.com/iframe_api";
-        s.async = true;
-        document.head.appendChild(s);
-      }
-
-      // Chain any existing callback instead of clobbering
-      const prev = window.onYouTubeIframeAPIReady;
-      window.onYouTubeIframeAPIReady = () => {
-        prev?.();
-        ytReadyResolvers.splice(0).forEach((r) => r());
-      };
-    });
-  }
-  return ytReadyPromise;
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type YTPlayer = any;
-
-async function createPlayer(container: HTMLElement, videoId: string, { autoplay, loop }: { autoplay: 0 | 1; loop?: 0 | 1 }): Promise<YTPlayer> {
+// Remove duplicate YTPlayer type - use centralized types from youtube.d.ts
+async function createPlayer(container: HTMLElement, videoId: string, { autoplay, loop }: { autoplay: 0 | 1; loop?: 0 | 1 }): Promise<YT.Player> {
   await loadYouTubeAPI();
   if (!window.YT?.Player) throw new Error('YouTube API not available');
   return new window.YT.Player(container, {
@@ -53,7 +21,7 @@ async function createPlayer(container: HTMLElement, videoId: string, { autoplay,
       ...(loop ? { loop: 1, playlist: videoId } : {}),
     },
     events: {
-      onReady: (ev: { target: YTPlayer }) => {
+      onReady: (ev: { target: YT.Player }) => {
         try {
           ev.target.setVolume(15);
           if (autoplay) ev.target.playVideo();
@@ -66,7 +34,7 @@ async function createPlayer(container: HTMLElement, videoId: string, { autoplay,
   });
 }
 
-function fadeVolume(player: YTPlayer | null | undefined, to: number, ms = 600) {
+function fadeVolume(player: YT.Player | null | undefined, to: number, ms = 600) {
   if (!player) return;
   try {
     const start = performance.now();
@@ -90,8 +58,8 @@ export default function AudioHud({ fadeOutRef }: { fadeOutRef: React.MutableRefO
   const [armed, setArmed] = useState(false);
   const musicRef = useRef<HTMLDivElement>(null);
   const noiseRef = useRef<HTMLDivElement>(null);
-  const music = useRef<YTPlayer | null>(null);
-  const noise = useRef<YTPlayer | null>(null);
+  const music = useRef<YT.Player | null>(null);
+  const noise = useRef<YT.Player | null>(null);
 
   // expose fadeOut
   useEffect(() => {

@@ -1,5 +1,5 @@
 /**
- * Centralized animation policy for the entire app
+     * Centralized animation policy for the entire app
  * Respects reduced motion preferences and environment
  */
 export const shouldAnimate = (active?: boolean) =>
@@ -78,3 +78,13 @@ export const THEME = {
     toast: 1070,
   },
 } as const;
+
+/**
+ * Safe animation wrapper that only executes if user allows motion
+ */
+export function withMotionGuard<T extends (...args: unknown[]) => unknown>(fn: T): T {
+  return ((...args: Parameters<T>) => {
+    if (!shouldAnimate()) return;
+    return fn(...args);
+  }) as T;
+}

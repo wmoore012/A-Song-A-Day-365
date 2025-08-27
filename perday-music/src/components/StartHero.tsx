@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { FlowState, type Settings } from "../types";
+import { FlowState, type Settings as AppSettings } from "../types";
 import { useAppStore } from "../store/store";
 import { usePrestart } from "../hooks/usePrestart";
 import { useVillainAnnounce } from "../hooks/useVillainAnnounce";
@@ -12,7 +12,7 @@ import { Button } from "./ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Tooltip, TooltipTrigger, TooltipContent } from "./ui/tooltip";
 import UserQuestionnaire from "./UserQuestionnaire";
-import { Settings } from "lucide-react";
+import { Settings as SettingsIcon } from "lucide-react";
 import { toast } from "sonner";
 import GlassPanel from "./common/GlassPanel";
 
@@ -92,7 +92,7 @@ export default function StartHero({ fadeOutRef }: StartHeroProps) {
           <div className="absolute top-6 right-6 z-20 flex items-center gap-3">
             <SettingsSheet
               currentSettings={settings}
-              onSave={(s: Settings) => setSettings(s)}
+              onSave={(s: AppSettings) => setSettings(s)}
               onResetAll={() => {
                 setSettings({}); // Assuming setSettings handles reset
                 toast.success("Reset complete. Clean slate. 🔁");
@@ -176,7 +176,7 @@ export default function StartHero({ fadeOutRef }: StartHeroProps) {
                     className="h-8 w-8 bg-black/40 border-cyan-400/40 text-cyan-300 hover:bg-cyan-400/20 rounded-full"
                     onClick={() => setOverlay("none")}
                   >
-                    <Settings className="h-4 w-4" />
+                    <SettingsIcon className="h-4 w-4" />
                   </Button>
                 </div>
                 <UserQuestionnaire

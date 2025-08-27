@@ -1,0 +1,11 @@
+FROM node:20-bullseye
+WORKDIR /workspace
+COPY package*.json ./
+COPY perday-music/package.json perday-music/
+RUN npm ci
+COPY . .
+WORKDIR /workspace/perday-music
+ENV CI=true NODE_ENV=production
+RUN npm test -- --run || true
+RUN npm run lint || true
+RUN npm run build

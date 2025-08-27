@@ -1,7 +1,7 @@
 import React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../lib/utils';
-import { shouldAnimateButton, ANIM } from '../../lib/shouldAnimate';
+import { shouldAnimateButton, ANIM } from '../../lib/motion';
 
 // CTA variants using class-variance-authority
 const ctaVariants = cva(

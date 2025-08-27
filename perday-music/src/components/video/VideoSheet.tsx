@@ -63,7 +63,13 @@ export default function VideoSheet({ open, onOpenChange }: Props) {
         parentNode: jitsiRef.current,
         width: "100%",
         height: 520,
-        configOverwrite: { startWithAudioMuted: false, startWithVideoMuted: false },
+        configOverwrite: {
+          startWithAudioMuted: false,
+          startWithVideoMuted: false,
+          disableThirdPartyRequests: true,
+          enableWelcomePage: false,
+          prejoinPageEnabled: true
+        },
         interfaceConfigOverwrite: { MOBILE_APP_PROMO: false },
       });
     });
@@ -106,7 +112,7 @@ export default function VideoSheet({ open, onOpenChange }: Props) {
             <a
               href="https://www.focusmate.com/"
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
               className="ml-auto inline-flex items-center gap-1 px-3 py-2 rounded bg-white/10 hover:bg-white/15"
               title="Open Focusmate"
             >
@@ -132,7 +138,9 @@ export default function VideoSheet({ open, onOpenChange }: Props) {
               <iframe
                 title="Whereby"
                 src={wherebyRoom}
-                allow="camera; microphone; fullscreen; speaker; display-capture"
+                allow="camera; microphone; fullscreen; display-capture; autoplay; clipboard-write"
+                loading="lazy"
+                referrerPolicy="strict-origin-when-cross-origin"
                 className="w-full h-[520px]"
               />
               <p className="text-xs text-white/40 px-2 py-2">

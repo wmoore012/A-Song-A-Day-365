@@ -1,0 +1,17 @@
+[build]
+  base = "perday-music"
+  command = "npm run build"
+  publish = "perday-music/dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Content-Security-Policy = "default-src 'self'; script-src 'self' https://www.youtube.com https://www.gstatic.com https://meet.jit.si https://www.eventbrite.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://i.ytimg.com; font-src 'self' data:; frame-src 'self' https://www.youtube.com https://meet.jit.si https://*.whereby.com https://www.eventbrite.com; connect-src 'self' https://meet.jit.si https://www.youtube.com https://www.googleapis.com; frame-ancestors 'self';"
+    Permissions-Policy = "camera=(self \"https://*.whereby.com\" \"https://meet.jit.si\"), microphone=(self \"https://*.whereby.com\" \"https://meet.jit.si\"), display-capture=(self \"https://*.whereby.com\" \"https://meet.jit.si\")"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Cross-Origin-Opener-Policy = "same-origin"
+    X-Content-Type-Options = "nosniff"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
