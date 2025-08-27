@@ -47,7 +47,8 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="text-center space-y-8 max-w-2xl relative">
+    <div className="flex items-center justify-center min-h-screen p-8">
+      <div className="text-center space-y-8 max-w-2xl relative">
       <div className="space-y-6">
         <div className="space-y-4">
           <h1 className="text-5xl md:text-7xl font-black leading-tight">
@@ -170,5 +171,6 @@ export default function LandingPage() {
         </p>
       </div>
     </div>
+  </div>
   );
 }
