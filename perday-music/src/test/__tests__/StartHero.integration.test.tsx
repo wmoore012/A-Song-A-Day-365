@@ -68,7 +68,7 @@ describe('StartHero → audio fade on Ready (integration smoke)', () => {
     );
 
     // First, click the Start Timer button
-    const startTimerBtn = await screen.findByRole('button', { name: /start 7-minute timer/i });
+    const startTimerBtn = await screen.findByRole('button', { name: /start timer now/i });
     expect(startTimerBtn).toBeInTheDocument();
     fireEvent.click(startTimerBtn);
 

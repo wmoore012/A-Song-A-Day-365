@@ -5,7 +5,7 @@ import App from '../../App';
 // Mock the store to force hydrated state
 vi.mock('../../store/store', () => ({
   useAppStore: () => ({
-    session: { state: "VAULT_CLOSED", readyPressed: false },
+          session: { state: "DASHBOARD", readyPressed: false },
     settings: {
       defaultDuration: 25,
       defaultMultiplier: 1.5,

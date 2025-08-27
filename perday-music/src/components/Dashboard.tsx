@@ -7,6 +7,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from './ui/sheet';
 import LockInTips from './LockInTips';
 import HeatButtons from './HeatButtons';
+import TimerWidget from './TimerWidget';
+import SessionTimerDock from './SessionTimerDock';
 import { 
   Play, 
   Target, 
@@ -65,7 +67,7 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-black text-white p-6">
+    <div className="min-h-screen text-white p-6">
       <LockInTips />
       
       {/* Sound Enable Prompt - Front and Center */}
@@ -129,6 +131,16 @@ export default function Dashboard() {
             </Button>
           </div>
         </div>
+      </div>
+
+      {/* Timer Widget - Always visible */}
+      <div className="mb-8 relative z-10">
+        <TimerWidget />
+      </div>
+
+      {/* Session Timer Dock */}
+      <div className="mb-8 max-w-md">
+        <SessionTimerDock />
       </div>
 
       {/* Heat Buttons - Only show when session is active and questionnaire completed */}

@@ -40,7 +40,7 @@ type AppState = {
 export const useAppStore = create<AppState>()(
   persist(
     (set) => ({
-      session: { state: FlowState.VAULT_CLOSED, readyPressed: false, multiplierPenalty: false, preparationStartTime: undefined },
+      session: { state: FlowState.DASHBOARD, readyPressed: false, multiplierPenalty: false, preparationStartTime: undefined },
       settings: { 
         defaultDuration: 25, 
         defaultMultiplier: 1.5, 

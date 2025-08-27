@@ -122,7 +122,7 @@ export default function StartHero({ fadeOutRef }: StartHeroProps) {
   switch (session.state) {
     case FlowState.PRE_START:
       return (
-        <div className="relative isolate min-h-screen flex items-center justify-center p-4 bg-black">
+        <div className="relative isolate min-h-screen flex items-center justify-center p-4">
           {/* Visual background (non-interactive, behind everything) */}
           <div className="absolute inset-0 -z-10 pointer-events-none opacity-20" aria-hidden="true">
             <AtomOrbit />
@@ -150,7 +150,7 @@ export default function StartHero({ fadeOutRef }: StartHeroProps) {
             </div>
             <div className="text-lg font-semibold text-synth-white mb-2">7-minute Pre-Start to get your mind right.</div>
             <div className="text-sm text-amber-300/90 mb-6">
-              Ready the sooner you start the higher your multiplier
+              The sooner you start the higher your multiplier
             </div>
 
             {!timerStarted ? (
@@ -161,7 +161,7 @@ export default function StartHero({ fadeOutRef }: StartHeroProps) {
                   className="w-full h-12 text-base font-semibold bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-white rounded-2xl"
                   onClick={onStartTimer}
                 >
-                  🎯 Start 7-Minute Timer
+                  🎯 Start Timer Now
                 </Button>
                 <div className="text-sm text-cyan-200/70">
                   Take the challenge! One step closer to making a beat a day!

@@ -57,7 +57,7 @@ function AppContent() {
   useStartupScript(userName);
 
   // Handle questionnaire completion
-  const handleQuestionnaireComplete = (data: { name: string; collaborators: string; sessionDate?: Date }) => {
+  const handleQuestionnaireComplete = (data: { name: string; collaborators: string; sessionDate?: Date; durationHours?: number; durationMinutes?: number }) => {
     // Handle allnighter backdating logic
     if (data.sessionDate) {
       const today = new Date();
@@ -72,7 +72,12 @@ function AppContent() {
       }
     }
 
+    // Calculate total duration in minutes
+    const totalMinutes = (data.durationHours || 0) * 60 + (data.durationMinutes || 25);
+    
     dispatch({ type: "COMPLETE_QUESTIONNAIRE", payload: data });
+    // Set the duration in the session
+    dispatch({ type: "SET_DURATION", payload: totalMinutes });
   };
 
   // Handle preparation completion
@@ -82,22 +87,27 @@ function AppContent() {
 
   return (
     <ShaderBackground data-testid="app-main">
+      {/* Debug info */}
+      <div className="fixed top-0 left-0 z-50 bg-black/80 text-white p-2 text-xs">
+        State: {session.state} | User: {settings.userName || 'none'}
+      </div>
+      
       {/* Global Components - Always Available */}
       <DemoModeToggle />
       <VillainDisplay />
       <AudioHud fadeOutRef={fadeOutRef} />
 
       <Routes>
-        {/* Landing Page for New Users */}
-        <Route path="/" element={
-          session.state === FlowState.VAULT_CLOSED && !settings.userName ? (
-            <LandingPage />
-          ) : (
-            <div className="flex items-center justify-center min-h-screen p-8">
-              <WelcomeScreen />
-            </div>
-          )
-        } />
+                 {/* Landing Page for New Users */}
+         <Route path="/" element={
+           !settings.userName ? (
+             <LandingPage />
+           ) : (
+             <div className="flex items-center justify-center min-h-screen p-8">
+               <WelcomeScreen />
+             </div>
+           )
+         } />
 
         {/* Features Page */}
         <Route path="/features" element={<FeaturesPage />} />
@@ -114,54 +124,68 @@ function AppContent() {
           <ScrollDemoPage />
         )}
 
-        {/* Other flow states rendered when not in demo mode */}
-        {session.state !== FlowState.VAULT_CLOSED &&
-         session.state !== FlowState.SCROLL_DEMO && (
-          <>
-            {/* Main Dashboard */}
-            <DashboardLayout>
-              {/* Analytics HUD */}
-              <AnalyticsHud grades={[]} latencies={[]} />
+         {/* Main App Route - handles all flow states */}
+         <Route path="/*" element={
+           session.state !== FlowState.SCROLL_DEMO ? (
+             <DashboardLayout>
+               {/* Analytics HUD */}
+               <AnalyticsHud grades={[]} latencies={[]} />
 
-              {/* Sequential Flow Content */}
-          {session.state === FlowState.DASHBOARD && (
-            <Dashboard />
-          )}
+               {/* Sequential Flow Content */}
+               {session.state === FlowState.DASHBOARD && (
+                 <Dashboard />
+               )}
 
-          {session.state === FlowState.QUESTIONNAIRE && (
-            <div className="flex items-center justify-center min-h-screen p-4">
-              <UserQuestionnaire onComplete={handleQuestionnaireComplete} />
-            </div>
-          )}
+               {session.state === FlowState.QUESTIONNAIRE && (
+                 <div className="flex items-center justify-center min-h-screen p-4">
+                   <UserQuestionnaire onComplete={handleQuestionnaireComplete} />
+                 </div>
+               )}
 
-          {session.state === FlowState.PREPARATION && (
-            <PreparationPhase onComplete={handlePreparationComplete} />
-          )}
+               {session.state === FlowState.PREPARATION && (
+                 <PreparationPhase onComplete={handlePreparationComplete} />
+               )}
 
-          {session.state === FlowState.PRE_START && (
-            <StartHero fadeOutRef={fadeOutRef} />
-          )}
+               {session.state === FlowState.PRE_START && (
+                 <StartHero fadeOutRef={fadeOutRef} />
+               )}
 
-          {session.state === FlowState.LOCK_IN && (
-            <LockInMenu />
-          )}
+               {session.state === FlowState.LOCK_IN && (
+                 <LockInMenu />
+               )}
 
-          {session.state === FlowState.FOCUS_SETUP && (
-            <FocusSetup />
-          )}
+               {session.state === FlowState.FOCUS_SETUP && (
+                 <FocusSetup />
+               )}
 
-          {session.state === FlowState.FOCUS_RUNNING && (
-            <FocusRunning />
-          )}
+               {session.state === FlowState.FOCUS_RUNNING && (
+                 <FocusRunning />
+               )}
 
-          {/* Session Completion States */}
-          {[FlowState.CHECKPOINT, FlowState.SELF_RATE, FlowState.RECAP, FlowState.REWARD_GATE, FlowState.POST_ACTIONS].includes(session.state) && (
-            <SessionCompletion />
-          )}
-        </DashboardLayout>
-      </>
-    )}
+               {/* Session Completion States */}
+               {[FlowState.CHECKPOINT, FlowState.SELF_RATE, FlowState.RECAP, FlowState.REWARD_GATE, FlowState.POST_ACTIONS].includes(session.state) && (
+                 <SessionCompletion />
+               )}
+             </DashboardLayout>
+           ) : null
+         } />
       </Routes>
+      
+             {/* Fallback - always show something */}
+       {!session.state && (
+         <div className="flex items-center justify-center min-h-screen">
+           <div className="text-center space-y-4">
+             <h1 className="text-4xl font-bold text-white">Perday Music</h1>
+             <p className="text-cyan-300">Loading...</p>
+             <button
+               onClick={() => dispatch({ type: "GO_TO_DASHBOARD" })}
+               className="px-4 py-2 bg-cyan-500 text-white rounded"
+             >
+               Go to Dashboard
+             </button>
+           </div>
+         </div>
+       )}
     </ShaderBackground>
   );
 }

@@ -17,7 +17,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   }, []);
 
   return (
-    <div className="flex h-screen bg-black">
+    <div className="flex h-screen">
       <PremiumSidebar />
       <main className="flex-1 overflow-auto relative">
         {children}

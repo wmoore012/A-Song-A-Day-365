@@ -10,7 +10,7 @@ import { Settings, Users, UserPlus } from 'lucide-react';
 import { getDemoConfig } from '../utils/demoMode';
 
 interface UserQuestionnaireProps {
-  onComplete: (data: { name: string; collaborators: string; sessionDate?: Date }) => void;
+  onComplete: (data: { name: string; collaborators: string; sessionDate?: Date; durationHours?: number; durationMinutes?: number }) => void;
 }
 
 export default function UserQuestionnaire({ onComplete }: UserQuestionnaireProps) {
@@ -18,6 +18,8 @@ export default function UserQuestionnaire({ onComplete }: UserQuestionnaireProps
   const [collaborators, setCollaborators] = useState('');
   const [isRemote, setIsRemote] = useState(false);
   const [date, setDate] = useState<Date | undefined>(new Date());
+  const [durationHours, setDurationHours] = useState(0);
+  const [durationMinutes, setDurationMinutes] = useState(25);
 
   // Read demo config for pre-filled values
   useEffect(() => {
@@ -34,7 +36,9 @@ export default function UserQuestionnaire({ onComplete }: UserQuestionnaireProps
       onComplete({
         name: name.trim(),
         collaborators: collaborators.trim(),
-        sessionDate: date
+        sessionDate: date,
+        durationHours,
+        durationMinutes
       });
     }
   };
@@ -157,6 +161,43 @@ export default function UserQuestionnaire({ onComplete }: UserQuestionnaireProps
                 onSelect={setDate}
                 className="rounded-lg border-0 bg-transparent text-synth-white"
               />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-synth-white">Session Duration</Label>
+            <div className="flex gap-3">
+              <div className="flex-1">
+                <Label className="text-synth-icy/70 text-sm">Hours</Label>
+                <Input
+                  type="number"
+                  value={durationHours}
+                  onChange={(e) => {
+                    const value = parseInt(e.target.value) || 0;
+                    setDurationHours(Math.min(value, 5)); // Cap at 5 hours
+                  }}
+                  min="0"
+                  max="5"
+                  className="bg-black/40 border-cyan-400/40 text-synth-white"
+                />
+              </div>
+              <div className="flex-1">
+                <Label className="text-synth-icy/70 text-sm">Minutes</Label>
+                <Input
+                  type="number"
+                  value={durationMinutes}
+                  onChange={(e) => {
+                    const value = parseInt(e.target.value) || 0;
+                    setDurationMinutes(Math.min(value, 59)); // Cap at 59 minutes
+                  }}
+                  min="0"
+                  max="59"
+                  className="bg-black/40 border-cyan-400/40 text-synth-white"
+                />
+              </div>
+            </div>
+            <div className="text-sm text-cyan-300 bg-cyan-400/10 p-3 rounded-lg">
+              ✅ Duration set: <strong>{durationHours}h {durationMinutes}m</strong> ({(durationHours * 60 + durationMinutes)} total minutes)
             </div>
           </div>
           

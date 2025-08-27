@@ -2,17 +2,13 @@ import { Action, FlowState, InvalidTransition, Session } from "../types";
 
 export function transition(s: Session, a: Action): Session {
   switch (a.type) {
-    case "OPEN_VAULT":
-      if (s.state !== FlowState.VAULT_CLOSED) throw new InvalidTransition(s.state, a.type);
-      return { ...s, state: FlowState.QUESTIONNAIRE };
-
     case "GO_TO_DASHBOARD":
       // Can go to dashboard from any state
       return { ...s, state: FlowState.DASHBOARD };
 
     case "START_QUESTIONNAIRE":
-      // Allow transition from VAULT_CLOSED to QUESTIONNAIRE
-      if (s.state !== FlowState.VAULT_CLOSED && s.state !== FlowState.QUESTIONNAIRE) throw new InvalidTransition(s.state, a.type);
+      // Can start questionnaire from dashboard
+      if (s.state !== FlowState.DASHBOARD && s.state !== FlowState.QUESTIONNAIRE) throw new InvalidTransition(s.state, a.type);
       return { ...s, state: FlowState.QUESTIONNAIRE };
 
     case "COMPLETE_QUESTIONNAIRE":
@@ -114,7 +110,7 @@ export function transition(s: Session, a: Action): Session {
       return { ...s, state: FlowState.RECAP };
 
     case "RESET":
-      return { state: FlowState.VAULT_CLOSED, readyPressed: false, multiplierPenalty: false, preparationStartTime: undefined };
+      return { state: FlowState.DASHBOARD, readyPressed: false, multiplierPenalty: false, preparationStartTime: undefined };
 
     default:
       return s;
