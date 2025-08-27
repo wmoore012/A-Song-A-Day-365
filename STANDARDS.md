@@ -1,334 +1,369 @@
-# Perday Pro Engineering Standards
+Totally—here’s a clean, copy-pasteable STANDARDS.md that captures what we fixed, what to avoid, and the right way to wire things going forward. Drop this in your repo root as STANDARDS.md.
 
-## Philosophy
-- **Think hard. Fail loudly. No silent fallbacks.**
-- If a precondition isn't met, surface it (throw in dev; render an explicit error UI in prod).
-- Prefer boring, deterministic code over cleverness.
-- Accessibility and performance are gate checks, not afterthoughts.
-- Tailwind v4 is our CSS baseline; use its Vite plugin and `@import "tailwindcss"` in the entry CSS.
+⸻
 
-## Step-by-Step Evolution Plan
+Perday Frontend Standards
 
-### 1) Wire up Zustand (state only)
+Why this exists
 
-**Goal:** A minimal store with a single phase string and a button that toggles it.
+We hit classic “AI-bloat” problems: too many abstractions, duplicated mocks, animation code fighting tests, store hydration gates that never open, and Tailwind v3 vs v4 mismatches. This doc shows what we removed, what we keep, and exactly how to build and test so things stay fast, stable, and shippable.
 
-**Impl:**
-```typescript
-// src/store/app.ts
-import { create } from 'zustand'
-export type Phase = 'prestart' | 'lockin'
-type S = { phase: Phase; setPhase: (p: Phase) => void }
-export const useApp = create<S>((set) => ({
-  phase: 'prestart',
-  setPhase: (phase) => set({ phase }),
-}))
+⸻
 
-// src/App.tsx
-import { useApp } from './store/app'
-export default function App() {
-  const { phase, setPhase } = useApp()
-  return (
-    <div data-testid="phase">
-      <span>{phase}</span>
-      <button onClick={() => setPhase('lockin')}>Lock in</button>
-    </div>
-  )
-}
-```
+Golden Rules
+	1.	Prefer minimal, robust code over flashy abstractions. Micro-motion only; no elaborate timelines in prod or tests.
+	2.	One source of truth for mocks. If you need to mock GSAP (or anything), do it once in src/test/setup.ts.
+	3.	Never block the UI behind hydration. Show a shell that becomes “real” when hydrated; tests can bypass via store mock.
+	4.	Keep legacy code quarantined. Legacy tests must not break CI for the app.
+	5.	Stick to Tailwind v4 conventions. Use @import "tailwindcss"; not the v3 @tailwind base/components/utilities.
+	6.	Forward your refs. Any component that passes ref (Radix + shadcn/ui) must use React.forwardRef.
+	7.	Respect reduced motion + test environments. Skip animations when prefers-reduced-motion or running in tests.
 
-**Smoke test (Vitest + jsdom):**
-```typescript
-import { describe, it, expect } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
-import App from './App'
+⸻
 
-describe('Zustand minimal', () => {
-  it('toggles phase', async () => {
-    render(<App />)
-    expect(screen.getByTestId('phase')).toHaveTextContent('prestart')
-    await fireEvent.click(screen.getByText('Lock in'))
-    expect(screen.getByTestId('phase')).toHaveTextContent('lockin')
-  })
-})
-```
+What we removed (AI bloat detox)
+	•	❌ Multiple GSAP mocks scattered across tests → ✅ a single complete mock in src/test/setup.ts.
+	•	❌ Split-text/variant timelines everywhere → ✅ one optional micro-motion on the logo, guarded by reduced-motion + test env.
+	•	❌ Tailwind v3 directives in a v4 build → ✅ @import "tailwindcss"; + fixed tailwind.config.
+	•	❌ “Hydration forever” spinner → ✅ store hydration that resolves, plus tests that can force _hydrated: true.
+	•	❌ Function components receiving ref without forwarding → ✅ React.forwardRef on controls (e.g., Button).
+	•	❌ CI running DOM tests accidentally in Node environment / legacy suite mixed in → ✅ CI test globs + jsdom default, and legacy excluded.
 
-### 2) Add GSAP (one harmless tween)
+⸻
 
-**Goal:** Animate opacity on mount; respect reduced motion (skip animation).
+Folder Hygiene
+	•	perday-music/src/** – production app (tests must pass)
+	•	legacy/** – experiments + old suites (quarantined; CI must not fail on these)
 
-**Impl:**
-```typescript
-// src/features/fade/FadeIn.tsx
-import { useEffect, useRef } from 'react'
-import { gsap } from 'gsap'
+⸻
 
-export function FadeIn({ children }: { children: React.ReactNode }) {
-  const el = useRef<HTMLDivElement>(null)
-  useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-    if (el.current) gsap.fromTo(el.current, { opacity: 0 }, { opacity: 1, duration: 0.4 })
-  }, [])
-  return <div ref={el} data-testid="fade-in">{children}</div>
-}
-```
+Motion / GSAP
 
-**Smoke test (no real timers):**
-```typescript
-import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
-import { FadeIn } from './FadeIn'
+Production usage
+	•	Only micro-motion (e.g., logo fade/scale). Nothing blocking navigation or hydration.
+	•	Always guard:
 
-describe('FadeIn', () => {
-  it('renders element (animation optional)', () => {
-    vi.useFakeTimers()
-    render(<FadeIn><div>Hi</div></FadeIn>)
-    expect(screen.getByTestId('fade-in')).toBeInTheDocument()
-  })
-})
-```
-
-### 3) Add ECharts (dispose correctly)
-
-**Goal:** Render a tiny chart and dispose on unmount.
-
-**Impl:**
-```typescript
-// src/features/chart/MiniChart.tsx
-import { useEffect, useRef } from 'react'
-import * as echarts from 'echarts'
-
-export function MiniChart() {
-  const ref = useRef<HTMLDivElement>(null)
-  useEffect(() => {
-    if (!ref.current) return
-    const chart = echarts.init(ref.current)
-    chart.setOption({ 
-      xAxis: { type: 'category', data: [1,2,3] }, 
-      yAxis: {}, 
-      series: [{ type: 'line', data: [1,2,1] }] 
-    })
-    return () => chart.dispose()
-  }, [])
-  return <div data-testid="chart" style={{ width: 240, height: 120 }} ref={ref} />
-}
-```
-
-**Smoke test (mock & verify dispose):**
-```typescript
-import { describe, it, expect, vi } from 'vitest'
-import { render, unmountComponentAtNode } from 'react-dom'
-import * as echarts from 'echarts'
-import { MiniChart } from './MiniChart'
-
-it('disposes on unmount', () => {
-  const div = document.createElement('div')
-  const dispose = vi.fn()
-  vi.spyOn(echarts, 'init').mockReturnValue({ setOption: vi.fn(), dispose } as any)
-  render(<MiniChart />, div)
-  unmountComponentAtNode(div)
-  expect(dispose).toHaveBeenCalled()
-})
-```
-
-### 4) Add YouTube (user-gesture gated)
-
-**Goal:** Load the IFrame API only after a click; show fallback if blocked.
-
-**Impl:**
-```typescript
-// src/features/youtube/LitePlayer.tsx
-import { useState } from 'react'
-
-export function LitePlayer({ videoId }: { videoId: string }) {
-  const [active, setActive] = useState(false)
-  const onPlay = () => {
-    setActive(true)
-    if (!document.querySelector('script[src*="youtube.com/iframe_api"]')) {
-      const s = document.createElement('script')
-      s.src = 'https://www.youtube.com/iframe_api'
-      document.head.appendChild(s)
-    }
-  }
-  return active ? (
-    <iframe
-      data-testid="yt-frame"
-      width="560" height="315"
-      src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
-      title="YouTube video player" 
-      allow="autoplay; encrypted-media" 
-      allowFullScreen
-    />
-  ) : (
-    <button data-testid="yt-cta" onClick={onPlay}>Play ▶</button>
-  )
-}
-```
-
-**Smoke test (script tag appears after click):**
-```typescript
-import { render, screen, fireEvent } from '@testing-library/react'
-import { LitePlayer } from './LitePlayer'
-import { describe, it, expect } from 'vitest'
-
-describe('LitePlayer', () => {
-  it('injects API script on click', async () => {
-    render(<LitePlayer videoId="dQw4w9WgXcQ" />)
-    await fireEvent.click(screen.getByTestId('yt-cta'))
-    const script = document.querySelector('script[src*="youtube.com/iframe_api"]')
-    expect(script).not.toBeNull()
-    expect(screen.getByTestId('yt-frame')).toBeInTheDocument()
-  })
-})
-```
-
-## Errors & Preconditions
-
-- **Dev:** throw Error for missing DOM hooks, config, or required props.
-- **Prod:** render an obvious error state with a retry path; log to console and to the error pipeline.
-- **Tiny, explicit assertions:**
-
-```typescript
-export function must<T>(value: T | null | undefined, msg: string): T {
-  if (value == null) throw new Error(msg)
-  return value
+if (import.meta.env.VITEST || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+  return; // skip animations in tests and reduced-motion
 }
 
-// Usage
-const root = must(document.querySelector('[data-app-root]'), 'Missing [data-app-root]')
-```
+Test mock (single source of truth)
 
-- Use Error Boundaries at feature seams (StartGate, NotionSync, HUD).
+Put this (or equivalent) once in src/test/setup.ts:
 
-## Tests (Vitest + jsdom)
+vi.mock('gsap', () => {
+  const makeTween = () => ({ kill: vi.fn(), play: vi.fn().mockReturnThis() });
+  const to = vi.fn(() => makeTween());
+  const from = vi.fn(() => makeTween());
+  const fromTo = vi.fn(() => makeTween());
+  const timeline = vi.fn(() => {
+    const tl: any = makeTween();
+    tl.to = vi.fn().mockReturnValue(tl);
+    tl.from = vi.fn().mockReturnValue(tl);
+    tl.fromTo = vi.fn().mockReturnValue(tl);
+    tl.set = vi.fn().mockReturnValue(tl);
+    tl.add = vi.fn().mockReturnValue(tl);
+    tl.killTweensOf = vi.fn();
+    tl.kill = vi.fn();
+    return tl;
+  });
+  const registerPlugin = vi.fn();
+  const killTweensOf = vi.fn();
+  return { gsap: { to, from, fromTo, set: vi.fn(), timeline, registerPlugin, killTweensOf } };
+});
 
-- **Deterministic only:** no real timers/timeouts, no real network.
-- Use `vi.useFakeTimers()` and advance time; stub fetch.
-- Focus on pure functions and DOM with `data-testid` hooks; keep suites tiny (sub-second).
+Do not re-mock GSAP inside individual test files.
 
-```typescript
-import { describe, it, expect, vi } from 'vitest'
-describe('timer', () => {
-  it('ticks without real timers', () => {
-    vi.useFakeTimers()
-    // ...mount component...
-    vi.advanceTimersByTime(7_000)
-    // ...assert mm:ss updates...
-  })
-})
-```
+⸻
 
-## Accessibility
+Tailwind v4
 
-- **Tabs follow APG intent:** container `role="tablist"`, each tab `role="tab"` with `aria-controls` → panel `role="tabpanel"`. Keep `aria-selected` and focus in sync; arrow keys move focus.
-- **Respect reduced motion:**
+src/styles/index.css
 
-```css
+@import "tailwindcss";
+
+/* (Your custom vars/animations here) */
+
+html, body, #root { height: 100%; }
+body { background: #0b0b0d; color: #f5f5f7; }
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
 }
-```
 
-- **Keyboard targets:** visible focus rings, logical tab order, escape routes for overlays/sheets.
+tailwind.config.ts
 
-## Structure & Licensing
+import type { Config } from "tailwindcss";
+import animate from "tailwindcss-animate";
 
-- **Open core** (MIT or Apache-2.0) at repo root (`/LICENSE`).
-- **Proprietary features** under `/pro/**` (closed source, separate license).
-- **Never commit secrets;** keep configuration minimal and environment-driven.
-
-## CSS Rules
-
-- **Semantic class hooks** (e.g., `.start-gate`, `.hud-card`)—avoid brittle selectors.
-- **Tokenize brand colors** in `:root`; avoid hard-coding values throughout.
-- **Animations are tasteful, time-bounded, and disabled** under reduced motion (CSS first).
-- **Tailwind v4 entry CSS** uses: `@import "tailwindcss";` (no config needed for basics) and the Vite plugin for DX.
-
-## JS/TS Rules
-
-- **Small, focused modules**—no "god" utilities.
-- **Feature toggles:** persist with narrow, namespaced keys (e.g., `perday.sound.enabled`).
-- **Tiny storage helpers** that validate on read:
-
-```typescript
-export const store = {
-  get<T>(k: string, fallback: T): T {
-    try { 
-      const v = localStorage.getItem(k); 
-      return v ? JSON.parse(v) as T : fallback 
-    }
-    catch { 
-      return fallback // fail loud in dev via console
-    }
+export default {
+  darkMode: "class",
+  content: ["./index.html", "./src/**/*.{ts,tsx}"],
+  theme: {
+    extend: {
+      colors: { /* your synth palette */ },
+      // keyframes/animation if you want Tailwind-driven motion
+    },
   },
-  set<T>(k: string, v: T) { 
-    localStorage.setItem(k, JSON.stringify(v)) 
-  }
+  plugins: [animate],
+} satisfies Config;
+
+
+⸻
+
+Ref Forwarding (Radix/shadcn)
+
+Buttons, inputs, etc. must forward refs or Radix will warn and break some behaviors.
+
+import * as React from "react";
+import { Slot } from "@radix-ui/react-slot";
+import { cn } from "@/lib/utils";
+
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  asChild?: boolean;
 }
-```
 
-- If using Zustand persist, be mindful of hydration/SSR quirks.
+export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, asChild = false, ...props }, ref) => {
+    const Comp = asChild ? Slot : "button";
+    return <Comp ref={ref} className={cn("...base classes...", className)} {...props} />;
+  }
+);
+Button.displayName = "Button";
 
-## CI/CD
 
-- **GitHub Actions:** on every push/PR → install, `pnpm test --run`, `pnpm build`.
-- **Main deploys to Netlify.** Production secrets come from CI/host secrets—not the repo.
-- **Block merges** on failing tests/build; require lint and dependency review.
+⸻
 
-**Minimal workflow (example):**
-```yaml
-name: ci
+State & Hydration (Zustand)
+	•	Persist via localforage. Use onRehydrateStorage to toggle _hydrated so the app leaves “Loading…”.
+	•	UI should render a minimal shell immediately; do not block the entire app on hydration.
+
+Test strategy
+	•	For app-level tests, mock the store and set _hydrated: true:
+
+vi.mock('@/store/store', () => ({
+  useAppStore: () => ({
+    session: { state: "PRE_START", readyPressed: false },
+    settings: { /* defaults */ },
+    _hydrated: true,
+    dispatch: vi.fn(),
+    setSettings: vi.fn(),
+  }),
+}));
+
+
+⸻
+
+Test Environment (Vitest)
+	•	Default to jsdom for DOM tests.
+	•	One global setup file with all the platform shims (matchMedia, ResizeObserver, echarts stub, localforage if needed, GSAP mock).
+	•	Stable selectors: prefer data-testid over class names.
+	•	Use fake timers only where deterministic (e.g., countdowns), otherwise waitFor.
+
+vitest.config.ts (example)
+
+import { defineConfig } from 'vitest/config';
+
+export default defineConfig({
+  test: {
+    environment: 'jsdom',
+    setupFiles: ['src/test/setup.ts'],
+    include: ['perday-music/src/**/*.test.ts?(x)'],
+    exclude: ['legacy/**', 'node_modules/**', 'dist/**'],
+  },
+});
+
+src/test/setup.ts essentials
+
+/// <reference types="vitest/globals" />
+import '@testing-library/jest-dom';
+import { vi } from 'vitest';
+
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: vi.fn().mockImplementation((q: string) => ({
+    matches: false, media: q, onchange: null,
+    addListener: vi.fn(), removeListener: vi.fn(),
+    addEventListener: vi.fn(), removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  })),
+});
+
+(globalThis as any).ResizeObserver = vi.fn().mockImplementation(() => ({
+  observe: vi.fn(), unobserve: vi.fn(), disconnect: vi.fn(),
+}));
+
+vi.mock('echarts-for-react', () => ({ default: () => null }));
+
+// Put the GSAP mock from the Motion section here.
+// Optionally mock localforage here if you truly need it for unit tests.
+// Prefer mocking the store instead for app-level tests.
+
+
+⸻
+
+CI / GitHub Actions
+	•	A lockfile is required in CI (package-lock.json if you use npm). Commit it.
+	•	Use npm ci (never npm install) in CI.
+	•	Run selective tests for the app; quarantine legacy:
+	•	Option A: separate workflows
+	•	Option B: two vitest runs with different include globs
+
+Minimal Node workflow
+
+name: CI
 on: [push, pull_request]
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: 20, cache: 'pnpm' }
-      - run: corepack enable
-      - run: pnpm i --frozen-lockfile
-      - run: pnpm test --run
-      - run: pnpm build
-```
+        with:
+          node-version: 20
+          cache: 'npm'
+      - run: npm ci
+      - run: npx vitest --run --silent --include "perday-music/src/**/*.test.ts?(x)"
 
-## Component Contracts (spot checks)
+If you keep legacy tests, run them in a separate job and do not mark them required for merge.
 
-### Start Gate
-- **Required DOM/props:** throws in dev if missing.
-- **Reduced-motion:** shorter/eased-down by default; fully disabled under `prefers-reduced-motion`.
-- **Emits clear events** `onStarted(latencyMs)`, `onDone(result)`; no hidden global coupling.
+⸻
 
-### Notion Sync
-- **Never blocks UI.** Retriable queue (429/backoff). Failure surfaces a clear error UI and a retry button.
+Branch Protection (solo dev)
+	•	✅ Recommended: “Require a pull request before merging” with approvals = 1 (self-approve).
+	•	✅ “Dismiss stale approvals” = on (prevents accidental merges after last-minute changes).
+	•	❌ Status checks required: optional while you’re stabilizing; turn on once CI is green consistently.
 
-### HUD (ECharts)
-- **Disposes on unmount,** renders loading/empty explicitly, and shows a visible error for invalid data.
+⸻
 
-### YouTube Audio
-- **Load IFrame API only after a user gesture;** provide fallback UI if blocked.
+Path Aliases (so imports resolve in CI)
 
-## "Fail Loud" Patterns
+tsconfig.json
 
-- **Render component-local error UIs** for: missing config/env, third-party down, schema mismatches.
-- **Console in dev, toast/banner in prod;** include short cause + suggested action.
-- **Avoid** `try { … } catch { /* noop */ }`. Logged or lifted—never swallowed.
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": { "@/*": ["src/*"] }
+  }
+}
 
-## ARIA & Motion Quick-Refs
+vite.config.ts
 
-- **Tabs roles/keyboard behavior** per APG/MDN.
-- **Motion control** via `@media (prefers-reduced-motion: reduce)`.
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import path from 'path';
 
-## Ready-to-Use Checklists
+export default defineConfig({
+  plugins: [react()],
+  resolve: { alias: { '@': path.resolve(__dirname, './src') } },
+});
 
-### PR checklist
-- [ ] No silent returns for required flows (dev throws; prod error UI).
-- [ ] Tests: deterministic (fake timers, no network); coverage on scoring and Start Gate states.
-- [ ] A11y: roles/labels/keyboard; reduced-motion path verified.
-- [ ] Storage: namespaced keys; schema validated on read.
-- [ ] CI is green; no secrets added/modified in code.
 
-### Failure UI checklist
-- [ ] Message states what failed and why (short).
-- [ ] Action: Retry / Open Settings / View Logs.
-- [ ] Logged in devtools; error object preserved for debugging.
+⸻
+
+Debugging Order-of-Operations (when something breaks)
+	1.	Tailwind: if UI is black/white → ensure @import "tailwindcss"; and correct content globs.
+	2.	Refs: if Radix warns “Function components cannot be given refs” → add forwardRef.
+	3.	Hydration: if app stuck on “Loading…” → ensure _hydrated flips; in tests, mock store with _hydrated: true.
+	4.	Motion: if tests throw tl.fromTo is not a function or killTweensOf not a function → fix the single GSAP mock.
+	5.	Legacy: if CI fails with window is not defined from old suites → exclude legacy tests from the app job.
+	6.	CI npm: if CI says “lock file not found” → commit package-lock.json and use npm ci.
+
+⸻
+
+Anti-patterns we removed → Replacements
+	•	Many animation variants / split-text → One micro-motion, opt-in.
+	•	Multiple scattered mocks → One authoritative setup.ts.
+	•	Blocking hydration gates → Immediate shell + non-blocking hydration; tests can force hydrated store.
+	•	Function components with refs → React.forwardRef.
+	•	Flaky class-based queries → data-testid selectors.
+
+⸻
+
+Example Snippets
+
+PerdayLogo (micro-motion with guards)
+
+useGSAP(() => {
+  if (import.meta.env.VITEST || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+  const tl = gsap.timeline();
+  tl.fromTo(logoRef.current, { opacity: 0, y: -30, scale: 0.9 }, { opacity: 1, y: 0, scale: 1, duration: 0.6 });
+}, { scope: logoRef, dependencies: [] });
+
+usePrestart (countdown shape)
+
+export function usePrestart(totalMs = 7 * 60_000) {
+  const [msLeft, setMsLeft] = useState(totalMs);
+  const [sealed, setSealed] = useState(false);
+  const tlRef = useRef<gsap.core.Tween | null>(null);
+
+  useEffect(() => {
+    const obj = { v: totalMs };
+    tlRef.current?.kill();
+    tlRef.current = gsap.to(obj, {
+      v: 0, duration: totalMs / 1000, ease: "none",
+      onUpdate: () => setMsLeft(obj.v),
+      onComplete: () => setSealed(true),
+    });
+    return () => tlRef.current?.kill();
+  }, [totalMs]);
+
+  const mmss = useMemo(() => {
+    const s = Math.max(0, Math.ceil(msLeft / 1000));
+    return `${String(Math.floor(s/60)).padStart(2, '0')}:${String(s%60).padStart(2, '0')}`;
+  }, [msLeft]);
+
+  return { msLeft, mmss, sealed };
+}
+
+
+⸻
+
+Security Guidelines
+
+Authentication & Session Management
+	•	Never simulate login in production code. Use real OAuth providers (Supabase, NextAuth) or secure Netlify Functions.
+	•	Store session tokens in HttpOnly cookies, not localStorage. This prevents XSS-based token theft.
+	•	Implement proper CSRF protection for forms and API calls.
+	•	Rate limit authentication endpoints to prevent brute force attacks.
+
+Data Sanitization & Rendering
+	•	Never use dangerouslySetInnerHTML with user data unless sanitized with DOMPurify.
+	•	React automatically escapes text content - leverage this instead of raw HTML.
+	•	Validate and sanitize all user inputs before processing or storing.
+	•	Cap input sizes and implement proper parsing for user-generated content.
+
+Content Security Policy (CSP)
+	•	Use moderate CSP headers that allow inline styles but lock down scripts.
+	•	Whitelist only necessary external domains (YouTube for iframe API, Supabase for API calls).
+	•	Block frame-ancestors to prevent clickjacking attacks.
+	•	Enable HSTS, X-Content-Type-Options, and other security headers.
+
+API Security
+	•	Never expose service role keys or secrets in client-side code.
+	•	Use environment variables for sensitive configuration.
+	•	Implement proper CORS policies - allow only your origin, not wildcards.
+	•	Validate all API inputs server-side, even if client-side validation exists.
+
+Storage Security
+	•	localStorage is readable by any script - store only non-sensitive data.
+	•	Implement size caps for user-generated content (notes, uploads).
+	•	Use secure, signed URLs for private file access.
+	•	Prefer server-side storage for sensitive user data.
+
+Dependency Security
+	•	Run npm audit monthly to check for known vulnerabilities.
+	•	Keep React, Vite, GSAP, and other dependencies updated.
+	•	Use package-lock.json in CI to ensure consistent dependency versions.
+	•	Monitor security advisories for critical dependencies.
+
+⸻
+
+Legacy Quarantine Policy
+	•	Keep legacy code/tests under legacy/** (or the existing legacy folder).
+	•	CI for the app must ignore legacy. You can run legacy in a separate, non-required workflow.
+
+⸻
+
+When you need to dig via git
+	•	Use git bisect on app tests only to pinpoint regressions.
+	•	If the culprit is broad, trial-restore one file from the last good commit on a scratch branch (git restore --source=<good> -- <path>). If it helps, keep; if not, undo with git restore --source=HEAD -- <path>.
