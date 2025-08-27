@@ -12,12 +12,6 @@ interface VillainMessage {
   isTyping?: boolean;
 }
 
-interface VillainEventData {
-  msg?: string;
-  text?: string;
-  type?: string;
-}
-
 type FxType = 'announce' | 'confetti' | 'toast' | 'villain-nudge';
 
 type FxPayload =
@@ -38,9 +32,11 @@ export default function VillainDisplay() {
       if (type === 'villain-nudge' || type === 'announce' || type === 'toast') {
         const newMessage: VillainMessage = {
           id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-          text: (data as any)?.msg || (data as any)?.text || 'Villain speaks!',
-          type: type === 'villain-nudge' ? 'villain-nudge' : 
-                type === 'toast' ? (data.type || 'info') : 'info',
+          text: (data as FxPayload & { msg?: string; text?: string })?.msg ||
+                (data as FxPayload & { msg?: string; text?: string })?.text ||
+                'Villain speaks!',
+          type: type === 'villain-nudge' ? 'villain-nudge' :
+                type === 'toast' ? ((data as FxPayload & { type?: 'success' | 'error' | 'info' })?.type || 'info') : 'info',
           timestamp: Date.now(),
           isTyping: type === 'villain-nudge' // Only typewriter for villain messages
         };
