@@ -38,6 +38,14 @@ dist-ssr
 **/special-sauce/**
 **/private/**
 
+# Camp logic and proprietary features
+**/camps/**
+**/camp-logic/**
+**/instant-camps/**
+**/collaboration-features/**
+**/secret-features/**
+**/proprietary-features/**
+
 # AI/ML models and data
 *.pkl
 *.h5

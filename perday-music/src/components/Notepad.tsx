@@ -66,8 +66,8 @@ const Notepad = forwardRef<{ open: () => void }, {}>((_, ref) => {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 w-80 h-96 bg-black/90 border border-cyan-400/50 rounded-xl shadow-lg shadow-cyan-400/30">
-      <div className="flex items-center justify-between p-4 border-b border-cyan-400/30">
+    <div className="fixed bottom-6 right-6 z-50 w-80 h-96 backdrop-blur-xl border border-white/20 rounded-xl shadow-2xl shadow-black/50 bg-white/10">
+      <div className="flex items-center justify-between p-4 border-b border-white/20">
         <div className="flex items-center gap-2">
           <FileText className="w-5 h-5 text-cyan-300" />
           <span className="text-cyan-300 font-semibold">Notepad</span>
@@ -108,14 +108,14 @@ const Notepad = forwardRef<{ open: () => void }, {}>((_, ref) => {
         )}
       </div>
 
-      <div className="p-4 border-t border-cyan-400/30">
+      <div className="p-4 border-t border-white/20">
         <div className="flex gap-2">
           <textarea
             value={currentNote}
             onChange={(e) => setCurrentNote(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder="Write your ideas here..."
-            className="flex-1 bg-white/10 border border-cyan-400/30 rounded-lg px-3 py-2 text-white placeholder:text-white/50 text-sm resize-none"
+            className="flex-1 bg-black/80 border border-white/20 rounded-lg px-3 py-2 text-white placeholder:text-white/50 text-sm resize-none"
             rows={2}
           />
           <button

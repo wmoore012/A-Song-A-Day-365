@@ -133,9 +133,9 @@ export default function GlassNavigationDock() {
               <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl scale-110"></div>
             </button>
 
-            {/* Music Options Popup */}
-            {showMusicOptions && (
-              <div className="absolute bottom-full left-0 mb-2 p-3 bg-black/90 backdrop-blur-xl border border-purple-400/50 rounded-xl shadow-2xl">
+                    {/* Music Options Popup */}
+        {showMusicOptions && (
+          <div className="absolute bottom-full left-0 mb-2 p-3 bg-black/90 backdrop-blur-xl border border-purple-400/50 rounded-xl shadow-2xl z-30">
                 <div className="space-y-2">
                   <button
                     onClick={() => {

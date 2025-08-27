@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAppStore } from '../store/store';
 import { useDemoMode } from '../hooks/useDemoMode';
 import { Button } from './ui/button';
@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from './ui/sheet';
 import LockInTips from './LockInTips';
 import HeatButtons from './HeatButtons';
+import GlassPanel from './common/GlassPanel';
 import { 
   Play, 
   Target, 
@@ -16,14 +17,24 @@ import {
   Plus,
   BarChart3,
   Users,
-  Zap
+  Zap,
+  Volume2
 } from 'lucide-react';
 
 export default function Dashboard() {
-  const { dispatch } = useAppStore();
+  const { dispatch, settings, setSettings } = useAppStore();
   const { getData } = useDemoMode();
   const [showCommunity, setShowCommunity] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
+  const [showSoundPrompt, setShowSoundPrompt] = useState(false);
+
+  // Show sound prompt on first visit
+  useEffect(() => {
+    const hasSeenSoundPrompt = localStorage.getItem('hasSeenSoundPrompt');
+    if (!hasSeenSoundPrompt && !settings.soundEnabled) {
+      setShowSoundPrompt(true);
+    }
+  }, [settings.soundEnabled]);
 
   // Get data based on demo mode
   const data = getData();
@@ -56,6 +67,45 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-black text-white p-6">
       <LockInTips />
+      
+      {/* Sound Enable Prompt */}
+      {showSoundPrompt && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xl flex items-center justify-center p-4">
+          <GlassPanel className="max-w-md w-full p-8 text-center">
+            <div className="mb-6">
+              <Volume2 className="w-16 h-16 text-cyan-300 mx-auto mb-4" />
+              <h2 className="text-2xl font-bold text-white mb-2">Enable Sound?</h2>
+              <p className="text-cyan-200/80">
+                Get the full experience with background music and audio feedback
+              </p>
+            </div>
+            <div className="space-y-3">
+              <Button
+                onClick={() => {
+                  setSettings({ ...settings, soundEnabled: true });
+                  localStorage.setItem('hasSeenSoundPrompt', 'true');
+                  setShowSoundPrompt(false);
+                }}
+                className="w-full bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500"
+              >
+                <Volume2 className="w-4 h-4 mr-2" />
+                Enable Sound
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setSettings({ ...settings, soundEnabled: false });
+                  localStorage.setItem('hasSeenSoundPrompt', 'true');
+                  setShowSoundPrompt(false);
+                }}
+                className="w-full border-cyan-400/50 text-cyan-300 hover:bg-cyan-400/20"
+              >
+                Proceed with no sound
+              </Button>
+            </div>
+          </GlassPanel>
+        </div>
+      )}
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center justify-between">

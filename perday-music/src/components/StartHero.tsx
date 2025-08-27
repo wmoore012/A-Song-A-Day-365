@@ -3,7 +3,7 @@ import { FlowState, type Settings as AppSettings } from "../types";
 import { useAppStore } from "../store/store";
 import { usePrestart } from "../hooks/usePrestart";
 import { useVillainAnnounce } from "../hooks/useVillainAnnounce";
-
+import confetti from 'canvas-confetti';
 
 import AtomOrbit from "./AtomOrbit";
 import MultiplierBar from "./MultiplierBar";
@@ -27,8 +27,9 @@ export default function StartHero({ fadeOutRef }: StartHeroProps) {
   const { session, dispatch, settings, setSettings } = useAppStore();
   const { villainNudge } = useVillainAnnounce();
 
-  // --- Prestart countdown (7 min default)
-  const { mmss, sealed, tapReady } = usePrestart(7 * 60_000);
+  // --- Prestart countdown (7 min default) - MANUAL START
+  const [timerStarted, setTimerStarted] = useState(false);
+  const { mmss, sealed, tapReady } = usePrestart(timerStarted ? 7 * 60_000 : 0);
 
   // --- UI state
   const [overlay, setOverlay] = useState<Overlay>("none");
@@ -56,6 +57,18 @@ export default function StartHero({ fadeOutRef }: StartHeroProps) {
   }, [session.readyPressed]);
 
   // --- Events
+  const onStartTimer = () => {
+    setTimerStarted(true);
+    villainNudge("Timer started! Now power up your multiplier!");
+    
+    // Throw confetti for starting the challenge!
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 }
+    });
+  };
+
   const onReady = () => {
     if (session.readyPressed) return; // idempotent
     dispatch({ type: "READY" });
@@ -122,43 +135,59 @@ export default function StartHero({ fadeOutRef }: StartHeroProps) {
               Ready the sooner you start the higher your multiplier
             </div>
 
-            <div className={`text-8xl font-black tabular-nums mb-8 font-mono ${sealed ? "text-amber-300" : "text-white"}`}>
-              {mmss}
-            </div>
+            {!timerStarted ? (
+              <div className="space-y-6">
+                <div className="text-8xl font-black tabular-nums mb-8 font-mono text-white">07:00</div>
+                <Button
+                  size="lg"
+                  className="w-full h-12 text-base font-semibold bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-white rounded-2xl"
+                  onClick={onStartTimer}
+                >
+                  🎯 Start 7-Minute Timer
+                </Button>
+                <div className="text-sm text-cyan-200/70">
+                  Take the challenge! One step closer to making a beat a day!
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className={`text-8xl font-black tabular-nums mb-8 font-mono ${sealed ? "text-amber-300" : "text-white"}`}>
+                  {mmss}
+                </div>
 
-            <div className="mb-6">
-              <MultiplierBar multiplier={multiplier} />
-            </div>
+                <div className="mb-6">
+                  <MultiplierBar multiplier={multiplier} />
+                </div>
 
+                <div className="space-y-3 mt-4">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        size="lg"
+                        className="w-full h-12 text-base font-semibold bg-gradient-to-r from-magenta-500 via-cyan-400 to-purple-600 text-white rounded-2xl"
+                        onClick={onReady}
+                        disabled={session.readyPressed}
+                      >
+                        ⚡ Ready — Celebrate the first step
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent><p>Locks your multiplier before T-0</p></TooltipContent>
+                  </Tooltip>
 
-
-            <div className="space-y-3 mt-4">
-              <Tooltip>
-                <TooltipTrigger asChild>
                   <Button
-                    size="lg"
-                    className="w-full h-12 text-base font-semibold bg-gradient-to-r from-magenta-500 via-cyan-400 to-purple-600 text-white rounded-2xl"
-                    onClick={onReady}
-                    disabled={session.readyPressed}
+                    variant="outline"
+                    className="w-full h-12 border-cyan-400/60 text-cyan-300 rounded-2xl"
+                    onClick={onSkipPrestart}
                   >
-                    ⚡ Ready — Celebrate the first step
+                    🚀 Start Now (Skip Pre-Start)
                   </Button>
-                </TooltipTrigger>
-                <TooltipContent><p>Locks your multiplier before T-0</p></TooltipContent>
-              </Tooltip>
-
-              <Button
-                variant="outline"
-                className="w-full h-12 border-cyan-400/60 text-cyan-300 rounded-2xl"
-                onClick={onSkipPrestart}
-              >
-                🚀 Start Now (Skip Pre-Start)
-              </Button>
-            </div>
+                </div>
+              </>
+            )}
 
             {session.readyPressed && (
-              <div className="mt-6 text-amber-300 text-sm font-medium">
-                ✅ Ready locked. Multiplier boosted.
+              <div className="mt-6 text-amber-300 text-sm font-medium animate-pulse">
+                🎉 Congratulations! You took the first step! Multiplier locked and boosted! 🚀
               </div>
             )}
           </GlassPanel>

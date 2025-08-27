@@ -45,6 +45,11 @@ vi.mock('../features/fx/useVillainAnnounce', () => ({
 
 // GSAP is mocked globally in setup.ts - no need for local mock
 
+// Mock confetti to avoid canvas errors in tests
+vi.mock('canvas-confetti', () => ({
+  default: vi.fn(),
+}));
+
 describe('StartHero → audio fade on Ready (integration smoke)', () => {
   let fadeSpy: ReturnType<typeof vi.fn>;
 
@@ -57,11 +62,14 @@ describe('StartHero → audio fade on Ready (integration smoke)', () => {
 
     render(<StartHero fadeOutRef={fadeOutRef as React.MutableRefObject<() => void>} />);
 
-    // We don't assert every pixel — just the critical path: the Ready button exists…
+    // First, click the Start Timer button
+    const startTimerBtn = await screen.findByRole('button', { name: /start 7-minute timer/i });
+    expect(startTimerBtn).toBeInTheDocument();
+    fireEvent.click(startTimerBtn);
+
+    // Then find and click the Ready button
     const readyBtn = await screen.findByRole('button', { name: /ready/i });
     expect(readyBtn).toBeInTheDocument();
-
-    // …and clicking it triggers audio fade (our micro-celebration kick-off)
     fireEvent.click(readyBtn);
 
     expect(fadeSpy).toHaveBeenCalledTimes(1);
