@@ -212,7 +212,7 @@ function WelcomeScreen() {
               <div className="space-y-6">
           <div className="space-y-4">
             <h1 className="text-5xl md:text-7xl font-black leading-tight">
-              We Help You Make <span className="underline">1</span> Beat Per Day
+              We Help You Make <span className="underline">X</span> Beats Per Day
             </h1>
           </div>
         <p className="text-xl text-cyan-300/80 max-w-3xl mx-auto">
