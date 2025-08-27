@@ -29,8 +29,9 @@ describe('App', () => {
     expect(screen.getByTestId('app-main')).toBeInTheDocument();
   });
 
-  it('shows WelcomeScreen initially', () => {
+  it('shows LandingPage for new users', () => {
     render(<App />);
-    expect(screen.getByText(/Get locked in/)).toBeInTheDocument();
+    expect(screen.getByText(/PERDAY/)).toBeInTheDocument();
+    expect(screen.getByText(/Stop procrastinating/)).toBeInTheDocument();
   });
 });
