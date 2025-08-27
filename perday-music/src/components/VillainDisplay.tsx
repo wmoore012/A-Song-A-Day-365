@@ -12,6 +12,12 @@ interface VillainMessage {
   isTyping?: boolean;
 }
 
+interface VillainEventData {
+  msg?: string;
+  text?: string;
+  type?: string;
+}
+
 export default function VillainDisplay() {
   const [messages, setMessages] = useState<VillainMessage[]>([]);
   const [devilHeads, setDevilHeads] = useState<Array<{ id: string; x: number; y: number }>>([]);
@@ -21,7 +27,7 @@ export default function VillainDisplay() {
 
   useEffect(() => {
     // Subscribe to villain events
-    const unsubscribe = _fxSubscribe((type: string, data: any) => {
+    const unsubscribe = _fxSubscribe((type: string, data: VillainEventData) => {
       if (type === 'villain-nudge' || type === 'announce' || type === 'toast') {
         const newMessage: VillainMessage = {
           id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,

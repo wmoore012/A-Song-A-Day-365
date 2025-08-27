@@ -53,7 +53,7 @@ function EventbriteEmbed({ eventId }: { eventId: string }) {
     }
 
     function render() {
-      const w = (window as any).EBWidgets;
+      const w = (window as Window & { EBWidgets?: { createWidget: (config: unknown) => void } }).EBWidgets;
       if (!w) return;
       w.createWidget({
         widgetType: "checkout",

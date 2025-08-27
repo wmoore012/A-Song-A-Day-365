@@ -57,7 +57,9 @@ async function createPlayer(container: HTMLElement, videoId: string, { autoplay,
         try {
           ev.target.setVolume(15);
           if (autoplay) ev.target.playVideo();
-        } catch { /* ignore */ }
+        } catch (error) {
+    console.warn('Audio operation failed:', error);
+  }
       },
       onError: () => { /* toast or telemetry if you want */ },
     },
@@ -77,15 +79,12 @@ function fadeVolume(player: YTPlayer | null | undefined, to: number, ms = 600) {
       else if (to === 0) player.pauseVideo?.();
     };
     requestAnimationFrame(step);
-  } catch { /* ignore */ }
-}
-
-declare global {
-  interface Window {
-    YT?: { Player: new (el: HTMLElement, cfg: any) => YTPlayer };
-    onYouTubeIframeAPIReady?: () => void;
+  } catch (error) {
+    console.warn('Audio operation failed:', error);
   }
 }
+
+// YT types declared in src/types/youtube.d.ts
 
 export default function AudioHud({ fadeOutRef }: { fadeOutRef: React.MutableRefObject<() => void> }) {
   const [armed, setArmed] = useState(false);
@@ -117,13 +116,19 @@ export default function AudioHud({ fadeOutRef }: { fadeOutRef: React.MutableRefO
           noise.current = await createPlayer(noiseRef.current, "xdJ58r0k340", { autoplay: 0, loop: 1 });
           if (cancelled) noise.current?.destroy?.();
         }
-      } catch { /* ignore */ }
+      } catch (error) {
+    console.warn('Audio operation failed:', error);
+  }
     })();
 
     return () => {
       cancelled = true;
-      try { music.current?.destroy?.(); } catch {}
-      try { noise.current?.destroy?.(); } catch {}
+      try { music.current?.destroy?.(); } catch (error) {
+        console.warn('Music player cleanup failed:', error);
+      }
+      try { noise.current?.destroy?.(); } catch (error) {
+        console.warn('Noise player cleanup failed:', error);
+      }
       music.current = null;
       noise.current = null;
     };
@@ -149,7 +154,9 @@ export default function AudioHud({ fadeOutRef }: { fadeOutRef: React.MutableRefO
                 const s = music.current?.getPlayerState?.();
                 if (s === 1) music.current?.pauseVideo?.();
                 else music.current?.playVideo?.();
-              } catch {}
+              } catch (error) {
+                console.warn('Player control failed:', error);
+              }
             }}
             aria-label="Toggle Music"
             title="Toggle Music"
@@ -164,7 +171,9 @@ export default function AudioHud({ fadeOutRef }: { fadeOutRef: React.MutableRefO
                 const s = noise.current?.getPlayerState?.();
                 if (s === 1) noise.current?.pauseVideo?.();
                 else noise.current?.playVideo?.();
-              } catch {}
+              } catch (error) {
+                console.warn('Player control failed:', error);
+              }
             }}
             aria-label="Toggle White Noise"
             title="Toggle White Noise"
