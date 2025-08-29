@@ -10,6 +10,10 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        'sports': ['Oswald', 'sans-serif'],
+        'permanent-marker': ['Permanent Marker', 'cursive'],
+      },
       colors: {
         synth: {
           white: '#ffffff',

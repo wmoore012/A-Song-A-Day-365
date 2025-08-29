@@ -5,11 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:oauth": "vite --mode oauth",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest --run",
-    "test:ui": "vitest --ui"
+    "test:ui": "vitest --ui",
+    "oauth-urls": "node -e \"console.log('📋 Copy these OAuth URLs to Google Cloud Console:\\n\\n🔗 Authorized JavaScript origins:\\n  https://your-project-id.supabase.co\\n  http://localhost:5173\\n  http://localhost:5174\\n  http://localhost:5175\\n  http://localhost:5176\\n  http://localhost:5177\\n\\n🔄 Authorized redirect URIs:\\n  https://your-project-id.supabase.co/auth/v1/callback\\n  http://localhost:5173/dashboard\\n  http://localhost:5174/dashboard\\n  http://localhost:5175/dashboard\\n  http://localhost:5176/dashboard\\n  http://localhost:5177/dashboard\\n\\n💡 When you run npm run dev, use the port shown in the output!')\""
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
@@ -27,6 +29,7 @@
     "@radix-ui/react-slot": "^1.2.3",
     "@radix-ui/react-switch": "^1.2.6",
     "@radix-ui/react-tooltip": "^1.2.8",
+    "@supabase/supabase-js": "^2.56.0",
     "@types/react-router-dom": "^5.3.3",
     "canvas-confetti": "^1.9.3",
     "class-variance-authority": "^0.7.1",

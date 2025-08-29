@@ -10,11 +10,9 @@ import { Clock, Zap, Users, ExternalLink } from "lucide-react";
 
 export default function LandingPage() {
   const { dispatch } = useAppStore();
-  const { isDemoMode } = useDemoMode();
+  const { enableDemoMode, isDemoMode } = useDemoMode();
 
   const handleTryDemo = () => {
-    // Use the store's enableDemoMode method instead of dispatching
-    const { enableDemoMode } = useDemoMode();
     enableDemoMode();
     dispatch({ type: "GO_TO_DASHBOARD" });
   };

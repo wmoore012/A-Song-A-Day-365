@@ -1,38 +1,62 @@
+// src/AppRouter.tsx
+import { BrowserRouter, Routes, Route, Link, useNavigate } from 'react-router-dom';
+import LandingPage from './components/LandingPage';
+import Dashboard from './components/Dashboard';
+import FeaturesPage from './components/FeaturesPage';
+import DemoRibbon from './components/DemoRibbon';
+import { useDemoMode } from './hooks/useDemoMode';
 
-import { useAppStore } from "./store/store";
-import { FlowState } from "./types";
-import { useRef, useState, useEffect } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import DashboardLayout from "./components/DashboardLayout";
-import ShaderBackground from "./components/ShaderBackground";
-import DemoModeToggle from "./components/DemoModeToggle";
-import UserQuestionnaire from "./components/UserQuestionnaire";
-import StartHero from "./components/StartHero";
-import LockInMenu from "./components/LockInMenu";
-import FocusSetup from "./components/FocusSetup";
-import FocusRunning from "./components/FocusRunning";
-import ScrollDemoPage from "./components/ScrollDemoPage";
-import SessionCompletion from "./components/SessionCompletion";
-import VillainDisplay from "./components/VillainDisplay";
-import Dashboard from "./components/Dashboard";
-import LandingPage from "./components/LandingPage";
-import FeaturesPage from "./components/FeaturesPage";
-import { AnalyticsHud } from "./components/common/AnalyticsHud";
-import AudioHud from "./components/common/AudioHud";
-import { usePrestart } from "./hooks/usePrestart";
-import { useStartupScript } from "./hooks/useStartupScript";
-import { enableDemoFromQuery } from "./utils/demoMode";
+import { useAppStore } from './store/store';
+import { FlowState } from './types';
+import { useRef, useState, useEffect } from 'react';
+import DashboardLayout from './components/DashboardLayout';
+import ShaderBackground from './components/ShaderBackground';
+import DemoModeToggle from './components/DemoModeToggle';
+import UserQuestionnaire from './components/UserQuestionnaire';
+import StartHero from './components/StartHero';
+import LockInMenu from './components/LockInMenu';
+import FocusSetup from './components/FocusSetup';
+import FocusRunning from './components/FocusRunning';
+import ScrollDemoPage from './components/ScrollDemoPage';
+import SessionCompletion from './components/SessionCompletion';
+import VillainDisplay from './components/VillainDisplay';
+import { AnalyticsHud } from './components/common/AnalyticsHud';
+import AudioHud from './components/common/AudioHud';
+import { usePrestart } from './hooks/usePrestart';
+import { useStartupScript } from './hooks/useStartupScript';
+import { enableDemoFromQuery } from './utils/demoMode';
 
-// Main App Component with Routing
-export default function App() {
+function TopNav() {
+  const nav = useNavigate();
+  const { dispatch } = useAppStore();
+  
   return (
-    <BrowserRouter>
-      <AppContent />
-    </BrowserRouter>
+    <header className="fixed top-0 inset-x-0 z-50 bg-black/40 backdrop-blur border-b border-white/10">
+      <div className="max-w-7xl mx-auto px-4 py-3 flex items-center gap-4">
+        <Link to="/" className="font-black text-white hover:text-cyan-300">PERDAY</Link>
+        <nav className="flex items-center gap-4 text-white/70">
+          <Link to="/features" className="hover:text-white">Features</Link>
+          <Link to="/dashboard" className="hover:text-white">Dashboard</Link>
+          <button 
+            onClick={() => dispatch({ type: "SCROLL_DEMO" })}
+            className="hover:text-white"
+          >
+            Demo
+          </button>
+          <button onClick={() => nav(-1)} className="text-sm hover:text-white">← Back</button>
+          <button onClick={() => nav(1)} className="text-sm hover:text-white">Forward →</button>
+        </nav>
+        <div className="ml-auto">
+          <Link to="/recruiter" className="text-cyan-300 hover:text-cyan-200 underline">
+            60-sec tour
+          </Link>
+        </div>
+      </div>
+    </header>
   );
 }
 
-// App Content Component (existing logic)
+// App Content Component (existing logic from App.tsx)
 function AppContent() {
   const { session, dispatch, settings } = useAppStore();
   const fadeOutRef = useRef<() => void>(() => {});
@@ -154,6 +178,11 @@ function AppContent() {
             </DashboardLayout>
           ) : null
         } />
+
+        {/* Additional Routes */}
+        <Route path="/recruiter" element={<div className="p-8 text-white">Recruiter tour coming soon</div>} />
+        <Route path="/login" element={<div className="p-8 text-white">Login</div>} />
+        <Route path="/signup" element={<div className="p-8 text-white">Sign up</div>} />
       </Routes>
       
       {/* Fallback - always show something */}
@@ -291,5 +320,24 @@ function PreparationPhase({ onComplete }: { onComplete: () => void }) {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function AppRouter() {
+  const { isDemoMode, enableDemoMode } = useDemoMode();
+
+  // Auto-enable demo on preview deploys (set VITE_IS_PREVIEW=true in preview env)
+  if (import.meta.env.VITE_IS_PREVIEW && !isDemoMode) {
+    enableDemoMode();
+  }
+
+  return (
+    <BrowserRouter>
+      <TopNav />
+      <main className="pt-16">
+        <AppContent />
+      </main>
+      <DemoRibbon />
+    </BrowserRouter>
   );
 }

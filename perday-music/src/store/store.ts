@@ -31,6 +31,7 @@ type AppState = {
   // Demo methods
   enableDemoMode: () => void;
   disableDemoMode: () => void;
+  resetDemoData: () => void;
   
   // Prestart methods
   setPhase: (phase: string) => void;
@@ -61,7 +62,7 @@ export const useAppStore = create<AppState>()(
       _hydrated: false,
       
       // Demo mode
-      isDemoMode: false,
+      isDemoMode: true,
       
       // Prestart properties
       prestartTotalMs: 7 * 60 * 1000, // 7 minutes default
@@ -102,6 +103,14 @@ export const useAppStore = create<AppState>()(
       // Demo methods
       enableDemoMode: () => set({ isDemoMode: true }),
       disableDemoMode: () => set({ isDemoMode: false }),
+      resetDemoData: () => set({
+        session: { state: FlowState.DASHBOARD, readyPressed: false, multiplierPenalty: false, preparationStartTime: undefined },
+        grades: [],
+        latencies: [],
+        streak: 0,
+        freezes: 0,
+        inventory: []
+      }),
       
       // Prestart methods
       setPhase: (phase) => set({ phase }),

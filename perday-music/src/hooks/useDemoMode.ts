@@ -35,6 +35,7 @@ export const useDemoMode = () => {
     isDemoMode,
     enableDemoMode: store.enableDemoMode,
     disableDemoMode: store.disableDemoMode,
+    resetDemoData: store.resetDemoData,
     getData,
     // Direct access to store methods
     dispatch: store.dispatch,
