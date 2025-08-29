@@ -9,18 +9,21 @@ import LockInTips from './LockInTips';
 import HeatButtons from './HeatButtons';
 import TimerWidget from './TimerWidget';
 import SessionTimerDock from './SessionTimerDock';
-import { 
-  Play, 
-  Target, 
-  Clock, 
-  Trophy, 
-  TrendingUp, 
+import InviteCollaboratorSheet from './InviteCollaboratorSheet';
+import {
+  Play,
+  Target,
+  Clock,
+  Trophy,
+  TrendingUp,
   Music,
   Plus,
   BarChart3,
   Users,
+  UserPlus,
   Zap,
-  Volume2
+  Volume2,
+  Settings
 } from 'lucide-react';
 
 export default function Dashboard() {
@@ -29,6 +32,8 @@ export default function Dashboard() {
   const [showCommunity, setShowCommunity] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
   const [showSoundPrompt, setShowSoundPrompt] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [showInvite, setShowInvite] = useState(false);
 
   // Show sound prompt on first visit
   useEffect(() => {
@@ -63,7 +68,9 @@ export default function Dashboard() {
   const quickActions = [
     { title: "Start Focus Session", icon: Play, action: () => dispatch({ type: "START_QUESTIONNAIRE" }) },
     { title: "View Analytics", icon: BarChart3, action: () => setShowAnalytics(true) },
-    { title: "Community", icon: Users, action: () => setShowCommunity(true) }
+    { title: "Invite Collaborator", icon: UserPlus, action: () => setShowInvite(true) },
+    { title: "Community", icon: Users, action: () => setShowCommunity(true) },
+    { title: "Settings", icon: Settings, action: () => setShowSettings(true) }
   ];
 
   return (
@@ -374,7 +381,36 @@ export default function Dashboard() {
         </SheetContent>
       </Sheet>
 
+      {/* Settings Sheet */}
+      <Sheet open={showSettings} onOpenChange={setShowSettings}>
+        <SheetContent className="bg-black/95 border-cyan-400/30 text-white w-[400px]">
+          <SheetHeader>
+            <SheetTitle className="text-cyan-300">Settings</SheetTitle>
+            <SheetDescription className="text-white/60">
+              Customize your experience
+            </SheetDescription>
+          </SheetHeader>
+          <div className="mt-6 space-y-4">
+            <div className="p-4 bg-white/5 rounded-lg border border-cyan-400/20">
+              <h3 className="font-semibold text-cyan-300 mb-2">Audio</h3>
+              <p className="text-white/70 text-sm">Volume and playlist settings</p>
+            </div>
+            <div className="p-4 bg-white/5 rounded-lg border border-purple-400/20">
+              <h3 className="font-semibold text-purple-300 mb-2">Notifications</h3>
+              <p className="text-white/70 text-sm">Villain and community alerts</p>
+            </div>
+            <Button 
+              onClick={() => dispatch({ type: "RESET" })}
+              className="w-full bg-red-600 hover:bg-red-700"
+            >
+              Reset App
+            </Button>
+          </div>
+        </SheetContent>
+      </Sheet>
 
+      {/* Invite Collaborator Sheet */}
+      <InviteCollaboratorSheet open={showInvite} onOpenChange={setShowInvite} />
     </div>
   );
 }

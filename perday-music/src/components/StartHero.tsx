@@ -8,6 +8,7 @@ import { gsap } from "gsap";
 
 import AtomOrbit from "./AtomOrbit";
 import MultiplierBar from "./MultiplierBar";
+import SettingsSheet, { type SettingsData } from "./SettingsSheet";
 import { Button } from "./ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Tooltip, TooltipTrigger, TooltipContent } from "./ui/tooltip";
@@ -135,6 +136,14 @@ export default function StartHero({ fadeOutRef }: StartHeroProps) {
 
           {/* Top-right controls */}
           <div className="absolute top-6 right-6 z-20 flex items-center gap-3">
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-cyan-400/40 text-cyan-300 hover:bg-cyan-400/20"
+              onClick={() => setOverlay("setup")}
+            >
+              <SettingsIcon className="w-4 h-4" />
+            </Button>
             <Avatar className="h-10 w-10 border-2 border-cyan-400/40">
               <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${avatarSeed}`} />
               <AvatarFallback className="bg-gradient-to-r from-magenta-500 to-cyan-400 text-white font-bold">
@@ -233,6 +242,22 @@ export default function StartHero({ fadeOutRef }: StartHeroProps) {
                 />
               </div>
             </div>
+          )}
+
+          {overlay === "setup" && (
+            <SettingsSheet
+              open={overlay === "setup"}
+              onOpenChange={(open) => setOverlay(open ? "setup" : "none")}
+              currentSettings={{
+                ...settings,
+                celebration: settings.celebration ?? "none",
+              } as SettingsData}
+              onSave={(s: SettingsData) => setSettings(s)}
+              onResetAll={() => {
+                setSettings({}); // Assuming setSettings handles reset
+                toast.success("Reset complete. Clean slate. 🔁");
+              }}
+            />
           )}
         </div>
       );

@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "../ui/sheet";
+import {
+  DockSheet,
+  DockSheetContent,
+  DockSheetDescription,
+  DockSheetHeader,
+  DockSheetTitle,
+} from "../ui/dock-sheet";
 
 import { ExternalLink } from "lucide-react";
 
@@ -11,14 +17,14 @@ export default function CampsSheet({ open, onOpenChange }: Props) {
   const [tab, setTab] = useState<"eventbrite" | "cal" | "focusmate">("eventbrite");
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="bg-black/95 border-cyan-400/30 text-white w-[720px]">
-        <SheetHeader>
-          <SheetTitle className="text-cyan-300">Camps</SheetTitle>
-          <SheetDescription className="text-white/60">
+    <DockSheet open={open} onOpenChange={onOpenChange}>
+      <DockSheetContent className="bg-black/95 border-cyan-400/30 text-white w-[720px]">
+        <DockSheetHeader>
+          <DockSheetTitle className="text-cyan-300">Camps</DockSheetTitle>
+          <DockSheetDescription className="text-white/60">
             3-day commitments where everyone cooks together. Pick an embed to start scheduling now.
-          </SheetDescription>
-        </SheetHeader>
+          </DockSheetDescription>
+        </DockSheetHeader>
 
         <div className="mt-6">
           <div className="flex gap-2 mb-4">
@@ -31,8 +37,8 @@ export default function CampsSheet({ open, onOpenChange }: Props) {
           {tab === "cal" && <CalComEmbed url={import.meta.env.VITE_CAL_URL || "https://cal.com/yourteam/camp"} />}
           {tab === "focusmate" && <FocusmateBlurb />}
         </div>
-      </SheetContent>
-    </Sheet>
+      </DockSheetContent>
+    </DockSheet>
   );
 }
 

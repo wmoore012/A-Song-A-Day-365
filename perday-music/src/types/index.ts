@@ -87,6 +87,7 @@ export interface Settings {
   userName?: string;
   collaborators?: string;
   defaultPlaylist?: string;
+  celebration?: 'confetti' | 'fireworks' | 'none';
 }
 
 export class InvalidTransition extends Error {

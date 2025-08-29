@@ -52,7 +52,8 @@ export const useAppStore = create<AppState>()(
         accountabilityEmail: '',
         userName: '',
         collaborators: '',
-        defaultPlaylist: 'PLl-ShioB5kapLuMhLMqdyx_gKX_MBiXeb'
+        defaultPlaylist: 'PLl-ShioB5kapLuMhLMqdyx_gKX_MBiXeb',
+        celebration: 'confetti'
       },
       grades: [],
       latencies: [],
