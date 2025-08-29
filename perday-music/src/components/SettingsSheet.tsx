@@ -5,8 +5,7 @@ import { Label } from './ui/label';
 import { Switch } from './ui/switch';
 import { Slider } from './ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-<<<<<<< HEAD
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from './ui/sheet';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from './ui/sheet';
 import { Settings, Volume2, Target, Clock, Bell, Sparkles, Trash2 } from 'lucide-react';
 import { useAppStore } from '../store/store';
 
@@ -139,17 +138,6 @@ export default function SettingsSheet({ open, onOpenChange, onSave, currentSetti
               <Bell className="h-4 w-4" />
               Accountability Email
             </Label>
-<<<<<<< HEAD
-            <Input
-              value={settings.accountabilityEmail}
-              onChange={(e) => setLocalSettings(prev => ({ ...prev, accountabilityEmail: e.target.value }))}
-              placeholder="your@email.com"
-              className="bg-black/40 border-cyan-400/40 text-synth-white placeholder:text-synth-icy/50"
-            />
-            <p className="text-xs text-synth-icy/70">
-              Send an email to this person everytime you finish a session!
-            </p>
-=======
           <Input
             value={settings.accountabilityEmail}
             onChange={(e) => setLocalSettings(prev => ({ ...prev, accountabilityEmail: e.target.value }))}
@@ -177,7 +165,6 @@ export default function SettingsSheet({ open, onOpenChange, onSave, currentSetti
                 <SelectItem value="none">None</SelectItem>
               </SelectContent>
             </Select>
->>>>>>> codex/explore-ui-components-for-new-theme
           </div>
 
           {/* Switches */}

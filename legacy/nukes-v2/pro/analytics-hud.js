@@ -44,7 +44,7 @@ export async function bootAnalyticsHud(ctx={}){
 
 function el(tag, attrs={}, parent){ const e=document.createElement(tag); Object.entries(attrs).forEach(([k,v])=>{ if(k==='style'&&typeof v==='object') Object.assign(e.style,v); else if(k in e) e[k]=v; else e.setAttribute(k,v); }); if(parent) parent.appendChild(e); return e; }
 
-export async function bootAnalyticsHud(){ /* charts wired privately */ }
+// export async function bootAnalyticsHud(){ /* charts wired privately */ }
 
 export function rotateVillainAnnounce(kind, opts = {}){
 	const pool = (opts.pool && Array.isArray(opts.pool) ? opts.pool : [

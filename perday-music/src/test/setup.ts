@@ -30,6 +30,47 @@ Object.defineProperty(window, 'localStorage', { value: localStorageMock });
   observe: vi.fn(), unobserve: vi.fn(), disconnect: vi.fn(),
 }));
 
+// Canvas API mocks for tests
+Object.defineProperty(window, 'HTMLCanvasElement', {
+  writable: true,
+  value: {
+    prototype: {
+      getContext: vi.fn(() => ({
+        fillRect: vi.fn(),
+        clearRect: vi.fn(),
+        getImageData: vi.fn(() => ({ data: new Array(4) })),
+        putImageData: vi.fn(),
+        createImageData: vi.fn(() => ({ data: new Array(4) })),
+        setTransform: vi.fn(),
+        drawImage: vi.fn(),
+        save: vi.fn(),
+        fillText: vi.fn(),
+        restore: vi.fn(),
+        beginPath: vi.fn(),
+        moveTo: vi.fn(),
+        lineTo: vi.fn(),
+        closePath: vi.fn(),
+        stroke: vi.fn(),
+        translate: vi.fn(),
+        scale: vi.fn(),
+        rotate: vi.fn(),
+        arc: vi.fn(),
+        fill: vi.fn(),
+        measureText: vi.fn(() => ({ width: 0 })),
+        transform: vi.fn(),
+        rect: vi.fn(),
+        clip: vi.fn(),
+      })),
+    },
+  },
+});
+
+// Mock canvas element
+Object.defineProperty(window, 'CanvasRenderingContext2D', {
+  writable: true,
+  value: vi.fn(),
+});
+
 vi.mock('echarts-for-react', () => ({ default: () => null }));
 
 // Tiny GSAP mock that matches the improved components

@@ -147,7 +147,10 @@ export default function GlassNavigationDock() {
       <SettingsSheet
         open={settingsOpen}
         onOpenChange={setSettingsOpen}
-        currentSettings={settings}
+        currentSettings={{
+          ...settings,
+          celebration: settings.celebration ?? "confetti"
+        }}
         onSave={(newSettings) => {
           setSettings(newSettings);
           setSettingsOpen(false);

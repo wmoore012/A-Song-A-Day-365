@@ -16,7 +16,7 @@ type Props = {
   onSave?: (text: string) => void;
 };
 
-const Notepad = forwardRef<NotepadHandle, Props>(function Notepad({ }, ref) {
+const Notepad = forwardRef<NotepadHandle, Props>(function Notepad(_props, ref) {
   const { session } = useAppStore();
   const [isOpen, setIsOpen] = useState(false);
   const [currentNote, setCurrentNote] = useState("");
