@@ -43,8 +43,6 @@ export default function LockInTips() {
   }, []);
 
   useEffect(() => {
-    if (!isVisible) return;
-
     const tipInterval: ReturnType<typeof setInterval> = setInterval(() => {
       if (isVisible) {
         const randomIndex = Math.floor(Math.random() * LOCK_IN_TIPS.length);
