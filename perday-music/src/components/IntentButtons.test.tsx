@@ -1,3 +1,4 @@
+import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { vi } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
@@ -109,8 +110,6 @@ describe('IntentButtons', () => {
 
   it('applies correct gradient classes to each button', () => {
     renderWithRouter(<IntentButtons />);
-
-    const buttons = screen.getAllByRole('button');
 
     // Check that gradient divs are present with correct classes
     const gradientDivs = screen.getAllByRole('button').map(button =>

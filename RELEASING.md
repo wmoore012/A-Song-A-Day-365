@@ -1,19 +1,36 @@
-# Releasing Pro Code (closed source)
+# Releasing Perday Music 365
 
-This repo uses a closed source model for Pro folders (e.g., `/pro/**`).
+## Licensing Model
 
-// ...existing code...
-- “Change Date” must be ISO `YYYY-MM-DD`.
+This repository uses a dual-licensing approach:
 
-## Set Change Date = 36 months from today
+- **Core Application**: GPL-3.0 (open source) - Everything in `perday-music/src/**` and root level files
+- **Pro Features**: Proprietary (closed source) - Everything in `/pro/**` folders
 
-### macOS (with GNU coreutils) / Linux
-```
-NEW_DATE=$(date -u -d "+36 months" +"%Y-%m-%d" 2>/dev/null || gdate -u -d "+36 months" +"%Y-%m-%d")
-// ...existing code...
-```
+## Core Application (GPL-3.0)
 
-### Cross-platform Node one-liner (use on CI too)
-```
-node -e "const d=new Date(); d.setMonth(d.getMonth()+36); console.log(d.toISOString().slice(0,10))"
-```
+The main application code is licensed under GPL-3.0, which means:
+- ✅ Free to use, modify, and distribute
+- ✅ Must share source code when distributing
+- ✅ Derivative works must also be GPL-3.0
+- ✅ Commercial use allowed with GPL-3.0 compliance
+
+## Pro Features (Proprietary)
+
+Pro features in `/pro/**` folders are proprietary and closed source:
+- ❌ Not included in GPL-3.0 license
+- ❌ Source code not shared
+- ❌ Commercial licensing required for use
+- ✅ Excluded from git via .gitignore
+
+## Release Process
+
+1. **Core Application**: Tag releases with semantic versioning (v1.0.0, v1.1.0, etc.)
+2. **Pro Features**: Released separately under proprietary license
+3. **Documentation**: Update README.md with current licensing information
+
+## Version Management
+
+- Use semantic versioning for core application
+- Pro features have separate versioning scheme
+- Keep licensing information current in all documentation

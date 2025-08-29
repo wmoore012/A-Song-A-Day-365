@@ -69,5 +69,24 @@ cd legacy/nukes-v2
 
 ## License
 
-See [LICENSE](./LICENSE) for details.
+This project uses a dual-licensing approach:
+
+- **Core Application**: GPL-3.0 (open source) - Everything in `perday-music/src/**` and root level files
+- **Pro Features**: Proprietary (closed source) - Everything in `/pro/**` folders
+
+### Core Application (GPL-3.0)
+The main application code is licensed under GPL-3.0, which means:
+- ✅ Free to use, modify, and distribute
+- ✅ Must share source code when distributing
+- ✅ Derivative works must also be GPL-3.0
+- ✅ Commercial use allowed with GPL-3.0 compliance
+
+### Pro Features (Proprietary)
+Pro features in `/pro/**` folders are proprietary and closed source:
+- ❌ Not included in GPL-3.0 license
+- ❌ Source code not shared
+- ❌ Commercial licensing required for use
+- ✅ Excluded from git via .gitignore
+
+See [LICENSE](./LICENSE) for full GPL-3.0 license text.
 

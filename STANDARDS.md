@@ -1,14 +1,5 @@
-Totally—here’s a clean, copy-pasteable STANDARDS.md that captures what we fixed, what to avoid, and the right way to wire things going forward. Drop this in your repo root as STANDARDS.md.
 
-⸻
-
-Perday Frontend Standards
-
-Why this exists
-
-We hit classic “AI-bloat” problems: too many abstractions, duplicated mocks, animation code fighting tests, store hydration gates that never open, and Tailwind v3 vs v4 mismatches. This doc shows what we removed, what we keep, and exactly how to build and test so things stay fast, stable, and shippable.
-
-⸻
+# Philosophy: Think hard. Fail loudly. No silent fallbacks.
 
 Golden Rules
 	1.	Prefer minimal, robust code over flashy abstractions. Micro-motion only; no elaborate timelines in prod or tests.
@@ -18,6 +9,10 @@ Golden Rules
 	5.	Stick to Tailwind v4 conventions. Use @import "tailwindcss"; not the v3 @tailwind base/components/utilities.
 	6.	Forward your refs. Any component that passes ref (Radix + shadcn/ui) must use React.forwardRef.
 	7.	Respect reduced motion + test environments. Skip animations when prefers-reduced-motion or running in tests.
+	8.	Fail loudly: If a required DOM element or precondition is missing in dev, throw an Error or render an obvious error state. Avoid silent returns for required flows.
+	9.	Use explicit helpers like must(selector) to assert critical elements. Keep feature toggles persisted in localStorage with narrow keys.
+	10.	Honor ARIA patterns (e.g., tabs use role=tablist/tab/tabpanel; keep aria-selected synced).
+	11.	Use clear class hooks. Prefer semantic names. Avoid magic selectors. Support reduced motion in CSS, not JS.
 
 ⸻
 
@@ -32,8 +27,9 @@ What we removed (AI bloat detox)
 ⸻
 
 Folder Hygiene
-	•	perday-music/src/** – production app (tests must pass)
+	•	perday-music/src/** – production app (GPL-3.0 licensed, tests must pass)
 	•	legacy/** – experiments + old suites (quarantined; CI must not fail on these)
+	•	pro/** – proprietary features (closed source, excluded from git)
 
 ⸻
 
