@@ -45,21 +45,16 @@ export default function LockInTips() {
   useEffect(() => {
     if (!isVisible) return;
 
-    let tipInterval: ReturnType<typeof setInterval>;
-    let visibilityInterval: ReturnType<typeof setInterval>;
-
-    // Show/hide every 13 seconds
-    visibilityInterval = setInterval(() => {
-      setIsVisible(prev => !prev);
-    }, 13000);
-
-    // Change tip every 45 seconds (only when visible)
-    tipInterval = setInterval(() => {
+    const tipInterval: ReturnType<typeof setInterval> = setInterval(() => {
       if (isVisible) {
         const randomIndex = Math.floor(Math.random() * LOCK_IN_TIPS.length);
         setCurrentTip(randomIndex);
       }
     }, 45000);
+
+    const visibilityInterval: ReturnType<typeof setInterval> = setInterval(() => {
+      setIsVisible(prev => !prev);
+    }, 13000);
 
     return () => {
       if (tipInterval) clearInterval(tipInterval);
